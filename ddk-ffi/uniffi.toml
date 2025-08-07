@@ -1,0 +1,18 @@
+# uniffi.toml
+[bindings.typescript]
+logLevel = "verbose"
+
+[bindings.cpp]
+
+[turbo_module]
+# The name of your Turbo Module as it appears in React Native
+name = "Ddk"
+# The iOS framework name
+ios_framework = "Ddk"
+# The Android package name
+android_package = "dev.bennyhodl.ddk"
+
+[namespace.ddk_ffi]
+# Configuration specific to your ddk_ffi namespace
+# This tells the generator how to handle this particular namespace
+js_module_name = "Ddk"

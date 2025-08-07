@@ -1,0 +1,18 @@
+rust:
+  directory: ../ddk-ffi
+  manifestPath: Cargo.toml
+
+bindings:
+  cpp: cpp
+  ts: src
+
+android:
+  packageName: com.ddkrn
+
+ios:
+  frameworkName: DdkRn
+
+turboModule:
+  cpp: cpp
+  ts: src
+  spec: NativeDdkRn
