@@ -1,12 +1,10 @@
 import { StyleSheet, View, Text } from 'react-native';
-import { multiply } from 'ddk-rn';
-
-const result = multiply(3, 7);
+import { helloWorld } from '@bennyhodl/ddk-rn';
 
 export default function App() {
   return (
     <View style={styles.container}>
-      <Text>Result: {result}</Text>
+      <Text>Result: {helloWorld()}</Text>
     </View>
   );
 }

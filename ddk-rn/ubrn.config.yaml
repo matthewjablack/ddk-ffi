@@ -7,10 +7,15 @@ bindings:
   ts: src
 
 android:
+  directory: android
   packageName: com.ddkrn
 
 ios:
-  frameworkName: DdkRn
+  directory: ios
+  targets:
+    - aarch64-apple-ios
+    - aarch64-apple-ios-sim
+  frameworkName: ios/DdkRn
 
 turboModule:
   cpp: cpp

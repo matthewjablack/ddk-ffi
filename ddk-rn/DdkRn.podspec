@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   s.source       = { :git => "https://github.com/bennyhodl/ddk-ffi.git", :tag => "#{s.version}" }
 
   s.source_files = "ios/**/*.{h,m,mm,swift}", "ios/generated/**/*.{h,m,mm}", "cpp/**/*.{hpp,cpp,c,h}", "cpp/**/*.{hpp,cpp,c,h}"
-  s.vendored_frameworks = "DdkRn.xcframework"
+  s.vendored_frameworks = "ios/DdkRn.xcframework"
   s.dependency    "uniffi-bindgen-react-native", "0.29.3-1"
 
   # Use install_modules_dependencies helper to install the dependencies if React Native version >=0.71.0.

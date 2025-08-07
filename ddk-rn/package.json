@@ -1,5 +1,5 @@
 {
-  "name": "ddk-rn",
+  "name": "@bennyhodl/ddk-rn",
   "version": "0.1.0",
   "description": "rust-dlc bindings for react-native",
   "source": "./src/index.tsx",
@@ -44,11 +44,7 @@
     "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
     "prepare": "bob build",
     "release": "release-it",
-    "uniffi": "uniffi-bindgen-react-native generate jsi bindings --crate ddk-ffi --config ubrn.config.yaml --ts-dir src --cpp-dir cpp ../ddk-ffi/src/ddk_ffi.udl",
-    "uniffi-native": "uniffi-bindgen-react-native generate jsi turbo-module ddk_ffi --config ubrn.config.yaml --native-bindings",
-    "uniffi-build": "uniffi-bindgen-react-native build --config ubrn.config.yaml",
-    "uniffi-all": "pnpm run uniffi && pnpm run uniffi-native && pnpm run uniffi-build",
-    "uniffi-clean": "rm -rf cpp/DdkFFI.* src/DdkFFI.* src/types.ts ios/*.xcframework android/src/main/jniLibs",
+    "uniffi:clean": "rm -rf cpp/DdkFFI.* src/DdkFFI.* src/types.ts ios/*.xcframework android/src/main/jniLibs",
     "example:ios": "pnpm --filter example ios",
     "example:android": "pnpm --filter example android",
     "example:pods": "pnpm --filter example pod-install"
