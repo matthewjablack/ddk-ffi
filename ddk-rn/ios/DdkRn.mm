@@ -15,11 +15,11 @@ namespace uniffi_generated {
     static facebook::jsi::Value __hostFunction_DdkRn_installRustCrate(facebook::jsi::Runtime& rt, TurboModule &turboModule, const facebook::jsi::Value* args, size_t count) {
         auto& tm = static_cast<NativeDdkRnSpecJSI&>(turboModule);
         auto jsInvoker = tm.callInvoker;
-        uint8_t result = ddkrn::installRustCrate(rt, jsInvoker);
+        uint8_t result = bennyhodl_ddkrn::installRustCrate(rt, jsInvoker);
         return facebook::jsi::Value(rt, result);
     }
     static facebook::jsi::Value __hostFunction_DdkRn_cleanupRustCrate(facebook::jsi::Runtime& rt, TurboModule &turboModule, const facebook::jsi::Value* args, size_t count) {
-        uint8_t result = ddkrn::cleanupRustCrate(rt);
+        uint8_t result = bennyhodl_ddkrn::cleanupRustCrate(rt);
         return facebook::jsi::Value(rt, result);
     }
 
@@ -36,11 +36,11 @@ RCT_EXPORT_MODULE()
 // Don't compile this code when we build for the old architecture.
 #ifdef RCT_NEW_ARCH_ENABLED
 
-// Automated testing checks ddkrn
+// Automated testing checks bennyhodl_ddkrn
 // by comparing the whole line here.
 /*
 - (NSNumber *)multiply:(double)a b:(double)b {
-    NSNumber *result = @(ddkrn::multiply(a, b));
+    NSNumber *result = @(bennyhodl_ddkrn::multiply(a, b));
 }
 */
 

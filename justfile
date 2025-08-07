@@ -11,7 +11,7 @@ uniffi-turbo:
     --native-bindings
 
 build-ios:
-  cd {{justfile_directory()}}/ddk-rn && uniffi-bindgen-react-native build ios --and-generate && (cd example/ios && pod install)
+  cd {{justfile_directory()}}/ddk-rn && uniffi-bindgen-react-native build ios --and-generate && (cd example/ios && RCT_NEW_ARCH_ENABLED=1 pod install)
 
 build-android:
   cd {{justfile_directory()}}/ddk-rn && uniffi-bindgen-react-native build android --and-generate && (cd example/android && ./gradlew build)

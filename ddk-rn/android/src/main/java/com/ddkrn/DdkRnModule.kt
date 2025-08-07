@@ -14,7 +14,7 @@ class DdkRnModule(reactContext: ReactApplicationContext) :
   }
 
   // Two native methods implemented in cpp-adapter.cpp, and ultimately
-  // ddk-rn.cpp
+  // bennyhodl-ddk-rn.cpp
 
   external fun nativeInstallRustCrate(runtimePointer: Long, callInvoker: CallInvokerHolder): Boolean
   external fun nativeCleanupRustCrate(runtimePointer: Long): Boolean
@@ -37,7 +37,7 @@ class DdkRnModule(reactContext: ReactApplicationContext) :
     const val NAME = "DdkRn"
 
     init {
-      System.loadLibrary("ddk-rn")
+      System.loadLibrary("bennyhodl-ddk-rn")
     }
   }
 }

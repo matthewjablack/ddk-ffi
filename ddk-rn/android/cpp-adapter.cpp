@@ -2,16 +2,16 @@
 #include <jni.h>
 #include <jsi/jsi.h>
 #include <ReactCommon/CallInvokerHolder.h>
-#include "ddk-rn.h"
+#include "bennyhodl-ddk-rn.h"
 
 namespace jsi = facebook::jsi;
 namespace react = facebook::react;
 
-// Automated testing checks Java_com_ddkrn_DdkRnModule and ddkrn
+// Automated testing checks Java_com_ddkrn_DdkRnModule and bennyhodl_ddkrn
 // by comparing the whole line here.
 /*
 Java_com_ddkrn_DdkRnModule_nativeMultiply(JNIEnv *env, jclass type, jdouble a, jdouble b) {
-    return ddkrn::multiply(a, b);
+    return bennyhodl_ddkrn::multiply(a, b);
 }
 */
 
@@ -52,12 +52,12 @@ Java_com_ddkrn_DdkRnModule_nativeInstallRustCrate(
     auto jsCallInvoker = nativePointer->getCallInvoker();
 
     auto runtime = reinterpret_cast<jsi::Runtime *>(rtPtr);
-    return ddkrn::installRustCrate(*runtime, jsCallInvoker);
+    return bennyhodl_ddkrn::installRustCrate(*runtime, jsCallInvoker);
 }
 
 extern "C"
 JNIEXPORT jboolean JNICALL
 Java_com_ddkrn_DdkRnModule_nativeCleanupRustCrate(JNIEnv *env, jclass type, jlong rtPtr) {
     auto runtime = reinterpret_cast<jsi::Runtime *>(rtPtr);
-    return ddkrn::cleanupRustCrate(*runtime);
+    return bennyhodl_ddkrn::cleanupRustCrate(*runtime);
 }

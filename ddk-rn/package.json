@@ -5,6 +5,7 @@
   "source": "./src/index.tsx",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/module/index.js",
+  "react-native": "./src/index.tsx",
   "exports": {
     ".": {
       "import": {
@@ -184,18 +185,14 @@
   },
   "codegenConfig": {
     "name": "RNDdkRnSpec",
-    "type": "all",
+    "type": "modules",
     "jsSrcsDir": "src",
-    "outputDir": {
-      "ios": "ios/generated",
-      "android": "android/generated"
-    },
     "android": {
       "javaPackageName": "com.ddkrn"
-    },
-    "includesGeneratedCode": true
+    }
   },
   "dependencies": {
+    "@babel/runtime": "^7.20.0",
     "uniffi-bindgen-react-native": "0.29.3-1"
   }
 }
