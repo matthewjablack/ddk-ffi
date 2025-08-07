@@ -2,6 +2,11 @@
 name = "ddk_ffi"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
+description = "rust-dlc language bindings"
+repository = "https://github.com/bennyhodl/ddk-ffi"
+homepage = "https://github.com/bennyhodl/ddk-ffi"
+readme = "README.md"
 
 [lib]
 name = "ddk_ffi"
