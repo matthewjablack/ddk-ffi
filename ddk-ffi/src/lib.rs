@@ -4,6 +4,14 @@ pub fn hello_world() -> String {
     "Hello, World from Rust!".to_string()
 }
 
+pub fn do_the_dlc() -> String {
+    "heyhowareya".to_string()
+}
+
+pub fn lygos() -> String {
+    "lygos".to_string()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

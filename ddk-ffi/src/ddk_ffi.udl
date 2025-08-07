@@ -1,3 +1,5 @@
 namespace ddk_ffi {
     string hello_world();
+    string do_the_dlc();
+    string lygos();
 };

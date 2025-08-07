@@ -49,6 +49,19 @@ const uniffiIsDebug =
   true;
 // Public interface members begin here.
 
+export function doTheDlc(): string {
+  return FfiConverterString.lift(
+    uniffiCaller.rustCall(
+      /*caller:*/ (callStatus) => {
+        return (() => {
+          console.debug(`-- uniffi_ddk_ffi_fn_func_do_the_dlc`);
+          return nativeModule().ubrn_uniffi_ddk_ffi_fn_func_do_the_dlc;
+        })()(callStatus);
+      },
+      /*liftString:*/ FfiConverterString.lift
+    )
+  );
+}
 export function helloWorld(): string {
   return FfiConverterString.lift(
     uniffiCaller.rustCall(
@@ -56,6 +69,19 @@ export function helloWorld(): string {
         return (() => {
           console.debug(`-- uniffi_ddk_ffi_fn_func_hello_world`);
           return nativeModule().ubrn_uniffi_ddk_ffi_fn_func_hello_world;
+        })()(callStatus);
+      },
+      /*liftString:*/ FfiConverterString.lift
+    )
+  );
+}
+export function lygos(): string {
+  return FfiConverterString.lift(
+    uniffiCaller.rustCall(
+      /*caller:*/ (callStatus) => {
+        return (() => {
+          console.debug(`-- uniffi_ddk_ffi_fn_func_lygos`);
+          return nativeModule().ubrn_uniffi_ddk_ffi_fn_func_lygos;
         })()(callStatus);
       },
       /*liftString:*/ FfiConverterString.lift
@@ -110,11 +136,21 @@ function uniffiEnsureInitialized() {
       bindingsContractVersion
     );
   }
+  if (nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_do_the_dlc() !== 58155) {
+    throw new UniffiInternalError.ApiChecksumMismatch(
+      'uniffi_ddk_ffi_checksum_func_do_the_dlc'
+    );
+  }
   if (
     nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_hello_world() !== 13438
   ) {
     throw new UniffiInternalError.ApiChecksumMismatch(
       'uniffi_ddk_ffi_checksum_func_hello_world'
+    );
+  }
+  if (nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_lygos() !== 36696) {
+    throw new UniffiInternalError.ApiChecksumMismatch(
+      'uniffi_ddk_ffi_checksum_func_lygos'
     );
   }
 }

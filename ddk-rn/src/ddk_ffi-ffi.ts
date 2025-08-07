@@ -23,10 +23,18 @@ interface NativeModuleInterface {
     buffer: Uint8Array,
     uniffi_out_err: UniffiRustCallStatus
   ): string;
+  ubrn_uniffi_ddk_ffi_fn_func_do_the_dlc(
+    uniffi_out_err: UniffiRustCallStatus
+  ): Uint8Array;
   ubrn_uniffi_ddk_ffi_fn_func_hello_world(
     uniffi_out_err: UniffiRustCallStatus
   ): Uint8Array;
+  ubrn_uniffi_ddk_ffi_fn_func_lygos(
+    uniffi_out_err: UniffiRustCallStatus
+  ): Uint8Array;
+  ubrn_uniffi_ddk_ffi_checksum_func_do_the_dlc(): number;
   ubrn_uniffi_ddk_ffi_checksum_func_hello_world(): number;
+  ubrn_uniffi_ddk_ffi_checksum_func_lygos(): number;
   ubrn_ffi_ddk_ffi_uniffi_contract_version(): number;
 }
 
