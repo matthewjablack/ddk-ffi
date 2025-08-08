@@ -21,23 +21,14 @@ use std::str::FromStr;
 
 uniffi::include_scaffolding!("ddk_ffi");
 
-pub fn hello_world() -> String {
-    "Hello, World from Rust!".to_string()
-}
-
-pub fn do_the_dlc() -> String {
-    "heyhowareya".to_string()
-}
-
-pub fn lygos() -> String {
-    "lygos".to_string()
+pub fn version() -> String {
+    env!("CARGO_PKG_VERSION").to_string()
 }
 
 /// Minimum value that can be included in a transaction output. Under this value,
 /// outputs are discarded
 /// See: https://github.com/discreetlogcontracts/dlcspecs/blob/master/Transactions.md#change-outputs
 const DUST_LIMIT: Amount = Amount::from_sat(1000);
-
 
 /// The witness size of a P2WPKH input
 /// See: <https://github.com/discreetlogcontracts/dlcspecs/blob/master/Transactions.md#fees>
@@ -740,21 +731,19 @@ pub fn create_cet_adaptor_signature_from_oracle_info(
 mod tests {
     use super::*;
     use bitcoin::locktime::absolute::LockTime;
-    use secp256k1_zkp::rand::{RngCore, thread_rng};
+    use secp256k1_zkp::rand::{thread_rng, RngCore};
     use std::str::FromStr;
-
-    #[test]
-    fn test_hello_world() {
-        let result = hello_world();
-        assert_eq!(result, "Hello, World from Rust!");
-    }
 
     /// Create test keys similar to rust-dlc tests
     fn create_test_keys() -> (SecretKey, PublicKey, SecretKey, PublicKey) {
         let secp = Secp256k1::new();
-        let offer_sk = SecretKey::from_str("0000000000000000000000000000000000000000000000000000000000000001").unwrap();
+        let offer_sk =
+            SecretKey::from_str("0000000000000000000000000000000000000000000000000000000000000001")
+                .unwrap();
         let offer_pk = PublicKey::from_secret_key(&secp, &offer_sk);
-        let accept_sk = SecretKey::from_str("0000000000000000000000000000000000000000000000000000000000000002").unwrap();
+        let accept_sk =
+            SecretKey::from_str("0000000000000000000000000000000000000000000000000000000000000002")
+                .unwrap();
         let accept_pk = PublicKey::from_secret_key(&secp, &accept_sk);
         (offer_sk, offer_pk, accept_sk, accept_pk)
     }
@@ -768,17 +757,17 @@ mod tests {
     ) -> PartyParams {
         let secp = Secp256k1::new();
         let mut rng = thread_rng();
-        
+
         // Create a realistic P2WPKH script
         let mut random_hash = [0u8; 20];
         rng.fill_bytes(&mut random_hash);
         let mut change_script = vec![0x00, 0x14]; // OP_0 + 20 bytes (P2WPKH)
         change_script.extend_from_slice(&random_hash);
-        
+
         rng.fill_bytes(&mut random_hash);
         let mut payout_script = vec![0x00, 0x14]; // OP_0 + 20 bytes (P2WPKH)
         payout_script.extend_from_slice(&random_hash);
-        
+
         PartyParams {
             fund_pubkey,
             change_script_pubkey: change_script,
@@ -786,7 +775,8 @@ mod tests {
             payout_script_pubkey: payout_script,
             payout_serial_id: serial_id + 2,
             inputs: vec![TxInputInfo {
-                txid: "5df6e0e2761359d30a8275058e299fcc0381534545f55cf43e41983f5d4c9456".to_string(),
+                txid: "5df6e0e2761359d30a8275058e299fcc0381534545f55cf43e41983f5d4c9456"
+                    .to_string(),
                 vout: serial_id as u32,
                 script_sig: vec![],
                 max_witness_length: 108,
@@ -801,81 +791,85 @@ mod tests {
     #[test]
     fn test_create_fund_tx_locking_script_matches_rust_dlc() {
         let (_offer_sk, offer_pk, _accept_sk, accept_pk) = create_test_keys();
-        
+
         // Test our wrapper
         let wrapper_result = create_fund_tx_locking_script(
             offer_pk.serialize().to_vec(),
             accept_pk.serialize().to_vec(),
-        ).unwrap();
-        
+        )
+        .unwrap();
+
         // Compare with direct rust-dlc call
         let direct_result = dlc::make_funding_redeemscript(&offer_pk, &accept_pk);
-        
+
         assert_eq!(wrapper_result, direct_result.to_bytes());
     }
 
     #[test]
     fn test_get_change_output_and_fees_wrapper() {
         let (_offer_sk, offer_pk, _accept_sk, _accept_pk) = create_test_keys();
-        
+
         let params = create_test_party_params(
             150_000_000, // 1.5 BTC input
-            100_000_000, // 1 BTC collateral  
+            100_000_000, // 1 BTC collateral
             offer_pk.serialize().to_vec(),
             1,
         );
-        
+
         let result = get_change_output_and_fees(params.clone(), 4);
         assert!(result.is_ok());
-        
+
         let change_and_fees = result.unwrap();
-        
+
         // Verify we get reasonable values
         assert!(change_and_fees.fund_fee > 0);
         assert!(change_and_fees.cet_fee > 0);
         assert!(change_and_fees.change_output.value > 0);
-        
+
         // Compare with direct rust-dlc call
         let rust_params = party_params_to_rust(&params).unwrap();
         let total_collateral = Amount::from_sat(params.collateral * 2);
         let direct_result = rust_params
             .get_change_output_and_fees(total_collateral, 4, Amount::ZERO)
             .unwrap();
-            
+
         assert_eq!(change_and_fees.fund_fee, direct_result.1.to_sat());
         assert_eq!(change_and_fees.cet_fee, direct_result.2.to_sat());
-        assert_eq!(change_and_fees.change_output.value, direct_result.0.value.to_sat());
+        assert_eq!(
+            change_and_fees.change_output.value,
+            direct_result.0.value.to_sat()
+        );
     }
 
     #[test]
     fn test_create_dlc_transactions_wrapper() {
         let (_offer_sk, offer_pk, _accept_sk, accept_pk) = create_test_keys();
-        
+
         let offer_params = create_test_party_params(
             1_000_000_000, // 10 BTC input
             100_000_000,   // 1 BTC collateral
             offer_pk.serialize().to_vec(),
             1,
         );
-        
+
         let accept_params = create_test_party_params(
-            1_000_000_000, // 10 BTC input  
+            1_000_000_000, // 10 BTC input
             100_000_000,   // 1 BTC collateral
             accept_pk.serialize().to_vec(),
             2,
         );
-        
+
         let outcomes = vec![
             DlcOutcome {
-                local_payout: 200_000_000,  // 2 BTC to offer
-                remote_payout: 0,           // 0 BTC to accept
+                local_payout: 200_000_000, // 2 BTC to offer
+                remote_payout: 0,          // 0 BTC to accept
             },
             DlcOutcome {
                 local_payout: 0,            // 0 BTC to offer
                 remote_payout: 200_000_000, // 2 BTC to accept
             },
         ];
-        
+
         let result = create_dlc_transactions(
             outcomes,
             offer_params,
@@ -886,43 +880,49 @@ mod tests {
             10,  // cet lock time
             0,   // fund output serial id
         );
-        
+
         assert!(result.is_ok());
         let dlc_txs = result.unwrap();
-        
+
         // Verify structure
         assert_eq!(dlc_txs.fund.lock_time, 10);
         assert_eq!(dlc_txs.refund.lock_time, 100);
         assert_eq!(dlc_txs.cets.len(), 2);
         assert!(dlc_txs.cets.iter().all(|cet| cet.lock_time == 10));
-        
+
         // Verify funding transaction has correct structure
         assert_eq!(dlc_txs.fund.inputs.len(), 2); // Two parties contributing
-        assert!(dlc_txs.fund.outputs.len() >= 1);  // At least funding output
-        
+        assert!(dlc_txs.fund.outputs.len() >= 1); // At least funding output
+
         // Verify CETs have correct structure
         for cet in &dlc_txs.cets {
-            assert_eq!(cet.inputs.len(), 1);  // Single funding input
-            assert!(cet.outputs.len() >= 1);  // At least one output (dust may be filtered)
+            assert_eq!(cet.inputs.len(), 1); // Single funding input
+            assert!(cet.outputs.len() >= 1); // At least one output (dust may be filtered)
         }
-        
+
         // Verify refund transaction
-        assert_eq!(dlc_txs.refund.inputs.len(), 1);  // Single funding input
-        assert!(dlc_txs.refund.outputs.len() >= 2);  // At least two refund outputs
+        assert_eq!(dlc_txs.refund.inputs.len(), 1); // Single funding input
+        assert!(dlc_txs.refund.outputs.len() >= 2); // At least two refund outputs
     }
 
     #[test]
     fn test_create_cet_wrapper() {
         let local_output = TxOutput {
             value: 100_000_000, // 1 BTC
-            script_pubkey: vec![0x00, 0x14, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14],
+            script_pubkey: vec![
+                0x00, 0x14, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c,
+                0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14,
+            ],
         };
-        
+
         let remote_output = TxOutput {
             value: 100_000_000, // 1 BTC
-            script_pubkey: vec![0x00, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28],
+            script_pubkey: vec![
+                0x00, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20,
+                0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28,
+            ],
         };
-        
+
         let result = create_cet(
             local_output,
             1,
@@ -932,10 +932,10 @@ mod tests {
             0,
             10,
         );
-        
+
         assert!(result.is_ok());
         let cet = result.unwrap();
-        
+
         assert_eq!(cet.lock_time, 10);
         assert_eq!(cet.inputs.len(), 1);
         assert_eq!(cet.outputs.len(), 2);
@@ -945,9 +945,15 @@ mod tests {
 
     #[test]
     fn test_create_refund_transaction_wrapper() {
-        let local_script = vec![0x00, 0x14, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14];
-        let remote_script = vec![0x00, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28];
-        
+        let local_script = vec![
+            0x00, 0x14, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c,
+            0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14,
+        ];
+        let remote_script = vec![
+            0x00, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20,
+            0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28,
+        ];
+
         let result = create_refund_transaction(
             local_script,
             remote_script,
@@ -957,10 +963,10 @@ mod tests {
             "0000000000000000000000000000000000000000000000000000000000000000".to_string(),
             0,
         );
-        
+
         assert!(result.is_ok());
         let refund_tx = result.unwrap();
-        
+
         assert_eq!(refund_tx.lock_time, 144);
         assert_eq!(refund_tx.inputs.len(), 1);
         assert_eq!(refund_tx.outputs.len(), 2);
@@ -974,33 +980,29 @@ mod tests {
             value: 500, // Below dust limit
             script_pubkey: vec![],
         };
-        
+
         let non_dust_output = TxOutput {
             value: 5000, // Above dust limit
             script_pubkey: vec![],
         };
-        
+
         assert!(is_dust_output(dust_output));
         assert!(!is_dust_output(non_dust_output));
     }
 
-    #[test] 
+    #[test]
     fn test_conversion_functions() {
         let (_offer_sk, offer_pk, _accept_sk, accept_pk) = create_test_keys();
-        
+
         // Test party params conversion
-        let params = create_test_party_params(
-            100_000_000,
-            50_000_000,
-            offer_pk.serialize().to_vec(),
-            1,
-        );
-        
+        let params =
+            create_test_party_params(100_000_000, 50_000_000, offer_pk.serialize().to_vec(), 1);
+
         let rust_params = party_params_to_rust(&params).unwrap();
         assert_eq!(rust_params.fund_pubkey, offer_pk);
         assert_eq!(rust_params.input_amount, Amount::from_sat(100_000_000));
         assert_eq!(rust_params.collateral, Amount::from_sat(50_000_000));
-        
+
         // Test TX input conversion
         let tx_input = TxInputInfo {
             txid: "5df6e0e2761359d30a8275058e299fcc0381534545f55cf43e41983f5d4c9456".to_string(),
@@ -1009,7 +1011,7 @@ mod tests {
             max_witness_length: 108,
             serial_id: 1,
         };
-        
+
         let rust_input = tx_input_info_to_rust(&tx_input).unwrap();
         assert_eq!(rust_input.serial_id, 1);
         assert_eq!(rust_input.max_witness_len, 108);
@@ -1024,7 +1026,10 @@ mod tests {
             lock_time: LockTime::from_consensus(144),
             input: vec![TxIn {
                 previous_output: OutPoint {
-                    txid: Txid::from_str("5df6e0e2761359d30a8275058e299fcc0381534545f55cf43e41983f5d4c9456").unwrap(),
+                    txid: Txid::from_str(
+                        "5df6e0e2761359d30a8275058e299fcc0381534545f55cf43e41983f5d4c9456",
+                    )
+                    .unwrap(),
                     vout: 0,
                 },
                 script_sig: ScriptBuf::new(),
@@ -1036,17 +1041,20 @@ mod tests {
                 script_pubkey: ScriptBuf::from(vec![0x00, 0x14]),
             }],
         };
-        
+
         // Convert to UniFFI format and back
         let uniffi_tx = btc_tx_to_transaction(&btc_tx);
         let converted_back = transaction_to_btc_tx(&uniffi_tx).unwrap();
-        
+
         // Verify they're equivalent
         assert_eq!(btc_tx.version, converted_back.version);
         assert_eq!(btc_tx.lock_time, converted_back.lock_time);
         assert_eq!(btc_tx.input.len(), converted_back.input.len());
         assert_eq!(btc_tx.output.len(), converted_back.output.len());
-        assert_eq!(btc_tx.input[0].previous_output, converted_back.input[0].previous_output);
+        assert_eq!(
+            btc_tx.input[0].previous_output,
+            converted_back.input[0].previous_output
+        );
         assert_eq!(btc_tx.output[0].value, converted_back.output[0].value);
     }
 
@@ -1058,12 +1066,18 @@ mod tests {
             vec![1u8; 33],
         );
         assert!(matches!(result, Err(DLCError::InvalidPublicKey)));
-        
+
         // Test invalid txid
         let result = create_cet(
-            TxOutput { value: 1000, script_pubkey: vec![] },
+            TxOutput {
+                value: 1000,
+                script_pubkey: vec![],
+            },
             1,
-            TxOutput { value: 1000, script_pubkey: vec![] },
+            TxOutput {
+                value: 1000,
+                script_pubkey: vec![],
+            },
             2,
             "invalid_txid".to_string(),
             0,

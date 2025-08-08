@@ -1,12 +1,10 @@
 import { StyleSheet, View, Text } from 'react-native';
-import { helloWorld, doTheDlc, lygos } from '@bennyhodl/ddk-rn';
+import { version } from '@bennyhodl/ddk-rn';
 
 export default function App() {
   return (
     <View style={styles.container}>
-      <Text>Result: {helloWorld()}</Text>
-      <Text>Result: {doTheDlc()}</Text>
-      <Text>Result: {lygos()}</Text>
+      <Text><code>@bennyhodl/ddk-rn version</code>: {version()}</Text>
     </View>
   );
 }

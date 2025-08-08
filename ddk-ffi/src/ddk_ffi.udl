@@ -1,8 +1,5 @@
 namespace ddk_ffi {
-    // Demo functions
-    string hello_world();
-    string do_the_dlc();
-    string lygos();
+    string version();
     
     // DLC Transaction Creation Functions
     [Throws=DLCError]

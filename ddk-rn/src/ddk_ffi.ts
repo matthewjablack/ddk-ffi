@@ -296,19 +296,6 @@ export function createSplicedDlcTransactions(
     )
   );
 }
-export function doTheDlc(): string {
-  return FfiConverterString.lift(
-    uniffiCaller.rustCall(
-      /*caller:*/ (callStatus) => {
-        return (() => {
-          console.debug(`-- uniffi_ddk_ffi_fn_func_do_the_dlc`);
-          return nativeModule().ubrn_uniffi_ddk_ffi_fn_func_do_the_dlc;
-        })()(callStatus);
-      },
-      /*liftString:*/ FfiConverterString.lift
-    )
-  );
-}
 export function getChangeOutputAndFees(
   params: PartyParams,
   feeRate: /*u64*/ bigint
@@ -379,19 +366,6 @@ export function getTotalInputVsize(inputs: Array<TxInputInfo>): /*u32*/ number {
     )
   );
 }
-export function helloWorld(): string {
-  return FfiConverterString.lift(
-    uniffiCaller.rustCall(
-      /*caller:*/ (callStatus) => {
-        return (() => {
-          console.debug(`-- uniffi_ddk_ffi_fn_func_hello_world`);
-          return nativeModule().ubrn_uniffi_ddk_ffi_fn_func_hello_world;
-        })()(callStatus);
-      },
-      /*liftString:*/ FfiConverterString.lift
-    )
-  );
-}
 export function isDustOutput(output: TxOutput): boolean {
   return FfiConverterBool.lift(
     uniffiCaller.rustCall(
@@ -400,19 +374,6 @@ export function isDustOutput(output: TxOutput): boolean {
           console.debug(`-- uniffi_ddk_ffi_fn_func_is_dust_output`);
           return nativeModule().ubrn_uniffi_ddk_ffi_fn_func_is_dust_output;
         })()(FfiConverterTypeTxOutput.lower(output), callStatus);
-      },
-      /*liftString:*/ FfiConverterString.lift
-    )
-  );
-}
-export function lygos(): string {
-  return FfiConverterString.lift(
-    uniffiCaller.rustCall(
-      /*caller:*/ (callStatus) => {
-        return (() => {
-          console.debug(`-- uniffi_ddk_ffi_fn_func_lygos`);
-          return nativeModule().ubrn_uniffi_ddk_ffi_fn_func_lygos;
-        })()(callStatus);
       },
       /*liftString:*/ FfiConverterString.lift
     )
@@ -477,6 +438,19 @@ export function verifyFundTxSignature(
           FfiConverterUInt64.lower(inputAmount),
           callStatus
         );
+      },
+      /*liftString:*/ FfiConverterString.lift
+    )
+  );
+}
+export function version(): string {
+  return FfiConverterString.lift(
+    uniffiCaller.rustCall(
+      /*caller:*/ (callStatus) => {
+        return (() => {
+          console.debug(`-- uniffi_ddk_ffi_fn_func_version`);
+          return nativeModule().ubrn_uniffi_ddk_ffi_fn_func_version;
+        })()(callStatus);
       },
       /*liftString:*/ FfiConverterString.lift
     )
@@ -1695,11 +1669,6 @@ function uniffiEnsureInitialized() {
       'uniffi_ddk_ffi_checksum_func_create_spliced_dlc_transactions'
     );
   }
-  if (nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_do_the_dlc() !== 58155) {
-    throw new UniffiInternalError.ApiChecksumMismatch(
-      'uniffi_ddk_ffi_checksum_func_do_the_dlc'
-    );
-  }
   if (
     nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_get_change_output_and_fees() !==
     44150
@@ -1725,22 +1694,10 @@ function uniffiEnsureInitialized() {
     );
   }
   if (
-    nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_hello_world() !== 13438
-  ) {
-    throw new UniffiInternalError.ApiChecksumMismatch(
-      'uniffi_ddk_ffi_checksum_func_hello_world'
-    );
-  }
-  if (
     nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_is_dust_output() !== 64174
   ) {
     throw new UniffiInternalError.ApiChecksumMismatch(
       'uniffi_ddk_ffi_checksum_func_is_dust_output'
-    );
-  }
-  if (nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_lygos() !== 36696) {
-    throw new UniffiInternalError.ApiChecksumMismatch(
-      'uniffi_ddk_ffi_checksum_func_lygos'
     );
   }
   if (
@@ -1757,6 +1714,11 @@ function uniffiEnsureInitialized() {
   ) {
     throw new UniffiInternalError.ApiChecksumMismatch(
       'uniffi_ddk_ffi_checksum_func_verify_fund_tx_signature'
+    );
+  }
+  if (nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_version() !== 22317) {
+    throw new UniffiInternalError.ApiChecksumMismatch(
+      'uniffi_ddk_ffi_checksum_func_version'
     );
   }
 }
