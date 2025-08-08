@@ -41,25 +41,96 @@ When making changes to `src/lib.rs` or `src/ddk_ffi.udl`, you MUST:
 
 ### Release Process
 
-After creating a git tag for a release:
+#### Automated Release (Recommended)
 
-5. **Push to GitHub**: Push both commits and tags to GitHub
-
+5. **Update Rust version only**: Update version in Cargo.toml
    ```bash
+   # Update Rust crate version to match package.json
+   vim ddk-ffi/Cargo.toml  # Change version = "0.1.1" to "0.1.2"
+   ```
+
+6. **Regenerate bindings**: Run `just uniffi` to update version in generated bindings
+   ```bash
+   just uniffi
+   # Fix include path as usual
+   sed -i '' 's|#include "/ddk_ffi.hpp"|#include "ddk_ffi.hpp"|' ddk-rn/cpp/bennyhodl-ddk-rn.cpp
+   ```
+
+7. **Commit Rust version change**: Commit the Rust version bump
+   ```bash
+   git add .
+   git commit -m "chore: sync Rust version with package.json"
+   ```
+
+8. **Automated release with npm publishing**: Use release-it for everything else
+   ```bash
+   cd ddk-rn
+   
+   # Authenticate with npm (first time only)
+   npm login
+   
+   # Run automated release (handles versioning, tagging, GitHub release, npm publish)
+   pnpm release
+   ```
+
+This will automatically:
+- Prompt for version bump in package.json
+- Build the library with react-native-builder-bob
+- Create git tag and GitHub release
+- Publish to npm registry
+- Generate conventional changelog
+
+#### Manual Release (If needed)
+
+Alternatively, you can do it manually:
+
+5. **Update Version Numbers**: Update version in both package manifests
+   ```bash
+   # Update Rust crate version
+   vim ddk-ffi/Cargo.toml  # Change version = "0.1.1" to "0.1.2"
+   
+   # Update React Native package version  
+   vim ddk-rn/package.json  # Change "version": "0.1.1" to "0.1.2"
+   ```
+
+6. **Regenerate bindings**: Run `just uniffi` to update version in generated bindings
+   ```bash
+   just uniffi
+   sed -i '' 's|#include "/ddk_ffi.hpp"|#include "ddk_ffi.hpp"|' ddk-rn/cpp/bennyhodl-ddk-rn.cpp
+   ```
+
+7. **Build and test package**: Verify the npm package builds correctly
+   ```bash
+   cd ddk-rn
+   pnpm prepare  # Build with react-native-builder-bob
+   npm pack --dry-run  # Preview what will be published
+   ```
+
+8. **Commit version changes**: Include version bumps in the release commit
+   ```bash
+   git add .
+   git commit -m "chore: bump version to v<version>"
+   ```
+
+9. **Create and push tag**: Create git tag and push to GitHub
+   ```bash
+   git tag -a v<version> -m "Release v<version>: <description>"
    git push origin master
    git push origin --tags
    ```
 
-6. **Create GitHub Release**: Use GitHub CLI to create a release with source code
-   ```bash
-   gh release create v<version> --generate-notes --title "Release v<version>: <title>"
-   ```
-   Example:
-   ```bash
-   gh release create v0.1.1 --generate-notes --title "Release v0.1.1: Complete DLC functionality"
-   ```
+10. **Publish to npm**: Publish the package
+    ```bash
+    cd ddk-rn
+    npm publish
+    ```
 
-### Complete Development Cycle
+11. **Create GitHub Release**: Use GitHub CLI to create a release
+    ```bash
+    gh release create v<version> --generate-notes --title "Release v<version>: <title>"
+    ```
+
+### Complete Development Cycle (Automated)
 
 ```bash
 # 1. Make changes to Rust code
@@ -74,20 +145,36 @@ just uniffi
 # 4. Fix include path
 sed -i '' 's|#include "/ddk_ffi.hpp"|#include "ddk_ffi.hpp"|' ddk-rn/cpp/bennyhodl-ddk-rn.cpp
 
-# 5. Commit everything together (from project root)
+# 5. Commit feature changes
 git add .
 git commit -m "feat: description of changes"
 
-# 6. Create tag
-git tag -a v<version> -m "Release notes"
+# 6. Update Rust version to match package.json
+vim ddk-ffi/Cargo.toml    # Update version = "0.1.2" (match package.json)
 
-# 7. Push to GitHub
-git push origin master
-git push origin --tags
+# 7. Regenerate bindings with new version
+just uniffi
+sed -i '' 's|#include "/ddk_ffi.hpp"|#include "ddk_ffi.hpp"|' ddk-rn/cpp/bennyhodl-ddk-rn.cpp
 
-# 8. Create GitHub release
-gh release create v<version> --generate-notes --title "Release v<version>: <title>"
+# 8. Commit Rust version sync
+git add .
+git commit -m "chore: sync Rust version with package.json"
+
+# 9. Automated release with npm publishing
+cd ddk-rn
+npm login  # First time only
+pnpm release  # Handles everything: versioning, tagging, GitHub release, npm publish
 ```
+
+### What `pnpm release` does automatically:
+- Prompts for version bump (patch, minor, major)
+- Updates package.json version
+- Builds library with react-native-builder-bob
+- Generates conventional changelog
+- Creates git commit and tag
+- Pushes to GitHub
+- Creates GitHub release
+- Publishes to npm registry
 
 ### Why This Matters
 
@@ -150,7 +237,24 @@ Ask these questions for every change:
 3. **Could this be contributed to rust-dlc instead?** → Consider upstream contribution
 4. **Am I generating bindings after Rust changes?** → Always required
 
+## NPM Publishing Setup
+
+### First Time Setup
+Before you can publish to npm, you need:
+
+1. **npm account**: Create account at https://www.npmjs.com/
+2. **Access to @bennyhodl scope**: Ensure you have publish permissions
+3. **Authentication**: Run `npm login` in the `ddk-rn/` directory
+4. **Verify access**: Test with `npm whoami` and `npm access ls-packages @bennyhodl`
+
+### Publishing Requirements
+- Package builds successfully with `pnpm prepare`
+- All tests pass with `pnpm test`
+- Version in `package.json` is higher than published version
+- Git working tree is clean
+
 ## Memory
 
 - **CRITICAL**: Always run `just uniffi` and fix the include path before committing changes to `.udl` or `.rs` files
 - **PRINCIPLE**: This is a pure wrapper - delegate to rust-dlc, never reimplement
+- **RELEASES**: Use `pnpm release` for automated npm publishing with proper versioning
