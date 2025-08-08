@@ -65,7 +65,16 @@ When making changes to `src/lib.rs` or `src/ddk_ffi.udl`, you MUST:
    git commit -m "chore: sync Rust version with package.json"
    ```
 
-8. **Automated release with npm publishing**: Use release-it for everything else
+8. **Create binary archives**: Generate tarballs for GitHub release
+
+   ```bash
+   cd ddk-rn
+   
+   # Create binary archives (android-jni-libs.tar.gz, ios-xcframeworks.tar.gz)
+   pnpm create-archives
+   ```
+
+9. **Automated release with npm publishing**: Use release-it for everything else
 
    ```bash
    cd ddk-rn
@@ -76,6 +85,13 @@ When making changes to `src/lib.rs` or `src/ddk_ffi.udl`, you MUST:
    # Run automated release (handles versioning, tagging, GitHub release, npm publish)
    pnpm release
    ```
+
+10. **Upload binary archives**: After the GitHub release is created, upload the archives
+
+    ```bash
+    # Upload the generated archives to the GitHub release
+    gh release upload v<version> ../release-archives/android-jni-libs.tar.gz ../release-archives/ios-xcframeworks.tar.gz
+    ```
 
 This will automatically:
 
@@ -171,10 +187,17 @@ sed -i '' 's|#include "/ddk_ffi.hpp"|#include "ddk_ffi.hpp"|' ddk-rn/cpp/bennybl
 git add .
 git commit -m "chore: sync Rust version with package.json"
 
-# 9. Automated release with npm publishing
+# 9. Create binary archives
+cd ddk-rn
+pnpm create-archives  # Generate android-jni-libs.tar.gz and ios-xcframeworks.tar.gz
+
+# 10. Automated release with npm publishing
 cd ddk-rn
 npm login  # First time only
 pnpm release  # Handles everything: versioning, tagging, GitHub release, npm publish
+
+# 11. Upload binary archives to GitHub release
+gh release upload v<version> ../release-archives/android-jni-libs.tar.gz ../release-archives/ios-xcframeworks.tar.gz
 ```
 
 ### What `pnpm release` does automatically:

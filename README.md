@@ -16,9 +16,10 @@ A React Native library that provides complete DLC transaction functionality thro
 - **React Native 0.75+**: Optimized for the new architecture with TurboModules
 
 ### 🔥 DLC Capabilities
+
 - **Transaction Creation**: Funding, CET, and refund transaction generation
 - **Adaptor Signatures**: Oracle-based conditional execution
-- **Fee Management**: Intelligent fee calculation and dust handling  
+- **Fee Management**: Intelligent fee calculation and dust handling
 - **Multi-Party Support**: Full support for complex DLC scenarios
 - **Signing & Verification**: Complete cryptographic operations
 
@@ -38,22 +39,24 @@ pnpm add @bennyblader/ddk-rn
 ### Platform Setup
 
 #### iOS
+
 ```bash
 cd ios && pod install
 ```
 
 #### Android
+
 No additional setup required - native libraries are included.
 
 ## 🚀 Quick Start
 
 ```typescript
-import { 
-  createDlcTransactions, 
+import {
+  createDlcTransactions,
   createFundTxLockingScript,
   DlcOutcome,
-  PartyParams 
-} from '@bennyblader/ddk-rn';
+  PartyParams,
+} from "@bennyblader/ddk-rn";
 
 // Initialize DLC parties
 const localParams: PartyParams = {
@@ -64,15 +67,15 @@ const localParams: PartyParams = {
   payoutSerialId: 2n,
   inputs: localInputs,
   inputAmount: 1000000n, // 0.01 BTC in sats
-  collateral: 500000n,   // 0.005 BTC in sats
-  dlcInputs: []
+  collateral: 500000n, // 0.005 BTC in sats
+  dlcInputs: [],
 };
 
 // Define contract outcomes
 const outcomes: DlcOutcome[] = [
-  { localPayout: 1000000n, remotePayout: 0n },      // Local wins
-  { localPayout: 500000n, remotePayout: 500000n },  // Split
-  { localPayout: 0n, remotePayout: 1000000n }       // Remote wins
+  { localPayout: 1000000n, remotePayout: 0n }, // Local wins
+  { localPayout: 500000n, remotePayout: 500000n }, // Split
+  { localPayout: 0n, remotePayout: 1000000n }, // Remote wins
 ];
 
 // Create complete DLC transaction set
@@ -81,20 +84,20 @@ try {
     outcomes,
     localParams,
     remoteParams,
-    144,        // refund locktime (blocks)
-    2n,         // fee rate (sat/vB)
-    0,          // fund lock time
-    0,          // CET lock time
-    0n          // fund output serial ID
+    144, // refund locktime (blocks)
+    2n, // fee rate (sat/vB)
+    0, // fund lock time
+    0, // CET lock time
+    0n // fund output serial ID
   );
-  
-  console.log('✅ DLC transactions created:', {
+
+  console.log("✅ DLC transactions created:", {
     funding: dlcTxs.fund.rawBytes.length,
     cets: dlcTxs.cets.length,
-    refund: dlcTxs.refund.rawBytes.length
+    refund: dlcTxs.refund.rawBytes.length,
   });
 } catch (error) {
-  console.error('❌ DLC creation failed:', error);
+  console.error("❌ DLC creation failed:", error);
 }
 ```
 
@@ -103,37 +106,47 @@ try {
 ### Core Transaction Functions
 
 #### `createDlcTransactions(outcomes, localParams, remoteParams, refundLocktime, feeRate, fundLockTime, cetLockTime, fundOutputSerialId)`
+
 Creates a complete set of DLC transactions (funding, CETs, refund).
 
 #### `createFundTxLockingScript(localFundPubkey, remoteFundPubkey)`
+
 Generates the multisig locking script for the funding transaction.
 
 #### `createCets(fundTxId, fundVout, localScript, remoteScript, outcomes, lockTime, localSerialId, remoteSerialId)`
+
 Creates multiple Contract Execution Transactions for different outcomes.
 
 #### `createRefundTransaction(localScript, remoteScript, localAmount, remoteAmount, lockTime, fundTxId, fundVout)`
+
 Creates a refund transaction with CSV timelock.
 
 ### Signing Functions
 
 #### `signFundTransactionInput(fundTx, privkey, prevTxId, prevTxVout, value)`
+
 Signs a funding transaction input with the provided private key.
 
 #### `verifyFundTxSignature(fundTx, signature, pubkey, txid, vout, inputAmount)`
+
 Verifies a signature on a funding transaction input.
 
 #### `createCetAdaptorSignatureFromOracleInfo(cet, oracleInfo, fundingSk, fundingScript, totalCollateral, msgs)`
+
 Creates adaptor signatures for oracle-based contract execution.
 
 ### Utility Functions
 
 #### `getChangeOutputAndFees(params, feeRate)`
+
 Calculates change outputs and fee requirements for a party.
 
 #### `isDustOutput(output)`
+
 Checks if a transaction output is below the dust threshold.
 
 #### `getTotalInputVsize(inputs)`
+
 Calculates the virtual size of inputs for fee estimation.
 
 ### Error Handling
@@ -141,24 +154,46 @@ Calculates the virtual size of inputs for fee estimation.
 All functions return detailed error information:
 
 ```typescript
-import { DLCError } from '@bennyblader/ddk-rn';
+import { DLCError } from "@bennyblader/ddk-rn";
 
 try {
   const result = createDlcTransactions(/* ... */);
 } catch (error) {
   if (error instanceof DLCError) {
     switch (error.message) {
-      case 'InvalidPublicKey':
-        console.log('Invalid public key provided');
+      case "InvalidPublicKey":
+        console.log("Invalid public key provided");
         break;
-      case 'InsufficientFunds':
-        console.log('Not enough funds for transaction');
+      case "InsufficientFunds":
+        console.log("Not enough funds for transaction");
         break;
       default:
-        console.log('DLC error:', error.message);
+        console.log("DLC error:", error.message);
     }
   }
 }
+```
+
+## 📁 Project Structure
+
+```
+.
+├── ddk-ffi/                 # Rust crate with UniFFI definitions
+│   ├── src/
+│   │   ├── lib.rs          # Rust implementation
+│   │   └── ddk_ffi.udl     # UniFFI interface definitions
+│   ├── Cargo.toml
+│   └── uniffi.toml         # UniFFI configuration for Kotlin/Swift
+│
+├── ddk-rn/                  # React Native library
+│   ├── src/                # Generated TypeScript bindings
+│   ├── cpp/                # Generated C++ bindings for JSI
+│   ├── ios/                # iOS native module
+│   ├── android/            # Android native module
+│   ├── example/            # Example React Native app
+│   └── ubrn.config.yaml    # UniFFI React Native configuration
+│
+└── justfile                 # Build automation commands
 ```
 
 ## 🏗️ Architecture
@@ -185,8 +220,9 @@ This library uses a **pure wrapper approach** around the [rust-dlc](https://gith
 ## 🧪 Example Usage Patterns
 
 ### Complete DLC Flow
+
 ```typescript
-import { 
+import {
   createDlcTransactions,
   signFundTransactionInput,
   createCetAdaptorSignatureFromOracleInfo,
@@ -200,18 +236,18 @@ const dlcTxs = createDlcTransactions(outcomes, localParams, remoteParams, ...);
 
 // 2. Sign funding transaction
 const signedFundTx = signFundTransactionInput(
-  dlcTxs.fund, 
-  privateKey, 
-  inputTxId, 
-  inputVout, 
+  dlcTxs.fund,
+  privateKey,
+  inputTxId,
+  inputVout,
   inputValue
 );
 
 // 3. Create adaptor signatures for CETs
-const adaptorSigs = dlcTxs.cets.map(cet => 
+const adaptorSigs = dlcTxs.cets.map(cet =>
   createCetAdaptorSignatureFromOracleInfo(
-    cet, 
-    oracleInfo, 
+    cet,
+    oracleInfo,
     fundingPrivkey,
     dlcTxs.fundingScriptPubkey,
     totalCollateral,
@@ -221,27 +257,31 @@ const adaptorSigs = dlcTxs.cets.map(cet =>
 ```
 
 ### Fee Estimation
+
 ```typescript
-import { getChangeOutputAndFees, getTotalInputVsize } from '@bennyblader/ddk-rn';
+import {
+  getChangeOutputAndFees,
+  getTotalInputVsize,
+} from "@bennyblader/ddk-rn";
 
 // Calculate fees and change
 const feeInfo = getChangeOutputAndFees(partyParams, 2n); // 2 sat/vB
 
-console.log('💰 Fee breakdown:', {
+console.log("💰 Fee breakdown:", {
   fundingFee: feeInfo.fundFee,
   cetFee: feeInfo.cetFee,
-  changeAmount: feeInfo.changeOutput.value
+  changeAmount: feeInfo.changeOutput.value,
 });
 
 // Estimate input size for fee calculation
 const inputSize = getTotalInputVsize(inputs);
-console.log('📏 Input vsize:', inputSize, 'vBytes');
+console.log("📏 Input vsize:", inputSize, "vBytes");
 ```
 
 ## ⚡ Performance
 
 - **Zero-copy operations** via React Native JSI
-- **Rust-level performance** for cryptographic operations  
+- **Rust-level performance** for cryptographic operations
 - **Minimal overhead** type conversions
 - **Synchronous execution** - no promise overhead for core operations
 
@@ -250,6 +290,7 @@ console.log('📏 Input vsize:', inputSize, 'vBytes');
 Want to contribute or modify this library? See our comprehensive development guide:
 
 ### Prerequisites
+
 - **Rust** (latest stable)
 - **Node.js** 18+ and **pnpm**
 - **React Native development environment**
@@ -259,39 +300,43 @@ Want to contribute or modify this library? See our comprehensive development gui
 ### Development Workflow
 
 1. **Clone and setup**
+
    ```bash
    git clone https://github.com/bennyhodl/ddk-ffi.git
    cd ddk-ffi
    ```
 
 2. **Make changes to Rust code**
+
    ```bash
    # Edit Rust implementation
    vim ddk-ffi/src/lib.rs
-   
+
    # Update UniFFI interface
    vim ddk-ffi/src/ddk_ffi.udl
    ```
 
 3. **Generate and test**
+
    ```bash
    # Generate all bindings
    just uniffi
-   
+
    # Fix include path (required after generation)
    sed -i '' 's|#include "/ddk_ffi.hpp"|#include "ddk_ffi.hpp"|' ddk-rn/cpp/bennyblader-ddk-rn.cpp
-   
+
    # Test changes
    cd ddk-ffi && cargo test
    cd ../ddk-rn && pnpm test
    ```
 
 4. **Run example app**
+
    ```bash
    # iOS
    cd ddk-rn/example && npx react-native run-ios
-   
-   # Android  
+
+   # Android
    cd ddk-rn/example && npx react-native run-android
    ```
 
@@ -329,7 +374,7 @@ Contributions welcome! Please read our [development guide](./DEVELOPMENT.md) and
 ## 🔗 Links
 
 - **GitHub**: https://github.com/bennyhodl/ddk-ffi
-- **npm Package**: https://www.npmjs.com/package/@bennyblader/ddk-rn  
+- **npm Package**: https://www.npmjs.com/package/@bennyblader/ddk-rn
 - **Issues**: https://github.com/bennyhodl/ddk-ffi/issues
 - **rust-dlc**: https://github.com/p2pderivatives/rust-dlc
 

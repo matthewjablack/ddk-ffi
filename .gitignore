@@ -213,3 +213,6 @@ buck-out/
 # Backup files
 *.backup
 *.bak
+
+# Release artifacts
+release-archives/

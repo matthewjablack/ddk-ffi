@@ -24,14 +24,17 @@
     "android",
     "ios",
     "cpp",
+    "scripts/postinstall.js",
     "*.podspec",
     "react-native.config.json",
     "!ios/build",
+    "!ios/*.xcframework",
     "!android/build",
     "!android/gradle",
     "!android/gradlew",
     "!android/gradlew.bat",
     "!android/local.properties",
+    "!android/src/main/jniLibs",
     "!**/__tests__",
     "!**/__fixtures__",
     "!**/__mocks__",
@@ -44,7 +47,10 @@
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
     "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
     "prepare": "bob build",
+    "postinstall": "node scripts/postinstall.js",
     "release": "release-it",
+    "release-full": "node scripts/release.js",
+    "create-archives": "node scripts/create-binary-archives.js",
     "uniffi:clean": "rm -rf cpp/DdkFFI.* src/DdkFFI.* src/types.ts ios/*.xcframework android/src/main/jniLibs",
     "example:ios": "pnpm --filter example ios",
     "example:android": "pnpm --filter example android",
@@ -66,6 +72,7 @@
   },
   "homepage": "https://github.com/bennyhodl/ddk-ffi#readme",
   "publishConfig": {
+    "access": "public",
     "registry": "https://registry.npmjs.org/"
   },
   "devDependencies": {
@@ -116,7 +123,8 @@
       "tagName": "v${version}"
     },
     "npm": {
-      "publish": true
+      "publish": true,
+      "access": "public"
     },
     "github": {
       "release": true

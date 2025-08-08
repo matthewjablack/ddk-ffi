@@ -1,0 +1,22 @@
+# Exclude large binary files from npm package
+# These will be downloaded during postinstall
+
+# Android binaries
+android/src/main/jniLibs/
+
+# iOS binaries  
+ios/*.xcframework/
+
+# Build artifacts
+target/
+build/
+
+# Development files
+example/
+*.tgz
+
+# Git and dev files
+.git/
+.github/
+.vscode/
+*.log

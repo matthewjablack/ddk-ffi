@@ -39,3 +39,9 @@ example-android:
 
 clean:
   cd {{justfile_directory()}}/ddk-rn && rm -rf cpp/ddk_ffi.* cpp/ddk-rn.* cpp/UniffiCallInvoker.h src/ddk_ffi*.ts src/NativeDdkRn.ts ios/DdkRn.xcframework android/src/main/jniLibs lib ios/build android/build example/ios/build example/android/build example/android/app/build example/ios/Pods example/ios/Podfile.lock example/ios/DdkRnExample.xcworkspace src/index.tsx
+
+release:
+  cd {{justfile_directory()}}/ddk-rn && node scripts/release.js
+
+release-archives:
+  cd {{justfile_directory()}}/ddk-rn && node scripts/create-binary-archives.js
