@@ -3,3 +3,113 @@ namespace ddk_ffi {
     string do_the_dlc();
     string lygos();
 };
+
+// Transaction representation
+dictionary Transaction {
+    i32 version;
+    u32 lock_time;
+    sequence<TxInput> inputs;
+    sequence<TxOutput> outputs;
+    sequence<u8> raw_bytes;
+};
+
+// Transaction input
+dictionary TxInput {
+    string txid;
+    u32 vout;
+    sequence<u8> script_sig;
+    u32 sequence;
+    sequence<sequence<u8>> witness;
+};
+
+// Transaction output  
+dictionary TxOutput {
+    u64 value;
+    sequence<u8> script_pubkey;
+};
+
+// Input information for funding
+dictionary TxInputInfo {
+    string txid;
+    u32 vout;
+    sequence<u8> script_sig;
+    u32 max_witness_length;
+    u64 serial_id;
+};
+
+// DLC outcome with payouts
+dictionary DlcOutcome {
+    u64 local_payout;
+    u64 remote_payout;
+};
+
+// Payout for offer and accept parties
+dictionary Payout {
+    u64 offer;
+    u64 accept;
+};
+
+// Parameters for a party in the DLC
+dictionary PartyParams {
+    sequence<u8> fund_pubkey;
+    sequence<u8> change_script_pubkey;
+    u64 change_serial_id;
+    sequence<u8> payout_script_pubkey;
+    u64 payout_serial_id;
+    sequence<TxInputInfo> inputs;
+    u64 input_amount;
+    u64 collateral;
+    sequence<DlcInputInfo> dlc_inputs;
+};
+
+dictionary DlcInputInfo {
+    Transaction fund_tx;
+    u32 fund_vout;
+    sequence<u8> local_fund_pubkey;
+    sequence<u8> remote_fund_pubkey;
+    u64 fund_amount;
+    u32 max_witness_len;
+    u64 input_serial_id;
+    sequence<u8> contract_id;
+};
+
+// Container for all DLC transactions
+dictionary DlcTransactions {
+    Transaction fund;
+    sequence<Transaction> cets;
+    Transaction refund;
+    sequence<u8> funding_script_pubkey;
+};
+
+// Adaptor signature with proof
+dictionary AdaptorSignature {
+    sequence<u8> signature;
+    sequence<u8> proof;
+};
+
+// Change output and fees result
+dictionary ChangeOutputAndFees {
+    TxOutput change_output;
+    u64 fund_fee;
+    u64 cet_fee;
+};
+
+// Oracle information
+dictionary OracleInfo {
+    sequence<u8> public_key;
+    sequence<sequence<u8>> nonces;
+};
+
+// Error types for DLC operations
+[Error]
+enum DLCError {
+    "InvalidSignature",
+    "InvalidPublicKey",
+    "InvalidTransaction",
+    "InsufficientFunds",
+    "InvalidArgument",
+    "SerializationError",
+    "Secp256k1Error",
+    "MiniscriptError",
+    "NetworkError",
+};

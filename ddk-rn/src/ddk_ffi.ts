@@ -32,10 +32,20 @@ import nativeModule, {
 } from './ddk_ffi-ffi';
 import {
   type UniffiByteArray,
+  AbstractFfiConverterByteArray,
+  FfiConverterArray,
+  FfiConverterInt32,
+  FfiConverterUInt32,
+  FfiConverterUInt64,
+  FfiConverterUInt8,
   RustBuffer,
+  UniffiError,
   UniffiInternalError,
   UniffiRustCaller,
   uniffiCreateFfiConverterString,
+  uniffiCreateRecord,
+  uniffiTypeNameSymbol,
+  variantOrdinalSymbol,
 } from 'uniffi-bindgen-react-native';
 
 // Get converters from the other files, if any.
@@ -89,6 +99,796 @@ export function lygos(): string {
   );
 }
 
+export type AdaptorSignature = {
+  signature: Array</*u8*/ number>;
+  proof: Array</*u8*/ number>;
+};
+
+/**
+ * Generated factory for {@link AdaptorSignature} record objects.
+ */
+export const AdaptorSignature = (() => {
+  const defaults = () => ({});
+  const create = (() => {
+    return uniffiCreateRecord<AdaptorSignature, ReturnType<typeof defaults>>(
+      defaults
+    );
+  })();
+  return Object.freeze({
+    /**
+     * Create a frozen instance of {@link AdaptorSignature}, with defaults specified
+     * in Rust, in the {@link ddk_ffi} crate.
+     */
+    create,
+
+    /**
+     * Create a frozen instance of {@link AdaptorSignature}, with defaults specified
+     * in Rust, in the {@link ddk_ffi} crate.
+     */
+    new: create,
+
+    /**
+     * Defaults specified in the {@link ddk_ffi} crate.
+     */
+    defaults: () => Object.freeze(defaults()) as Partial<AdaptorSignature>,
+  });
+})();
+
+const FfiConverterTypeAdaptorSignature = (() => {
+  type TypeName = AdaptorSignature;
+  class FFIConverter extends AbstractFfiConverterByteArray<TypeName> {
+    read(from: RustBuffer): TypeName {
+      return {
+        signature: FfiConverterArrayUInt8.read(from),
+        proof: FfiConverterArrayUInt8.read(from),
+      };
+    }
+    write(value: TypeName, into: RustBuffer): void {
+      FfiConverterArrayUInt8.write(value.signature, into);
+      FfiConverterArrayUInt8.write(value.proof, into);
+    }
+    allocationSize(value: TypeName): number {
+      return (
+        FfiConverterArrayUInt8.allocationSize(value.signature) +
+        FfiConverterArrayUInt8.allocationSize(value.proof)
+      );
+    }
+  }
+  return new FFIConverter();
+})();
+
+export type ChangeOutputAndFees = {
+  changeOutput: TxOutput;
+  fundFee: /*u64*/ bigint;
+  cetFee: /*u64*/ bigint;
+};
+
+/**
+ * Generated factory for {@link ChangeOutputAndFees} record objects.
+ */
+export const ChangeOutputAndFees = (() => {
+  const defaults = () => ({});
+  const create = (() => {
+    return uniffiCreateRecord<ChangeOutputAndFees, ReturnType<typeof defaults>>(
+      defaults
+    );
+  })();
+  return Object.freeze({
+    /**
+     * Create a frozen instance of {@link ChangeOutputAndFees}, with defaults specified
+     * in Rust, in the {@link ddk_ffi} crate.
+     */
+    create,
+
+    /**
+     * Create a frozen instance of {@link ChangeOutputAndFees}, with defaults specified
+     * in Rust, in the {@link ddk_ffi} crate.
+     */
+    new: create,
+
+    /**
+     * Defaults specified in the {@link ddk_ffi} crate.
+     */
+    defaults: () => Object.freeze(defaults()) as Partial<ChangeOutputAndFees>,
+  });
+})();
+
+const FfiConverterTypeChangeOutputAndFees = (() => {
+  type TypeName = ChangeOutputAndFees;
+  class FFIConverter extends AbstractFfiConverterByteArray<TypeName> {
+    read(from: RustBuffer): TypeName {
+      return {
+        changeOutput: FfiConverterTypeTxOutput.read(from),
+        fundFee: FfiConverterUInt64.read(from),
+        cetFee: FfiConverterUInt64.read(from),
+      };
+    }
+    write(value: TypeName, into: RustBuffer): void {
+      FfiConverterTypeTxOutput.write(value.changeOutput, into);
+      FfiConverterUInt64.write(value.fundFee, into);
+      FfiConverterUInt64.write(value.cetFee, into);
+    }
+    allocationSize(value: TypeName): number {
+      return (
+        FfiConverterTypeTxOutput.allocationSize(value.changeOutput) +
+        FfiConverterUInt64.allocationSize(value.fundFee) +
+        FfiConverterUInt64.allocationSize(value.cetFee)
+      );
+    }
+  }
+  return new FFIConverter();
+})();
+
+export type DlcInputInfo = {
+  fundTx: Transaction;
+  fundVout: /*u32*/ number;
+  localFundPubkey: Array</*u8*/ number>;
+  remoteFundPubkey: Array</*u8*/ number>;
+  fundAmount: /*u64*/ bigint;
+  maxWitnessLen: /*u32*/ number;
+  inputSerialId: /*u64*/ bigint;
+  contractId: Array</*u8*/ number>;
+};
+
+/**
+ * Generated factory for {@link DlcInputInfo} record objects.
+ */
+export const DlcInputInfo = (() => {
+  const defaults = () => ({});
+  const create = (() => {
+    return uniffiCreateRecord<DlcInputInfo, ReturnType<typeof defaults>>(
+      defaults
+    );
+  })();
+  return Object.freeze({
+    /**
+     * Create a frozen instance of {@link DlcInputInfo}, with defaults specified
+     * in Rust, in the {@link ddk_ffi} crate.
+     */
+    create,
+
+    /**
+     * Create a frozen instance of {@link DlcInputInfo}, with defaults specified
+     * in Rust, in the {@link ddk_ffi} crate.
+     */
+    new: create,
+
+    /**
+     * Defaults specified in the {@link ddk_ffi} crate.
+     */
+    defaults: () => Object.freeze(defaults()) as Partial<DlcInputInfo>,
+  });
+})();
+
+const FfiConverterTypeDlcInputInfo = (() => {
+  type TypeName = DlcInputInfo;
+  class FFIConverter extends AbstractFfiConverterByteArray<TypeName> {
+    read(from: RustBuffer): TypeName {
+      return {
+        fundTx: FfiConverterTypeTransaction.read(from),
+        fundVout: FfiConverterUInt32.read(from),
+        localFundPubkey: FfiConverterArrayUInt8.read(from),
+        remoteFundPubkey: FfiConverterArrayUInt8.read(from),
+        fundAmount: FfiConverterUInt64.read(from),
+        maxWitnessLen: FfiConverterUInt32.read(from),
+        inputSerialId: FfiConverterUInt64.read(from),
+        contractId: FfiConverterArrayUInt8.read(from),
+      };
+    }
+    write(value: TypeName, into: RustBuffer): void {
+      FfiConverterTypeTransaction.write(value.fundTx, into);
+      FfiConverterUInt32.write(value.fundVout, into);
+      FfiConverterArrayUInt8.write(value.localFundPubkey, into);
+      FfiConverterArrayUInt8.write(value.remoteFundPubkey, into);
+      FfiConverterUInt64.write(value.fundAmount, into);
+      FfiConverterUInt32.write(value.maxWitnessLen, into);
+      FfiConverterUInt64.write(value.inputSerialId, into);
+      FfiConverterArrayUInt8.write(value.contractId, into);
+    }
+    allocationSize(value: TypeName): number {
+      return (
+        FfiConverterTypeTransaction.allocationSize(value.fundTx) +
+        FfiConverterUInt32.allocationSize(value.fundVout) +
+        FfiConverterArrayUInt8.allocationSize(value.localFundPubkey) +
+        FfiConverterArrayUInt8.allocationSize(value.remoteFundPubkey) +
+        FfiConverterUInt64.allocationSize(value.fundAmount) +
+        FfiConverterUInt32.allocationSize(value.maxWitnessLen) +
+        FfiConverterUInt64.allocationSize(value.inputSerialId) +
+        FfiConverterArrayUInt8.allocationSize(value.contractId)
+      );
+    }
+  }
+  return new FFIConverter();
+})();
+
+export type DlcOutcome = {
+  localPayout: /*u64*/ bigint;
+  remotePayout: /*u64*/ bigint;
+};
+
+/**
+ * Generated factory for {@link DlcOutcome} record objects.
+ */
+export const DlcOutcome = (() => {
+  const defaults = () => ({});
+  const create = (() => {
+    return uniffiCreateRecord<DlcOutcome, ReturnType<typeof defaults>>(
+      defaults
+    );
+  })();
+  return Object.freeze({
+    /**
+     * Create a frozen instance of {@link DlcOutcome}, with defaults specified
+     * in Rust, in the {@link ddk_ffi} crate.
+     */
+    create,
+
+    /**
+     * Create a frozen instance of {@link DlcOutcome}, with defaults specified
+     * in Rust, in the {@link ddk_ffi} crate.
+     */
+    new: create,
+
+    /**
+     * Defaults specified in the {@link ddk_ffi} crate.
+     */
+    defaults: () => Object.freeze(defaults()) as Partial<DlcOutcome>,
+  });
+})();
+
+const FfiConverterTypeDlcOutcome = (() => {
+  type TypeName = DlcOutcome;
+  class FFIConverter extends AbstractFfiConverterByteArray<TypeName> {
+    read(from: RustBuffer): TypeName {
+      return {
+        localPayout: FfiConverterUInt64.read(from),
+        remotePayout: FfiConverterUInt64.read(from),
+      };
+    }
+    write(value: TypeName, into: RustBuffer): void {
+      FfiConverterUInt64.write(value.localPayout, into);
+      FfiConverterUInt64.write(value.remotePayout, into);
+    }
+    allocationSize(value: TypeName): number {
+      return (
+        FfiConverterUInt64.allocationSize(value.localPayout) +
+        FfiConverterUInt64.allocationSize(value.remotePayout)
+      );
+    }
+  }
+  return new FFIConverter();
+})();
+
+export type DlcTransactions = {
+  fund: Transaction;
+  cets: Array<Transaction>;
+  refund: Transaction;
+  fundingScriptPubkey: Array</*u8*/ number>;
+};
+
+/**
+ * Generated factory for {@link DlcTransactions} record objects.
+ */
+export const DlcTransactions = (() => {
+  const defaults = () => ({});
+  const create = (() => {
+    return uniffiCreateRecord<DlcTransactions, ReturnType<typeof defaults>>(
+      defaults
+    );
+  })();
+  return Object.freeze({
+    /**
+     * Create a frozen instance of {@link DlcTransactions}, with defaults specified
+     * in Rust, in the {@link ddk_ffi} crate.
+     */
+    create,
+
+    /**
+     * Create a frozen instance of {@link DlcTransactions}, with defaults specified
+     * in Rust, in the {@link ddk_ffi} crate.
+     */
+    new: create,
+
+    /**
+     * Defaults specified in the {@link ddk_ffi} crate.
+     */
+    defaults: () => Object.freeze(defaults()) as Partial<DlcTransactions>,
+  });
+})();
+
+const FfiConverterTypeDlcTransactions = (() => {
+  type TypeName = DlcTransactions;
+  class FFIConverter extends AbstractFfiConverterByteArray<TypeName> {
+    read(from: RustBuffer): TypeName {
+      return {
+        fund: FfiConverterTypeTransaction.read(from),
+        cets: FfiConverterArrayTypeTransaction.read(from),
+        refund: FfiConverterTypeTransaction.read(from),
+        fundingScriptPubkey: FfiConverterArrayUInt8.read(from),
+      };
+    }
+    write(value: TypeName, into: RustBuffer): void {
+      FfiConverterTypeTransaction.write(value.fund, into);
+      FfiConverterArrayTypeTransaction.write(value.cets, into);
+      FfiConverterTypeTransaction.write(value.refund, into);
+      FfiConverterArrayUInt8.write(value.fundingScriptPubkey, into);
+    }
+    allocationSize(value: TypeName): number {
+      return (
+        FfiConverterTypeTransaction.allocationSize(value.fund) +
+        FfiConverterArrayTypeTransaction.allocationSize(value.cets) +
+        FfiConverterTypeTransaction.allocationSize(value.refund) +
+        FfiConverterArrayUInt8.allocationSize(value.fundingScriptPubkey)
+      );
+    }
+  }
+  return new FFIConverter();
+})();
+
+export type OracleInfo = {
+  publicKey: Array</*u8*/ number>;
+  nonces: Array<Array</*u8*/ number>>;
+};
+
+/**
+ * Generated factory for {@link OracleInfo} record objects.
+ */
+export const OracleInfo = (() => {
+  const defaults = () => ({});
+  const create = (() => {
+    return uniffiCreateRecord<OracleInfo, ReturnType<typeof defaults>>(
+      defaults
+    );
+  })();
+  return Object.freeze({
+    /**
+     * Create a frozen instance of {@link OracleInfo}, with defaults specified
+     * in Rust, in the {@link ddk_ffi} crate.
+     */
+    create,
+
+    /**
+     * Create a frozen instance of {@link OracleInfo}, with defaults specified
+     * in Rust, in the {@link ddk_ffi} crate.
+     */
+    new: create,
+
+    /**
+     * Defaults specified in the {@link ddk_ffi} crate.
+     */
+    defaults: () => Object.freeze(defaults()) as Partial<OracleInfo>,
+  });
+})();
+
+const FfiConverterTypeOracleInfo = (() => {
+  type TypeName = OracleInfo;
+  class FFIConverter extends AbstractFfiConverterByteArray<TypeName> {
+    read(from: RustBuffer): TypeName {
+      return {
+        publicKey: FfiConverterArrayUInt8.read(from),
+        nonces: FfiConverterArrayArrayUInt8.read(from),
+      };
+    }
+    write(value: TypeName, into: RustBuffer): void {
+      FfiConverterArrayUInt8.write(value.publicKey, into);
+      FfiConverterArrayArrayUInt8.write(value.nonces, into);
+    }
+    allocationSize(value: TypeName): number {
+      return (
+        FfiConverterArrayUInt8.allocationSize(value.publicKey) +
+        FfiConverterArrayArrayUInt8.allocationSize(value.nonces)
+      );
+    }
+  }
+  return new FFIConverter();
+})();
+
+export type PartyParams = {
+  fundPubkey: Array</*u8*/ number>;
+  changeScriptPubkey: Array</*u8*/ number>;
+  changeSerialId: /*u64*/ bigint;
+  payoutScriptPubkey: Array</*u8*/ number>;
+  payoutSerialId: /*u64*/ bigint;
+  inputs: Array<TxInputInfo>;
+  inputAmount: /*u64*/ bigint;
+  collateral: /*u64*/ bigint;
+  dlcInputs: Array<DlcInputInfo>;
+};
+
+/**
+ * Generated factory for {@link PartyParams} record objects.
+ */
+export const PartyParams = (() => {
+  const defaults = () => ({});
+  const create = (() => {
+    return uniffiCreateRecord<PartyParams, ReturnType<typeof defaults>>(
+      defaults
+    );
+  })();
+  return Object.freeze({
+    /**
+     * Create a frozen instance of {@link PartyParams}, with defaults specified
+     * in Rust, in the {@link ddk_ffi} crate.
+     */
+    create,
+
+    /**
+     * Create a frozen instance of {@link PartyParams}, with defaults specified
+     * in Rust, in the {@link ddk_ffi} crate.
+     */
+    new: create,
+
+    /**
+     * Defaults specified in the {@link ddk_ffi} crate.
+     */
+    defaults: () => Object.freeze(defaults()) as Partial<PartyParams>,
+  });
+})();
+
+const FfiConverterTypePartyParams = (() => {
+  type TypeName = PartyParams;
+  class FFIConverter extends AbstractFfiConverterByteArray<TypeName> {
+    read(from: RustBuffer): TypeName {
+      return {
+        fundPubkey: FfiConverterArrayUInt8.read(from),
+        changeScriptPubkey: FfiConverterArrayUInt8.read(from),
+        changeSerialId: FfiConverterUInt64.read(from),
+        payoutScriptPubkey: FfiConverterArrayUInt8.read(from),
+        payoutSerialId: FfiConverterUInt64.read(from),
+        inputs: FfiConverterArrayTypeTxInputInfo.read(from),
+        inputAmount: FfiConverterUInt64.read(from),
+        collateral: FfiConverterUInt64.read(from),
+        dlcInputs: FfiConverterArrayTypeDlcInputInfo.read(from),
+      };
+    }
+    write(value: TypeName, into: RustBuffer): void {
+      FfiConverterArrayUInt8.write(value.fundPubkey, into);
+      FfiConverterArrayUInt8.write(value.changeScriptPubkey, into);
+      FfiConverterUInt64.write(value.changeSerialId, into);
+      FfiConverterArrayUInt8.write(value.payoutScriptPubkey, into);
+      FfiConverterUInt64.write(value.payoutSerialId, into);
+      FfiConverterArrayTypeTxInputInfo.write(value.inputs, into);
+      FfiConverterUInt64.write(value.inputAmount, into);
+      FfiConverterUInt64.write(value.collateral, into);
+      FfiConverterArrayTypeDlcInputInfo.write(value.dlcInputs, into);
+    }
+    allocationSize(value: TypeName): number {
+      return (
+        FfiConverterArrayUInt8.allocationSize(value.fundPubkey) +
+        FfiConverterArrayUInt8.allocationSize(value.changeScriptPubkey) +
+        FfiConverterUInt64.allocationSize(value.changeSerialId) +
+        FfiConverterArrayUInt8.allocationSize(value.payoutScriptPubkey) +
+        FfiConverterUInt64.allocationSize(value.payoutSerialId) +
+        FfiConverterArrayTypeTxInputInfo.allocationSize(value.inputs) +
+        FfiConverterUInt64.allocationSize(value.inputAmount) +
+        FfiConverterUInt64.allocationSize(value.collateral) +
+        FfiConverterArrayTypeDlcInputInfo.allocationSize(value.dlcInputs)
+      );
+    }
+  }
+  return new FFIConverter();
+})();
+
+export type Payout = {
+  offer: /*u64*/ bigint;
+  accept: /*u64*/ bigint;
+};
+
+/**
+ * Generated factory for {@link Payout} record objects.
+ */
+export const Payout = (() => {
+  const defaults = () => ({});
+  const create = (() => {
+    return uniffiCreateRecord<Payout, ReturnType<typeof defaults>>(defaults);
+  })();
+  return Object.freeze({
+    /**
+     * Create a frozen instance of {@link Payout}, with defaults specified
+     * in Rust, in the {@link ddk_ffi} crate.
+     */
+    create,
+
+    /**
+     * Create a frozen instance of {@link Payout}, with defaults specified
+     * in Rust, in the {@link ddk_ffi} crate.
+     */
+    new: create,
+
+    /**
+     * Defaults specified in the {@link ddk_ffi} crate.
+     */
+    defaults: () => Object.freeze(defaults()) as Partial<Payout>,
+  });
+})();
+
+const FfiConverterTypePayout = (() => {
+  type TypeName = Payout;
+  class FFIConverter extends AbstractFfiConverterByteArray<TypeName> {
+    read(from: RustBuffer): TypeName {
+      return {
+        offer: FfiConverterUInt64.read(from),
+        accept: FfiConverterUInt64.read(from),
+      };
+    }
+    write(value: TypeName, into: RustBuffer): void {
+      FfiConverterUInt64.write(value.offer, into);
+      FfiConverterUInt64.write(value.accept, into);
+    }
+    allocationSize(value: TypeName): number {
+      return (
+        FfiConverterUInt64.allocationSize(value.offer) +
+        FfiConverterUInt64.allocationSize(value.accept)
+      );
+    }
+  }
+  return new FFIConverter();
+})();
+
+export type Transaction = {
+  version: /*i32*/ number;
+  lockTime: /*u32*/ number;
+  inputs: Array<TxInput>;
+  outputs: Array<TxOutput>;
+  rawBytes: Array</*u8*/ number>;
+};
+
+/**
+ * Generated factory for {@link Transaction} record objects.
+ */
+export const Transaction = (() => {
+  const defaults = () => ({});
+  const create = (() => {
+    return uniffiCreateRecord<Transaction, ReturnType<typeof defaults>>(
+      defaults
+    );
+  })();
+  return Object.freeze({
+    /**
+     * Create a frozen instance of {@link Transaction}, with defaults specified
+     * in Rust, in the {@link ddk_ffi} crate.
+     */
+    create,
+
+    /**
+     * Create a frozen instance of {@link Transaction}, with defaults specified
+     * in Rust, in the {@link ddk_ffi} crate.
+     */
+    new: create,
+
+    /**
+     * Defaults specified in the {@link ddk_ffi} crate.
+     */
+    defaults: () => Object.freeze(defaults()) as Partial<Transaction>,
+  });
+})();
+
+const FfiConverterTypeTransaction = (() => {
+  type TypeName = Transaction;
+  class FFIConverter extends AbstractFfiConverterByteArray<TypeName> {
+    read(from: RustBuffer): TypeName {
+      return {
+        version: FfiConverterInt32.read(from),
+        lockTime: FfiConverterUInt32.read(from),
+        inputs: FfiConverterArrayTypeTxInput.read(from),
+        outputs: FfiConverterArrayTypeTxOutput.read(from),
+        rawBytes: FfiConverterArrayUInt8.read(from),
+      };
+    }
+    write(value: TypeName, into: RustBuffer): void {
+      FfiConverterInt32.write(value.version, into);
+      FfiConverterUInt32.write(value.lockTime, into);
+      FfiConverterArrayTypeTxInput.write(value.inputs, into);
+      FfiConverterArrayTypeTxOutput.write(value.outputs, into);
+      FfiConverterArrayUInt8.write(value.rawBytes, into);
+    }
+    allocationSize(value: TypeName): number {
+      return (
+        FfiConverterInt32.allocationSize(value.version) +
+        FfiConverterUInt32.allocationSize(value.lockTime) +
+        FfiConverterArrayTypeTxInput.allocationSize(value.inputs) +
+        FfiConverterArrayTypeTxOutput.allocationSize(value.outputs) +
+        FfiConverterArrayUInt8.allocationSize(value.rawBytes)
+      );
+    }
+  }
+  return new FFIConverter();
+})();
+
+export type TxInput = {
+  txid: string;
+  vout: /*u32*/ number;
+  scriptSig: Array</*u8*/ number>;
+  sequence: /*u32*/ number;
+  witness: Array<Array</*u8*/ number>>;
+};
+
+/**
+ * Generated factory for {@link TxInput} record objects.
+ */
+export const TxInput = (() => {
+  const defaults = () => ({});
+  const create = (() => {
+    return uniffiCreateRecord<TxInput, ReturnType<typeof defaults>>(defaults);
+  })();
+  return Object.freeze({
+    /**
+     * Create a frozen instance of {@link TxInput}, with defaults specified
+     * in Rust, in the {@link ddk_ffi} crate.
+     */
+    create,
+
+    /**
+     * Create a frozen instance of {@link TxInput}, with defaults specified
+     * in Rust, in the {@link ddk_ffi} crate.
+     */
+    new: create,
+
+    /**
+     * Defaults specified in the {@link ddk_ffi} crate.
+     */
+    defaults: () => Object.freeze(defaults()) as Partial<TxInput>,
+  });
+})();
+
+const FfiConverterTypeTxInput = (() => {
+  type TypeName = TxInput;
+  class FFIConverter extends AbstractFfiConverterByteArray<TypeName> {
+    read(from: RustBuffer): TypeName {
+      return {
+        txid: FfiConverterString.read(from),
+        vout: FfiConverterUInt32.read(from),
+        scriptSig: FfiConverterArrayUInt8.read(from),
+        sequence: FfiConverterUInt32.read(from),
+        witness: FfiConverterArrayArrayUInt8.read(from),
+      };
+    }
+    write(value: TypeName, into: RustBuffer): void {
+      FfiConverterString.write(value.txid, into);
+      FfiConverterUInt32.write(value.vout, into);
+      FfiConverterArrayUInt8.write(value.scriptSig, into);
+      FfiConverterUInt32.write(value.sequence, into);
+      FfiConverterArrayArrayUInt8.write(value.witness, into);
+    }
+    allocationSize(value: TypeName): number {
+      return (
+        FfiConverterString.allocationSize(value.txid) +
+        FfiConverterUInt32.allocationSize(value.vout) +
+        FfiConverterArrayUInt8.allocationSize(value.scriptSig) +
+        FfiConverterUInt32.allocationSize(value.sequence) +
+        FfiConverterArrayArrayUInt8.allocationSize(value.witness)
+      );
+    }
+  }
+  return new FFIConverter();
+})();
+
+export type TxInputInfo = {
+  txid: string;
+  vout: /*u32*/ number;
+  scriptSig: Array</*u8*/ number>;
+  maxWitnessLength: /*u32*/ number;
+  serialId: /*u64*/ bigint;
+};
+
+/**
+ * Generated factory for {@link TxInputInfo} record objects.
+ */
+export const TxInputInfo = (() => {
+  const defaults = () => ({});
+  const create = (() => {
+    return uniffiCreateRecord<TxInputInfo, ReturnType<typeof defaults>>(
+      defaults
+    );
+  })();
+  return Object.freeze({
+    /**
+     * Create a frozen instance of {@link TxInputInfo}, with defaults specified
+     * in Rust, in the {@link ddk_ffi} crate.
+     */
+    create,
+
+    /**
+     * Create a frozen instance of {@link TxInputInfo}, with defaults specified
+     * in Rust, in the {@link ddk_ffi} crate.
+     */
+    new: create,
+
+    /**
+     * Defaults specified in the {@link ddk_ffi} crate.
+     */
+    defaults: () => Object.freeze(defaults()) as Partial<TxInputInfo>,
+  });
+})();
+
+const FfiConverterTypeTxInputInfo = (() => {
+  type TypeName = TxInputInfo;
+  class FFIConverter extends AbstractFfiConverterByteArray<TypeName> {
+    read(from: RustBuffer): TypeName {
+      return {
+        txid: FfiConverterString.read(from),
+        vout: FfiConverterUInt32.read(from),
+        scriptSig: FfiConverterArrayUInt8.read(from),
+        maxWitnessLength: FfiConverterUInt32.read(from),
+        serialId: FfiConverterUInt64.read(from),
+      };
+    }
+    write(value: TypeName, into: RustBuffer): void {
+      FfiConverterString.write(value.txid, into);
+      FfiConverterUInt32.write(value.vout, into);
+      FfiConverterArrayUInt8.write(value.scriptSig, into);
+      FfiConverterUInt32.write(value.maxWitnessLength, into);
+      FfiConverterUInt64.write(value.serialId, into);
+    }
+    allocationSize(value: TypeName): number {
+      return (
+        FfiConverterString.allocationSize(value.txid) +
+        FfiConverterUInt32.allocationSize(value.vout) +
+        FfiConverterArrayUInt8.allocationSize(value.scriptSig) +
+        FfiConverterUInt32.allocationSize(value.maxWitnessLength) +
+        FfiConverterUInt64.allocationSize(value.serialId)
+      );
+    }
+  }
+  return new FFIConverter();
+})();
+
+export type TxOutput = {
+  value: /*u64*/ bigint;
+  scriptPubkey: Array</*u8*/ number>;
+};
+
+/**
+ * Generated factory for {@link TxOutput} record objects.
+ */
+export const TxOutput = (() => {
+  const defaults = () => ({});
+  const create = (() => {
+    return uniffiCreateRecord<TxOutput, ReturnType<typeof defaults>>(defaults);
+  })();
+  return Object.freeze({
+    /**
+     * Create a frozen instance of {@link TxOutput}, with defaults specified
+     * in Rust, in the {@link ddk_ffi} crate.
+     */
+    create,
+
+    /**
+     * Create a frozen instance of {@link TxOutput}, with defaults specified
+     * in Rust, in the {@link ddk_ffi} crate.
+     */
+    new: create,
+
+    /**
+     * Defaults specified in the {@link ddk_ffi} crate.
+     */
+    defaults: () => Object.freeze(defaults()) as Partial<TxOutput>,
+  });
+})();
+
+const FfiConverterTypeTxOutput = (() => {
+  type TypeName = TxOutput;
+  class FFIConverter extends AbstractFfiConverterByteArray<TypeName> {
+    read(from: RustBuffer): TypeName {
+      return {
+        value: FfiConverterUInt64.read(from),
+        scriptPubkey: FfiConverterArrayUInt8.read(from),
+      };
+    }
+    write(value: TypeName, into: RustBuffer): void {
+      FfiConverterUInt64.write(value.value, into);
+      FfiConverterArrayUInt8.write(value.scriptPubkey, into);
+    }
+    allocationSize(value: TypeName): number {
+      return (
+        FfiConverterUInt64.allocationSize(value.value) +
+        FfiConverterArrayUInt8.allocationSize(value.scriptPubkey)
+      );
+    }
+  }
+  return new FFIConverter();
+})();
+
 const stringConverter = {
   stringToBytes: (s: string) =>
     uniffiCaller.rustCall((status) =>
@@ -113,6 +913,324 @@ const stringConverter = {
     ),
 };
 const FfiConverterString = uniffiCreateFfiConverterString(stringConverter);
+
+// Flat error type: DlcError
+export enum DlcError_Tags {
+  InvalidSignature = 'InvalidSignature',
+  InvalidPublicKey = 'InvalidPublicKey',
+  InvalidTransaction = 'InvalidTransaction',
+  InsufficientFunds = 'InsufficientFunds',
+  InvalidArgument = 'InvalidArgument',
+  SerializationError = 'SerializationError',
+  Secp256k1Error = 'Secp256k1Error',
+  MiniscriptError = 'MiniscriptError',
+  NetworkError = 'NetworkError',
+}
+export const DlcError = (() => {
+  class InvalidSignature extends UniffiError {
+    /**
+     * @private
+     * This field is private and should not be used.
+     */
+    readonly [uniffiTypeNameSymbol]: string = 'DlcError';
+    /**
+     * @private
+     * This field is private and should not be used.
+     */
+    readonly [variantOrdinalSymbol] = 1;
+
+    public readonly tag = DlcError_Tags.InvalidSignature;
+
+    constructor(message: string) {
+      super('DlcError', 'InvalidSignature', message);
+    }
+
+    static instanceOf(e: any): e is InvalidSignature {
+      return instanceOf(e) && (e as any)[variantOrdinalSymbol] === 1;
+    }
+  }
+  class InvalidPublicKey extends UniffiError {
+    /**
+     * @private
+     * This field is private and should not be used.
+     */
+    readonly [uniffiTypeNameSymbol]: string = 'DlcError';
+    /**
+     * @private
+     * This field is private and should not be used.
+     */
+    readonly [variantOrdinalSymbol] = 2;
+
+    public readonly tag = DlcError_Tags.InvalidPublicKey;
+
+    constructor(message: string) {
+      super('DlcError', 'InvalidPublicKey', message);
+    }
+
+    static instanceOf(e: any): e is InvalidPublicKey {
+      return instanceOf(e) && (e as any)[variantOrdinalSymbol] === 2;
+    }
+  }
+  class InvalidTransaction extends UniffiError {
+    /**
+     * @private
+     * This field is private and should not be used.
+     */
+    readonly [uniffiTypeNameSymbol]: string = 'DlcError';
+    /**
+     * @private
+     * This field is private and should not be used.
+     */
+    readonly [variantOrdinalSymbol] = 3;
+
+    public readonly tag = DlcError_Tags.InvalidTransaction;
+
+    constructor(message: string) {
+      super('DlcError', 'InvalidTransaction', message);
+    }
+
+    static instanceOf(e: any): e is InvalidTransaction {
+      return instanceOf(e) && (e as any)[variantOrdinalSymbol] === 3;
+    }
+  }
+  class InsufficientFunds extends UniffiError {
+    /**
+     * @private
+     * This field is private and should not be used.
+     */
+    readonly [uniffiTypeNameSymbol]: string = 'DlcError';
+    /**
+     * @private
+     * This field is private and should not be used.
+     */
+    readonly [variantOrdinalSymbol] = 4;
+
+    public readonly tag = DlcError_Tags.InsufficientFunds;
+
+    constructor(message: string) {
+      super('DlcError', 'InsufficientFunds', message);
+    }
+
+    static instanceOf(e: any): e is InsufficientFunds {
+      return instanceOf(e) && (e as any)[variantOrdinalSymbol] === 4;
+    }
+  }
+  class InvalidArgument extends UniffiError {
+    /**
+     * @private
+     * This field is private and should not be used.
+     */
+    readonly [uniffiTypeNameSymbol]: string = 'DlcError';
+    /**
+     * @private
+     * This field is private and should not be used.
+     */
+    readonly [variantOrdinalSymbol] = 5;
+
+    public readonly tag = DlcError_Tags.InvalidArgument;
+
+    constructor(message: string) {
+      super('DlcError', 'InvalidArgument', message);
+    }
+
+    static instanceOf(e: any): e is InvalidArgument {
+      return instanceOf(e) && (e as any)[variantOrdinalSymbol] === 5;
+    }
+  }
+  class SerializationError extends UniffiError {
+    /**
+     * @private
+     * This field is private and should not be used.
+     */
+    readonly [uniffiTypeNameSymbol]: string = 'DlcError';
+    /**
+     * @private
+     * This field is private and should not be used.
+     */
+    readonly [variantOrdinalSymbol] = 6;
+
+    public readonly tag = DlcError_Tags.SerializationError;
+
+    constructor(message: string) {
+      super('DlcError', 'SerializationError', message);
+    }
+
+    static instanceOf(e: any): e is SerializationError {
+      return instanceOf(e) && (e as any)[variantOrdinalSymbol] === 6;
+    }
+  }
+  class Secp256k1Error extends UniffiError {
+    /**
+     * @private
+     * This field is private and should not be used.
+     */
+    readonly [uniffiTypeNameSymbol]: string = 'DlcError';
+    /**
+     * @private
+     * This field is private and should not be used.
+     */
+    readonly [variantOrdinalSymbol] = 7;
+
+    public readonly tag = DlcError_Tags.Secp256k1Error;
+
+    constructor(message: string) {
+      super('DlcError', 'Secp256k1Error', message);
+    }
+
+    static instanceOf(e: any): e is Secp256k1Error {
+      return instanceOf(e) && (e as any)[variantOrdinalSymbol] === 7;
+    }
+  }
+  class MiniscriptError extends UniffiError {
+    /**
+     * @private
+     * This field is private and should not be used.
+     */
+    readonly [uniffiTypeNameSymbol]: string = 'DlcError';
+    /**
+     * @private
+     * This field is private and should not be used.
+     */
+    readonly [variantOrdinalSymbol] = 8;
+
+    public readonly tag = DlcError_Tags.MiniscriptError;
+
+    constructor(message: string) {
+      super('DlcError', 'MiniscriptError', message);
+    }
+
+    static instanceOf(e: any): e is MiniscriptError {
+      return instanceOf(e) && (e as any)[variantOrdinalSymbol] === 8;
+    }
+  }
+  class NetworkError extends UniffiError {
+    /**
+     * @private
+     * This field is private and should not be used.
+     */
+    readonly [uniffiTypeNameSymbol]: string = 'DlcError';
+    /**
+     * @private
+     * This field is private and should not be used.
+     */
+    readonly [variantOrdinalSymbol] = 9;
+
+    public readonly tag = DlcError_Tags.NetworkError;
+
+    constructor(message: string) {
+      super('DlcError', 'NetworkError', message);
+    }
+
+    static instanceOf(e: any): e is NetworkError {
+      return instanceOf(e) && (e as any)[variantOrdinalSymbol] === 9;
+    }
+  }
+
+  // Utility function which does not rely on instanceof.
+  function instanceOf(e: any): e is DlcError {
+    return (e as any)[uniffiTypeNameSymbol] === 'DlcError';
+  }
+  return {
+    InvalidSignature,
+    InvalidPublicKey,
+    InvalidTransaction,
+    InsufficientFunds,
+    InvalidArgument,
+    SerializationError,
+    Secp256k1Error,
+    MiniscriptError,
+    NetworkError,
+    instanceOf,
+  };
+})();
+
+// Union type for DlcError error type.
+
+export type DlcError = InstanceType<
+  (typeof DlcError)[keyof Omit<typeof DlcError, 'instanceOf'>]
+>;
+
+const FfiConverterTypeDLCError = (() => {
+  const intConverter = FfiConverterInt32;
+  type TypeName = DlcError;
+  class FfiConverter extends AbstractFfiConverterByteArray<TypeName> {
+    read(from: RustBuffer): TypeName {
+      switch (intConverter.read(from)) {
+        case 1:
+          return new DlcError.InvalidSignature(FfiConverterString.read(from));
+
+        case 2:
+          return new DlcError.InvalidPublicKey(FfiConverterString.read(from));
+
+        case 3:
+          return new DlcError.InvalidTransaction(FfiConverterString.read(from));
+
+        case 4:
+          return new DlcError.InsufficientFunds(FfiConverterString.read(from));
+
+        case 5:
+          return new DlcError.InvalidArgument(FfiConverterString.read(from));
+
+        case 6:
+          return new DlcError.SerializationError(FfiConverterString.read(from));
+
+        case 7:
+          return new DlcError.Secp256k1Error(FfiConverterString.read(from));
+
+        case 8:
+          return new DlcError.MiniscriptError(FfiConverterString.read(from));
+
+        case 9:
+          return new DlcError.NetworkError(FfiConverterString.read(from));
+
+        default:
+          throw new UniffiInternalError.UnexpectedEnumCase();
+      }
+    }
+    write(value: TypeName, into: RustBuffer): void {
+      const obj = value as any;
+      const index = obj[variantOrdinalSymbol] as number;
+      intConverter.write(index, into);
+    }
+    allocationSize(value: TypeName): number {
+      return intConverter.allocationSize(0);
+    }
+  }
+  return new FfiConverter();
+})();
+
+// FfiConverter for Array<DlcInputInfo>
+const FfiConverterArrayTypeDlcInputInfo = new FfiConverterArray(
+  FfiConverterTypeDlcInputInfo
+);
+
+// FfiConverter for Array<Transaction>
+const FfiConverterArrayTypeTransaction = new FfiConverterArray(
+  FfiConverterTypeTransaction
+);
+
+// FfiConverter for Array<TxInput>
+const FfiConverterArrayTypeTxInput = new FfiConverterArray(
+  FfiConverterTypeTxInput
+);
+
+// FfiConverter for Array<TxInputInfo>
+const FfiConverterArrayTypeTxInputInfo = new FfiConverterArray(
+  FfiConverterTypeTxInputInfo
+);
+
+// FfiConverter for Array<TxOutput>
+const FfiConverterArrayTypeTxOutput = new FfiConverterArray(
+  FfiConverterTypeTxOutput
+);
+
+// FfiConverter for Array</*u8*/number>
+const FfiConverterArrayUInt8 = new FfiConverterArray(FfiConverterUInt8);
+
+// FfiConverter for Array<Array</*u8*/number>>
+const FfiConverterArrayArrayUInt8 = new FfiConverterArray(
+  FfiConverterArrayUInt8
+);
 
 /**
  * This should be called before anything else.
@@ -157,4 +1275,19 @@ function uniffiEnsureInitialized() {
 
 export default Object.freeze({
   initialize: uniffiEnsureInitialized,
+  converters: {
+    FfiConverterTypeAdaptorSignature,
+    FfiConverterTypeChangeOutputAndFees,
+    FfiConverterTypeDLCError,
+    FfiConverterTypeDlcInputInfo,
+    FfiConverterTypeDlcOutcome,
+    FfiConverterTypeDlcTransactions,
+    FfiConverterTypeOracleInfo,
+    FfiConverterTypePartyParams,
+    FfiConverterTypePayout,
+    FfiConverterTypeTransaction,
+    FfiConverterTypeTxInput,
+    FfiConverterTypeTxInputInfo,
+    FfiConverterTypeTxOutput,
+  },
 });
