@@ -28,7 +28,7 @@ pub fn version() -> String {
 /// Minimum value that can be included in a transaction output. Under this value,
 /// outputs are discarded
 /// See: https://github.com/discreetlogcontracts/dlcspecs/blob/master/Transactions.md#change-outputs
-const DUST_LIMIT: Amount = Amount::from_sat(1000);
+const DUST_LIMIT: u64 = 1000;
 
 /// The witness size of a P2WPKH input
 /// See: <https://github.com/discreetlogcontracts/dlcspecs/blob/master/Transactions.md#fees>
@@ -511,7 +511,7 @@ pub fn create_refund_transaction(
 
 /// Check if a transaction output is dust
 pub fn is_dust_output(output: TxOutput) -> bool {
-    Amount::from_sat(output.value) < DUST_LIMIT
+    output.value < DUST_LIMIT
 }
 
 /// Get change output and fees for a party

@@ -1,0 +1,19 @@
+{
+  "name": "@bennyblader/ddk-ts-win32-x64-msvc",
+  "version": "0.1.4",
+  "os": [
+    "win32"
+  ],
+  "cpu": [
+    "x64"
+  ],
+  "main": "ddk-ts.win32-x64-msvc.node",
+  "files": [
+    "ddk-ts.win32-x64-msvc.node"
+  ],
+  "license": "MIT",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  }
+}

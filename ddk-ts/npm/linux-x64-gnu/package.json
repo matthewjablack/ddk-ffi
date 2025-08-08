@@ -1,0 +1,22 @@
+{
+  "name": "@bennyblader/ddk-ts-linux-x64-gnu",
+  "version": "0.1.4",
+  "os": [
+    "linux"
+  ],
+  "cpu": [
+    "x64"
+  ],
+  "libc": [
+    "glibc"
+  ],
+  "main": "ddk-ts.linux-x64-gnu.node",
+  "files": [
+    "ddk-ts.linux-x64-gnu.node"
+  ],
+  "license": "MIT",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  }
+}
