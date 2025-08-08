@@ -31,6 +31,57 @@ When making changes to `src/lib.rs` or `src/ddk_ffi.udl`, you MUST:
    ```
 3. **Test build**: Verify the generated bindings compile correctly
 4. **Commit together**: Include both Rust changes AND generated bindings in the same commit
+   ```bash
+   cd .. && git add .  # Add from parent directory to include all generated files
+   git commit -m "feat: description of changes"
+   ```
+
+### Release Process
+After creating a git tag for a release:
+
+5. **Push to GitHub**: Push both commits and tags to GitHub
+   ```bash
+   git push origin master
+   git push origin --tags
+   ```
+
+6. **Create GitHub Release**: Use GitHub CLI to create a release with source code
+   ```bash
+   gh release create v<version> --generate-notes --title "Release v<version>: <title>"
+   ```
+   Example:
+   ```bash
+   gh release create v0.1.1 --generate-notes --title "Release v0.1.1: Complete DLC functionality"
+   ```
+
+### Complete Development Cycle
+```bash
+# 1. Make changes to Rust code
+vim ddk-ffi/src/lib.rs ddk-ffi/src/ddk_ffi.udl
+
+# 2. Test changes
+cd ddk-ffi && cargo test
+
+# 3. Generate bindings
+just uniffi
+
+# 4. Fix include path
+sed -i '' 's|#include "/ddk_ffi.hpp"|#include "ddk_ffi.hpp"|' ddk-rn/cpp/bennyhodl-ddk-rn.cpp
+
+# 5. Commit everything together (from project root)
+git add .
+git commit -m "feat: description of changes"
+
+# 6. Create tag
+git tag -a v<version> -m "Release notes"
+
+# 7. Push to GitHub
+git push origin master
+git push origin --tags
+
+# 8. Create GitHub release
+gh release create v<version> --generate-notes --title "Release v<version>: <title>"
+```
 
 ### Why This Matters
 - Generated bindings must stay in sync with Rust code
