@@ -1,6 +1,6 @@
 PODS:
   - boost (1.84.0)
-  - DdkRn (0.1.0):
+  - DdkRn (0.1.2):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1727,7 +1727,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   boost: 4cb898d0bf20404aab1850c656dcea009429d6c1
-  DdkRn: 6a3824691a2e591d67eccb761c62a50c38702ff8
+  DdkRn: b2115f950e8f0a3672b90059d35142565d1015a8
   DoubleConversion: 76ab83afb40bddeeee456813d9c04f67f78771b5
   FBLazyVector: ee328dc37246cbe6d45ae4472951c0ca0dd6ffbf
   fmt: 4c2741a687cc09f0634a2e2c72a838b99f1ff120

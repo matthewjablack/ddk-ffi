@@ -4,7 +4,7 @@ import { version } from '@bennyhodl/ddk-rn';
 export default function App() {
   return (
     <View style={styles.container}>
-      <Text><code>@bennyhodl/ddk-rn version</code>: {version()}</Text>
+      <Text>@bennyhodl/ddk-rn version: {version()}</Text>
     </View>
   );
 }

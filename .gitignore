@@ -168,6 +168,7 @@ ddk-rn/example/ios/*.xcworkspace
 ddk-rn/example/android/build/
 ddk-rn/example/android/app/build/
 ddk-rn/example/android/.gradle/
+ddk-rn/example/vendor
 
 # ====================
 # Environment & Config
