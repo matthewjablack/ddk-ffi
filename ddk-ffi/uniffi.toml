@@ -10,7 +10,7 @@ name = "Ddk"
 # The iOS framework name
 ios_framework = "Ddk"
 # The Android package name
-android_package = "dev.bennyhodl.ddk"
+android_package = "dev.bennyblader.ddk"
 
 [namespace.ddk_ffi]
 # Configuration specific to your ddk_ffi namespace

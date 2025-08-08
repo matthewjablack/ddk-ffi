@@ -6,7 +6,7 @@ uniffi:
   echo ""
   echo "🎉 Uniffi build complete! 🎉"
   echo "🔥 Run 'just example-ios' to test the build"
-  echo "⚠️ modify cpp/bennyhodl-ddk-rn.cpp to #include 'ddk_ffi.hpp' ⚠️"
+  echo "⚠️ modify cpp/bennyblader-ddk-rn.cpp to #include 'ddk_ffi.hpp' ⚠️"
 
 uniffi-jsi:
   cd {{justfile_directory()}}/ddk-ffi && uniffi-bindgen-react-native generate jsi bindings \

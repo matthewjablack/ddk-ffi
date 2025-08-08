@@ -81,7 +81,7 @@ importers:
 
   example:
     dependencies:
-      '@bennyhodl/ddk-rn':
+      '@bennyblader/ddk-rn':
         specifier: workspace:*
         version: link:..
       react:

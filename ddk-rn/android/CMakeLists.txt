@@ -23,8 +23,8 @@ include_directories(
     ${UNIFFI_BINDGEN_PATH}/cpp/includes
 )
 
-add_library(bennyhodl-ddk-rn            SHARED
-    ../cpp/bennyhodl-ddk-rn.cpp
+add_library(bennyblader-ddk-rn            SHARED
+    ../cpp/bennyblader-ddk-rn.cpp
     ../cpp/ddk_ffi.cpp
     cpp-adapter.cpp
 )
@@ -58,9 +58,9 @@ endif()
 # https://github.com/react-native-community/discussions-and-proposals/discussions/816
 # This if-then-else can be removed once this library does not support version below 0.76
 if (REACTNATIVE_MERGED_SO)
-  target_link_libraries(bennyhodl-ddk-rn ReactAndroid::reactnative)
+  target_link_libraries(bennyblader-ddk-rn ReactAndroid::reactnative)
 else()
-  target_link_libraries(bennyhodl-ddk-rn
+  target_link_libraries(bennyblader-ddk-rn
     ReactAndroid::turbomodulejsijni
     ReactAndroid::react_nativemodule_core
   )
@@ -68,7 +68,7 @@ endif()
 
 find_package(fbjni REQUIRED CONFIG)
 target_link_libraries(
-  bennyhodl-ddk-rn
+  bennyblader-ddk-rn
   fbjni::fbjni
   ReactAndroid::jsi
   ${LOGCAT}

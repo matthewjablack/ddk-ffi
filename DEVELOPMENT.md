@@ -25,7 +25,7 @@ This document outlines the key development practices and workflow for the ddk-ff
 When making changes to `src/lib.rs` or `src/ddk_ffi.udl`, you MUST:
 
 1. **Generate bindings**: Run `just uniffi` to regenerate all language bindings
-2. **Fix include path**: Manually fix the include path in `ddk-rn/cpp/bennyhodl-ddk-rn.cpp`:
+2. **Fix include path**: Manually fix the include path in `ddk-rn/cpp/bennyblader-ddk-rn.cpp`:
    ```cpp
    // Change this:
    #include "/ddk_ffi.hpp"
@@ -44,36 +44,41 @@ When making changes to `src/lib.rs` or `src/ddk_ffi.udl`, you MUST:
 #### Automated Release (Recommended)
 
 5. **Update Rust version only**: Update version in Cargo.toml
+
    ```bash
    # Update Rust crate version to match package.json
    vim ddk-ffi/Cargo.toml  # Change version = "0.1.1" to "0.1.2"
    ```
 
 6. **Regenerate bindings**: Run `just uniffi` to update version in generated bindings
+
    ```bash
    just uniffi
    # Fix include path as usual
-   sed -i '' 's|#include "/ddk_ffi.hpp"|#include "ddk_ffi.hpp"|' ddk-rn/cpp/bennyhodl-ddk-rn.cpp
+   sed -i '' 's|#include "/ddk_ffi.hpp"|#include "ddk_ffi.hpp"|' ddk-rn/cpp/bennyblader-ddk-rn.cpp
    ```
 
 7. **Commit Rust version change**: Commit the Rust version bump
+
    ```bash
    git add .
    git commit -m "chore: sync Rust version with package.json"
    ```
 
 8. **Automated release with npm publishing**: Use release-it for everything else
+
    ```bash
    cd ddk-rn
-   
+
    # Authenticate with npm (first time only)
    npm login
-   
+
    # Run automated release (handles versioning, tagging, GitHub release, npm publish)
    pnpm release
    ```
 
 This will automatically:
+
 - Prompt for version bump in package.json
 - Build the library with react-native-builder-bob
 - Create git tag and GitHub release
@@ -85,21 +90,24 @@ This will automatically:
 Alternatively, you can do it manually:
 
 5. **Update Version Numbers**: Update version in both package manifests
+
    ```bash
    # Update Rust crate version
    vim ddk-ffi/Cargo.toml  # Change version = "0.1.1" to "0.1.2"
-   
-   # Update React Native package version  
+
+   # Update React Native package version
    vim ddk-rn/package.json  # Change "version": "0.1.1" to "0.1.2"
    ```
 
 6. **Regenerate bindings**: Run `just uniffi` to update version in generated bindings
+
    ```bash
    just uniffi
-   sed -i '' 's|#include "/ddk_ffi.hpp"|#include "ddk_ffi.hpp"|' ddk-rn/cpp/bennyhodl-ddk-rn.cpp
+   sed -i '' 's|#include "/ddk_ffi.hpp"|#include "ddk_ffi.hpp"|' ddk-rn/cpp/bennyblader-ddk-rn.cpp
    ```
 
 7. **Build and test package**: Verify the npm package builds correctly
+
    ```bash
    cd ddk-rn
    pnpm prepare  # Build with react-native-builder-bob
@@ -107,12 +115,14 @@ Alternatively, you can do it manually:
    ```
 
 8. **Commit version changes**: Include version bumps in the release commit
+
    ```bash
    git add .
    git commit -m "chore: bump version to v<version>"
    ```
 
 9. **Create and push tag**: Create git tag and push to GitHub
+
    ```bash
    git tag -a v<version> -m "Release v<version>: <description>"
    git push origin master
@@ -120,6 +130,7 @@ Alternatively, you can do it manually:
    ```
 
 10. **Publish to npm**: Publish the package
+
     ```bash
     cd ddk-rn
     npm publish
@@ -143,7 +154,7 @@ cd ddk-ffi && cargo test
 just uniffi
 
 # 4. Fix include path
-sed -i '' 's|#include "/ddk_ffi.hpp"|#include "ddk_ffi.hpp"|' ddk-rn/cpp/bennyhodl-ddk-rn.cpp
+sed -i '' 's|#include "/ddk_ffi.hpp"|#include "ddk_ffi.hpp"|' ddk-rn/cpp/bennyblader-ddk-rn.cpp
 
 # 5. Commit feature changes
 git add .
@@ -154,7 +165,7 @@ vim ddk-ffi/Cargo.toml    # Update version = "0.1.2" (match package.json)
 
 # 7. Regenerate bindings with new version
 just uniffi
-sed -i '' 's|#include "/ddk_ffi.hpp"|#include "ddk_ffi.hpp"|' ddk-rn/cpp/bennyhodl-ddk-rn.cpp
+sed -i '' 's|#include "/ddk_ffi.hpp"|#include "ddk_ffi.hpp"|' ddk-rn/cpp/bennyblader-ddk-rn.cpp
 
 # 8. Commit Rust version sync
 git add .
@@ -167,6 +178,7 @@ pnpm release  # Handles everything: versioning, tagging, GitHub release, npm pub
 ```
 
 ### What `pnpm release` does automatically:
+
 - Prompts for version bump (patch, minor, major)
 - Updates package.json version
 - Builds library with react-native-builder-bob
@@ -240,14 +252,16 @@ Ask these questions for every change:
 ## NPM Publishing Setup
 
 ### First Time Setup
+
 Before you can publish to npm, you need:
 
 1. **npm account**: Create account at https://www.npmjs.com/
-2. **Access to @bennyhodl scope**: Ensure you have publish permissions
+2. **Access to @bennyblader scope**: Ensure you have publish permissions
 3. **Authentication**: Run `npm login` in the `ddk-rn/` directory
-4. **Verify access**: Test with `npm whoami` and `npm access ls-packages @bennyhodl`
+4. **Verify access**: Test with `npm whoami` and `npm access ls-packages @bennyblader`
 
 ### Publishing Requirements
+
 - Package builds successfully with `pnpm prepare`
 - All tests pass with `pnpm test`
 - Version in `package.json` is higher than published version

@@ -135,7 +135,7 @@ npx react-native run-android
 
 ### Manual Fix Required
 
-After running `just uniffi`, you need to manually fix the include path in `ddk-rn/cpp/bennyhodl-ddk-rn.cpp`:
+After running `just uniffi`, you need to manually fix the include path in `ddk-rn/cpp/bennyblader-ddk-rn.cpp`:
 
 ```cpp
 // Change from:

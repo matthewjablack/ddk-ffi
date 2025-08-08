@@ -1,5 +1,5 @@
 import { StyleSheet, View, Text } from 'react-native';
-import { version } from '@bennyhodl/ddk-rn';
+import { version } from '@bennyblader/ddk-rn';
 
 export default function App() {
   return (
