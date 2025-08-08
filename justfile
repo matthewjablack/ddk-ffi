@@ -40,8 +40,70 @@ example-android:
 clean:
   cd {{justfile_directory()}}/ddk-rn && rm -rf cpp/ddk_ffi.* cpp/ddk-rn.* cpp/UniffiCallInvoker.h src/ddk_ffi*.ts src/NativeDdkRn.ts ios/DdkRn.xcframework android/src/main/jniLibs lib ios/build android/build example/ios/build example/android/build example/android/app/build example/ios/Pods example/ios/Podfile.lock example/ios/DdkRnExample.xcworkspace src/index.tsx
 
-release:
+rn-release:
   cd {{justfile_directory()}}/ddk-rn && node scripts/release.js
 
-release-archives:
+rn-release-archives:
   cd {{justfile_directory()}}/ddk-rn && node scripts/create-binary-archives.js
+
+# ====================
+# TypeScript (Node.js) Bindings
+# ====================
+
+# Build TypeScript bindings for current platform
+ts-build:
+    cd {{justfile_directory()}}/ddk-ts && yarn install && yarn build
+
+# Build TypeScript bindings for all supported platforms (Darwin ARM64 and Linux x64)
+ts-build-all:
+    cd {{justfile_directory()}}/ddk-ts && yarn install && yarn build:darwin-arm64 && yarn build:linux-x64
+
+# Run TypeScript example
+ts-example:
+    cd {{justfile_directory()}}/ddk-ts && yarn build
+    cd {{justfile_directory()}}/ddk-ts/example && yarn install && yarn build && yarn start
+
+# Run TypeScript tests
+ts-test:
+    cd {{justfile_directory()}}/ddk-ts && yarn test
+
+# Release TypeScript package to npm
+ts-release version:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    cd {{justfile_directory()}}/ddk-ts
+    
+    # Check if working directory is clean
+    if [[ -n $(git status --porcelain) ]]; then
+        echo "Error: Working directory is not clean. Please commit or stash changes."
+        exit 1
+    fi
+    
+    # Update version
+    npm version {{version}} --no-git-tag-version
+    
+    # Build for all platforms
+    echo "Building for all platforms..."
+    # yarn build:darwin-arm64
+    yarn build
+    
+    # Run tests
+    echo "Running tests..."
+    yarn test
+    
+    # Commit changes
+    git add -A
+    git commit -m "chore(ddk-ts): release v{{version}}"
+    
+    # Create tag
+    git tag "ddk-ts-v{{version}}"
+    
+    # Push to GitHub
+    git push origin main
+    git push origin "ddk-ts-v{{version}}"
+    
+    # Publish to npm
+    echo "Publishing to npm..."
+    npm publish --access public
+    
+    echo "✅ Released ddk-ts v{{version}} successfully!"

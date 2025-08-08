@@ -10,7 +10,9 @@ import {
   TxInputInfo,
   DlcOutcome,
   PartyParams,
-} from '../../index.js'
+} from '@bennyblader/ddk-ts'
+
+console.log('heyhowareya')
 
 console.log('DDK TypeScript Bindings Example')
 console.log('================================\n')

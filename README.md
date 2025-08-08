@@ -1,112 +1,68 @@
-# @bennyblader/ddk-rn
+# DLC Dev Kit FFI Bindings
 
-**Rust-powered DLC (Discreet Log Contracts) bindings for React Native**
+**Rust-powered DLC (Discreet Log Contracts) bindings for JavaScript environments**
 
-A React Native library that provides complete DLC transaction functionality through high-performance Rust bindings. Built and tested with React Native 0.75 using the new architecture.
+This repository provides high-performance Rust bindings for the [rust-dlc](https://github.com/p2pderivatives/rust-dlc) library, making DLC functionality available in:
 
-[![npm version](https://badge.fury.io/js/@bennyblader%2Fddk-rn.svg)](https://badge.fury.io/js/@bennyblader%2Fddk-rn)
+- **Node.js/TypeScript**: [@bennyblader/ddk-ts](./ddk-ts) - NAPI-RS based native bindings
+- **React Native**: [@bennyblader/ddk-rn](./ddk-rn) - UniFFI-based native bindings with JSI
+
 [![GitHub](https://img.shields.io/github/license/bennyhodl/ddk-ffi)](https://github.com/bennyhodl/ddk-ffi/blob/master/LICENSE)
 
-## ✨ Features
+## 📦 Packages
 
-- **Complete DLC Support**: Full feature parity with industry-standard DLC implementations
-- **High Performance**: Rust-powered core with zero-copy data transfer via JSI
-- **Type Safe**: Full TypeScript definitions with comprehensive error handling
-- **Production Ready**: Built on battle-tested [rust-dlc](https://github.com/p2pderivatives/rust-dlc) library
-- **React Native 0.75+**: Optimized for the new architecture with TurboModules
+### [@bennyblader/ddk-ts](./ddk-ts) - Node.js/TypeScript
 
-### 🔥 DLC Capabilities
-
-- **Transaction Creation**: Funding, CET, and refund transaction generation
-- **Adaptor Signatures**: Oracle-based conditional execution
-- **Fee Management**: Intelligent fee calculation and dust handling
-- **Multi-Party Support**: Full support for complex DLC scenarios
-- **Signing & Verification**: Complete cryptographic operations
-
-## 📦 Installation
+Native Node.js bindings using NAPI-RS for server-side applications, CLI tools, and desktop apps.
 
 ```bash
-# Using npm
+npm install @bennyblader/ddk-ts
+```
+
+**Features:**
+- Zero-copy data transfer via NAPI
+- Prebuilt binaries for macOS ARM64 and Linux x64
+- Full TypeScript support
+- Synchronous API for performance
+
+[View package documentation →](./ddk-ts/README.md)
+
+### [@bennyblader/ddk-rn](./ddk-rn) - React Native
+
+React Native bindings using UniFFI for mobile DLC applications.
+
+```bash
 npm install @bennyblader/ddk-rn
-
-# Using yarn
-yarn add @bennyblader/ddk-rn
-
-# Using pnpm
-pnpm add @bennyblader/ddk-rn
 ```
 
-### Platform Setup
+**Features:**
+- JSI-based high-performance bridge
+- iOS and Android support
+- React Native 0.75+ with new architecture
+- TurboModule optimizations
 
-#### iOS
+[View package documentation →](./ddk-rn/README.md)
 
-```bash
-cd ios && pod install
-```
+## 🎯 API Reference
 
-#### Android
+Both packages expose the same API, ensuring complete compatibility across platforms. The API is generated from UniFFI definitions, guaranteeing consistency.
 
-No additional setup required - native libraries are included.
+### Core Functions
 
-## 🚀 Quick Start
+#### `version(): string`
+Returns the version of the DDK library.
 
 ```typescript
-import {
-  createDlcTransactions,
-  createFundTxLockingScript,
-  DlcOutcome,
-  PartyParams,
-} from "@bennyblader/ddk-rn";
-
-// Initialize DLC parties
-const localParams: PartyParams = {
-  fundPubkey: localPublicKey,
-  changeScriptPubkey: localChangeScript,
-  changeSerialId: 1n,
-  payoutScriptPubkey: localPayoutScript,
-  payoutSerialId: 2n,
-  inputs: localInputs,
-  inputAmount: 1000000n, // 0.01 BTC in sats
-  collateral: 500000n, // 0.005 BTC in sats
-  dlcInputs: [],
-};
-
-// Define contract outcomes
-const outcomes: DlcOutcome[] = [
-  { localPayout: 1000000n, remotePayout: 0n }, // Local wins
-  { localPayout: 500000n, remotePayout: 500000n }, // Split
-  { localPayout: 0n, remotePayout: 1000000n }, // Remote wins
-];
-
-// Create complete DLC transaction set
-try {
-  const dlcTxs = createDlcTransactions(
-    outcomes,
-    localParams,
-    remoteParams,
-    144, // refund locktime (blocks)
-    2n, // fee rate (sat/vB)
-    0, // fund lock time
-    0, // CET lock time
-    0n // fund output serial ID
-  );
-
-  console.log("✅ DLC transactions created:", {
-    funding: dlcTxs.fund.rawBytes.length,
-    cets: dlcTxs.cets.length,
-    refund: dlcTxs.refund.rawBytes.length,
-  });
-} catch (error) {
-  console.error("❌ DLC creation failed:", error);
-}
+const ddkVersion = version();
+console.log(`DDK Version: ${ddkVersion}`);
 ```
 
-## 📖 API Reference
+### Transaction Creation
 
-### Core Transaction Functions
+#### `createDlcTransactions()`
+Creates a complete set of DLC transactions including funding, CETs, and refund.
 
 ```typescript
-// Creates a complete set of DLC transactions (funding, CETs, refund)
 createDlcTransactions(
   outcomes: DlcOutcome[],
   localParams: PartyParams,
@@ -116,299 +72,266 @@ createDlcTransactions(
   fundLockTime: number,
   cetLockTime: number,
   fundOutputSerialId: bigint
-): DlcTransactions;
+): DlcTransactions
+```
 
-// Generates the multisig locking script for the funding transaction
+#### `createFundTxLockingScript()`
+Creates a 2-of-2 multisig locking script for the funding transaction.
+
+```typescript
 createFundTxLockingScript(
-  localFundPubkey: string,
-  remoteFundPubkey: string
-): string;
+  localFundPubkey: Buffer,
+  remoteFundPubkey: Buffer
+): Buffer
+```
 
-// Creates multiple Contract Execution Transactions for different outcomes
+#### `createCets()`
+Creates Contract Execution Transactions for all possible outcomes.
+
+```typescript
 createCets(
   fundTxId: string,
   fundVout: number,
-  localScript: string,
-  remoteScript: string,
+  localFinalScriptPubkey: Buffer,
+  remoteFinalScriptPubkey: Buffer,
   outcomes: DlcOutcome[],
   lockTime: number,
   localSerialId: bigint,
   remoteSerialId: bigint
-): Tx[];
+): Transaction[]
+```
 
-// Creates a refund transaction with CSV timelock
+#### `createRefundTransaction()`
+Creates a refund transaction with CSV timelock.
+
+```typescript
 createRefundTransaction(
-  localScript: string,
-  remoteScript: string,
+  localFinalScriptPubkey: Buffer,
+  remoteFinalScriptPubkey: Buffer,
   localAmount: bigint,
   remoteAmount: bigint,
   lockTime: number,
   fundTxId: string,
   fundVout: number
-): Tx;
+): Transaction
 ```
 
-### Signing Functions
+### Signing & Verification
+
+#### `signFundTransactionInput()`
+Signs a funding transaction input.
 
 ```typescript
-// Signs a funding transaction input with the provided private key
 signFundTransactionInput(
-  fundTx: Tx,
-  privkey: string,
+  fundTransaction: Transaction,
+  privkey: Buffer,
   prevTxId: string,
   prevTxVout: number,
   value: bigint
-): Tx;
+): Transaction
+```
 
-// Verifies a signature on a funding transaction input
+#### `verifyFundTxSignature()`
+Verifies a signature on a funding transaction.
+
+```typescript
 verifyFundTxSignature(
-  fundTx: Tx,
-  signature: string,
-  pubkey: string,
+  fundTx: Transaction,
+  signature: Buffer,
+  pubkey: Buffer,
   txid: string,
   vout: number,
   inputAmount: bigint
-): boolean;
+): boolean
+```
 
-// Creates adaptor signatures for oracle-based contract execution
+#### `createCetAdaptorSignatureFromOracleInfo()`
+Creates adaptor signatures for oracle-based execution.
+
+```typescript
 createCetAdaptorSignatureFromOracleInfo(
-  cet: Tx,
+  cet: Transaction,
   oracleInfo: OracleInfo,
-  fundingSk: string,
-  fundingScript: string,
+  fundingSk: Buffer,
+  fundingScriptPubkey: Buffer,
   totalCollateral: bigint,
-  msgs: Uint8Array[]
-): string;
+  msgs: Buffer[]
+): AdaptorSignature
 ```
 
 ### Utility Functions
 
+#### `isDustOutput()`
+Checks if an output is below the dust threshold.
+
 ```typescript
-// Calculates change outputs and fee requirements for a party
+isDustOutput(output: TxOutput): boolean
+```
+
+#### `getTotalInputVsize()`
+Calculates the virtual size of inputs for fee estimation.
+
+```typescript
+getTotalInputVsize(inputs: TxInputInfo[]): number
+```
+
+#### `getChangeOutputAndFees()`
+Calculates change outputs and fees for a party.
+
+```typescript
 getChangeOutputAndFees(
   params: PartyParams,
   feeRate: bigint
-): ChangeAndFees;
-
-// Checks if a transaction output is below the dust threshold
-isDustOutput(
-  output: TxOut
-): boolean;
-
-// Calculates the virtual size of inputs for fee estimation
-getTotalInputVsize(
-  inputs: TxInputInfo[]
-): bigint;
+): ChangeOutputAndFees
 ```
 
-### Error Handling
-
-All functions return detailed error information:
+### Type Definitions
 
 ```typescript
-import { DLCError } from "@bennyblader/ddk-rn";
-
-try {
-  const result = createDlcTransactions(/* ... */);
-} catch (error) {
-  if (error instanceof DLCError) {
-    switch (error.message) {
-      case "InvalidPublicKey":
-        console.log("Invalid public key provided");
-        break;
-      case "InsufficientFunds":
-        console.log("Not enough funds for transaction");
-        break;
-      default:
-        console.log("DLC error:", error.message);
-    }
-  }
+interface Transaction {
+  version: number;
+  lockTime: number;
+  inputs: TxInput[];
+  outputs: TxOutput[];
+  rawBytes: Buffer;
 }
-```
 
-## 📁 Project Structure
+interface TxOutput {
+  value: bigint;
+  scriptPubkey: Buffer;
+}
 
-```
-.
-├── ddk-ffi/                 # Rust crate with UniFFI definitions
-│   ├── src/
-│   │   ├── lib.rs          # Rust implementation
-│   │   └── ddk_ffi.udl     # UniFFI interface definitions
-│   ├── Cargo.toml
-│   └── uniffi.toml         # UniFFI configuration for Kotlin/Swift
-│
-├── ddk-rn/                  # React Native library
-│   ├── src/                # Generated TypeScript bindings
-│   ├── cpp/                # Generated C++ bindings for JSI
-│   ├── ios/                # iOS native module
-│   ├── android/            # Android native module
-│   ├── example/            # Example React Native app
-│   └── ubrn.config.yaml    # UniFFI React Native configuration
-│
-└── justfile                 # Build automation commands
+interface TxInput {
+  txid: string;
+  vout: number;
+  scriptSig: Buffer;
+  sequence: number;
+  witness: Buffer[];
+}
+
+interface TxInputInfo {
+  txid: string;
+  vout: number;
+  scriptSig: Buffer;
+  maxWitnessLength: number;
+  serialId: bigint;
+}
+
+interface DlcOutcome {
+  localPayout: bigint;
+  remotePayout: bigint;
+}
+
+interface PartyParams {
+  fundPubkey: Buffer;
+  changeScriptPubkey: Buffer;
+  changeSerialId: bigint;
+  payoutScriptPubkey: Buffer;
+  payoutSerialId: bigint;
+  inputs: TxInputInfo[];
+  inputAmount: bigint;
+  collateral: bigint;
+  dlcInputs: DlcInputInfo[];
+}
+
+interface DlcTransactions {
+  fund: Transaction;
+  cets: Transaction[];
+  refund: Transaction;
+  fundingScriptPubkey: Buffer;
+}
+
+interface OracleInfo {
+  publicKey: Buffer;
+  nonces: Buffer[];
+}
+
+interface AdaptorSignature {
+  signature: Buffer;
+  proof: Buffer;
+}
+
+interface ChangeOutputAndFees {
+  changeOutput: TxOutput;
+  fundFee: bigint;
+  cetFee: bigint;
+}
 ```
 
 ## 🏗️ Architecture
 
-This library uses a **pure wrapper approach** around the [rust-dlc](https://github.com/p2pderivatives/rust-dlc) library:
-
-1. **Rust Core**: All DLC logic implemented in rust-dlc (battle-tested)
-2. **Zero Duplication**: No reimplemented DLC functionality
-3. **Type Conversion**: Seamless bridging between TypeScript and Rust types
-4. **JSI Performance**: Direct memory access for maximum performance
-5. **Forward Compatible**: Automatic updates when rust-dlc improves
+Both packages follow a **pure wrapper approach** around rust-dlc:
 
 ```
 ┌─────────────────┐    ┌──────────────┐    ┌─────────────┐
-│   React Native  │    │  TypeScript  │    │    Rust     │
-│      App        │───▶│   Bindings   │───▶│   rust-dlc  │
-│                 │    │   (Generated)│    │   (Core)    │
+│   JavaScript    │    │   Generated  │    │    Rust     │
+│   Application   │───▶│   Bindings   │───▶│   rust-dlc  │
+│                 │    │  (TS + FFI)  │    │   (Core)    │
 └─────────────────┘    └──────────────┘    └─────────────┘
-       ▲                       ▲                   ▲
-       │                       │                   │
-   App Logic              Type Safety        DLC Implementation
 ```
 
-## 🧪 Example Usage Patterns
+### API Compatibility
 
-### Complete DLC Flow
+The packages maintain 100% API compatibility through:
 
-```typescript
-import {
-  createDlcTransactions,
-  signFundTransactionInput,
-  createCetAdaptorSignatureFromOracleInfo,
-  version
-} from '@bennyblader/ddk-rn';
+1. **Shared UDL**: Single UniFFI Definition Language file defines the interface
+2. **Verification Scripts**: Automated checks ensure parity between implementations
+3. **Type Safety**: Full TypeScript definitions generated from UDL
+4. **Testing**: Comprehensive test suites verify behavior consistency
 
-console.log('📦 Using ddk-rn version:', version());
-
-// 1. Create DLC transactions
-const dlcTxs = createDlcTransactions(outcomes, localParams, remoteParams, ...);
-
-// 2. Sign funding transaction
-const signedFundTx = signFundTransactionInput(
-  dlcTxs.fund,
-  privateKey,
-  inputTxId,
-  inputVout,
-  inputValue
-);
-
-// 3. Create adaptor signatures for CETs
-const adaptorSigs = dlcTxs.cets.map(cet =>
-  createCetAdaptorSignatureFromOracleInfo(
-    cet,
-    oracleInfo,
-    fundingPrivkey,
-    dlcTxs.fundingScriptPubkey,
-    totalCollateral,
-    messages
-  )
-);
-```
-
-### Fee Estimation
-
-```typescript
-import {
-  getChangeOutputAndFees,
-  getTotalInputVsize,
-} from "@bennyblader/ddk-rn";
-
-// Calculate fees and change
-const feeInfo = getChangeOutputAndFees(partyParams, 2n); // 2 sat/vB
-
-console.log("💰 Fee breakdown:", {
-  fundingFee: feeInfo.fundFee,
-  cetFee: feeInfo.cetFee,
-  changeAmount: feeInfo.changeOutput.value,
-});
-
-// Estimate input size for fee calculation
-const inputSize = getTotalInputVsize(inputs);
-console.log("📏 Input vsize:", inputSize, "vBytes");
-```
-
-## ⚡ Performance
-
-- **Zero-copy operations** via React Native JSI
-- **Rust-level performance** for cryptographic operations
-- **Minimal overhead** type conversions
-- **Synchronous execution** - no promise overhead for core operations
+View the [compatibility verification script](./ddk-ts/scripts/verify-parity.js) that ensures both packages expose identical APIs.
 
 ## 🛠️ Development
 
-Want to contribute or modify this library? See our comprehensive development guide:
-
 ### Prerequisites
 
-- **Rust** (latest stable)
-- **Node.js** 18+ and **pnpm**
-- **React Native development environment**
-- **just** (`cargo install just`)
-- **uniffi-bindgen-react-native** (`npm i -g uniffi-bindgen-react-native`)
+- Rust (latest stable)
+- Node.js 18+
+- Just (`cargo install just`)
 
-### Development Workflow
+### Project Structure
 
-1. **Clone and setup**
-
-   ```bash
-   git clone https://github.com/bennyhodl/ddk-ffi.git
-   cd ddk-ffi
-   ```
-
-2. **Make changes to Rust code**
-
-   ```bash
-   # Edit Rust implementation
-   vim ddk-ffi/src/lib.rs
-
-   # Update UniFFI interface
-   vim ddk-ffi/src/ddk_ffi.udl
-   ```
-
-3. **Generate and test**
-
-   ```bash
-   # Generate all bindings
-   just uniffi
-
-   # Fix include path (required after generation)
-   sed -i '' 's|#include "/ddk_ffi.hpp"|#include "ddk_ffi.hpp"|' ddk-rn/cpp/bennyblader-ddk-rn.cpp
-
-   # Test changes
-   cd ddk-ffi && cargo test
-   cd ../ddk-rn && pnpm test
-   ```
-
-4. **Run example app**
-
-   ```bash
-   # iOS
-   cd ddk-rn/example && npx react-native run-ios
-
-   # Android
-   cd ddk-rn/example && npx react-native run-android
-   ```
-
-### Release Process
-
-This library uses automated releases with `release-it`:
-
-```bash
-cd ddk-rn
-pnpm release  # Handles versioning, building, tagging, and npm publishing
+```
+.
+├── ddk-ffi/           # Rust crate with UniFFI definitions
+│   ├── src/
+│   │   ├── lib.rs     # Rust implementation
+│   │   └── ddk_ffi.udl # UniFFI interface definitions
+│   └── Cargo.toml
+│
+├── ddk-ts/            # Node.js/TypeScript package
+│   ├── src-napi/      # NAPI-RS Rust source
+│   ├── src/           # Generated JS/TS
+│   └── README.md
+│
+├── ddk-rn/            # React Native package
+│   ├── src/           # Generated TypeScript
+│   ├── cpp/           # Generated C++ JSI bindings
+│   ├── ios/           # iOS native module
+│   ├── android/       # Android native module
+│   └── README.md
+│
+└── justfile           # Build automation
 ```
 
-For detailed development instructions, see [DEVELOPMENT.md](./DEVELOPMENT.md).
+### Quick Commands
 
-## 📋 Requirements
+```bash
+# TypeScript/Node.js
+just ts-build          # Build for current platform
+just ts-build-all      # Build for all platforms
+just ts-test           # Run tests
+just ts-release 0.2.0  # Release new version
 
-- **React Native**: 0.75+
-- **New Architecture**: Required (TurboModules/Fabric)
-- **iOS**: 11.0+
-- **Android**: API 23+
+# React Native
+just uniffi            # Generate all bindings
+just build-ios         # Build iOS
+just build-android     # Build Android
+just release           # Release new version
+
+# Clean everything
+just clean
+```
 
 ## 📄 License
 
@@ -416,20 +339,20 @@ MIT License - see [LICENSE](./LICENSE) file for details.
 
 ## 🤝 Contributing
 
-Contributions welcome! Please read our [development guide](./DEVELOPMENT.md) and ensure:
+Contributions welcome! Please ensure:
 
-1. All tests pass (`cargo test` and `pnpm test`)
-2. Bindings are regenerated (`just uniffi`)
-3. Code follows the **pure wrapper** principle
-4. Changes include appropriate documentation
+1. All tests pass (`cargo test`, `yarn test`, `pnpm test`)
+2. Bindings are regenerated when changing Rust code
+3. API compatibility is maintained
+4. Documentation is updated
 
 ## 🔗 Links
 
 - **GitHub**: https://github.com/bennyhodl/ddk-ffi
-- **npm Package**: https://www.npmjs.com/package/@bennyblader/ddk-rn
-- **Issues**: https://github.com/bennyhodl/ddk-ffi/issues
 - **rust-dlc**: https://github.com/p2pderivatives/rust-dlc
+- **NAPI-RS**: https://napi.rs
+- **UniFFI**: https://mozilla.github.io/uniffi-rs/
 
 ---
 
-Built with ❤️ using [rust-dlc](https://github.com/p2pderivatives/rust-dlc) and [UniFFI](https://mozilla.github.io/uniffi-rs/)
+Built with ❤️ using [rust-dlc](https://github.com/p2pderivatives/rust-dlc)

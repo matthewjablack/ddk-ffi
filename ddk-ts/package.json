@@ -1,9 +1,9 @@
 {
   "name": "@bennyblader/ddk-ts",
   "version": "0.1.4",
-  "description": "Template project for writing node package with napi-rs",
-  "main": "src/index.js",
-  "repository": "git@github.com:napi-rs/package-template.git",
+  "description": "dlcdevkit typescript bindings",
+  "main": "index.js",
+  "repository": "https://github.com/bennyblader/ddk-ffi",
   "license": "MIT",
   "keywords": [
     "napi-rs",
@@ -18,13 +18,8 @@
   "napi": {
     "binaryName": "ddk-ts",
     "targets": [
-      "x86_64-pc-windows-msvc",
-      "x86_64-apple-darwin",
-      "x86_64-unknown-linux-gnu",
-      "x86_64-unknown-linux-musl",
       "aarch64-apple-darwin",
-      "aarch64-unknown-linux-gnu",
-      "aarch64-unknown-linux-musl"
+      "x86_64-unknown-linux-gnu"
     ]
   },
   "engines": {
@@ -37,22 +32,21 @@
   "scripts": {
     "artifacts": "napi artifacts",
     "bench": "node --import @oxc-node/core/register benchmark/bench.ts",
-    "build": "napi build --platform --release --js src/index.js --dts src/index.d.ts",
+    "build": "napi build --platform --release --js index.js --dts index.d.ts",
     "build:debug": "napi build --platform --js src/index.js --dts src/index.d.ts",
-    "build:all": "napi build --release --js src/index.js --dts src/index.d.ts --target x86_64-apple-darwin --target aarch64-apple-darwin --target x86_64-unknown-linux-gnu --target x86_64-unknown-linux-musl --target aarch64-unknown-linux-gnu --target aarch64-unknown-linux-musl",
+    "build:all": "napi build --release --js src/index.js --dts src/index.d.ts --target aarch64-apple-darwin --target x86_64-unknown-linux-gnu",
     "prepublish": "napi prepublish -t npm --skip-gh-release",
     "prepublishOnly": "napi prepublish -t npm --skip-gh-release",
-    "build:darwin-x64": "napi build --release --js src/index.js --dts src/index.d.ts --target x86_64-apple-darwin",
-    "build:darwin-arm64": "napi build --release --js src/index.js --dts src/index.d.ts --target aarch64-apple-darwin",
-    "build:linux-x64": "napi build --release --js src/index.js --dts src/index.d.ts --target x86_64-unknown-linux-gnu",
-    "build:linux-x64-musl": "napi build --release --js src/index.js --dts src/index.d.ts --target x86_64-unknown-linux-musl",
+    "build:darwin-x64": "napi build --release --js index.js --dts index.d.ts --target x86_64-apple-darwin",
+    "build:darwin-arm64": "napi build --release --js index.js --dts index.d.ts --target aarch64-apple-darwin",
+    "build:linux-x64": "napi build --release --js index.js --dts index.d.ts --target x86_64-unknown-linux-gnu",
+    "build:linux-x64-musl": "napi build --release --js index.js --dts index.d.ts --target x86_64-unknown-linux-musl",
     "build:linux-arm64": "napi build --release --js src/index.js --dts src/index.d.ts --target aarch64-unknown-linux-gnu",
     "build:linux-arm64-musl": "napi build --release --js src/index.js --dts src/index.d.ts --target aarch64-unknown-linux-musl",
     "format": "run-p format:prettier format:rs format:toml",
     "format:prettier": "prettier . -w",
     "format:toml": "taplo format",
     "format:rs": "cargo fmt",
-    "lint": "oxlint .",
     "test": "ava",
     "test:all": "yarn verify && cargo test && yarn test",
     "verify": "node scripts/verify-parity.js && node scripts/verify-types.js",
@@ -65,7 +59,6 @@
     "@emnapi/core": "^1.4.5",
     "@emnapi/runtime": "^1.4.5",
     "@napi-rs/cli": "^3.0.3",
-    "@oxc-node/core": "^0.0.30",
     "@taplo/cli": "^0.7.0",
     "@tybys/wasm-util": "^0.10.0",
     "ava": "^6.4.1",
@@ -73,21 +66,9 @@
     "husky": "^9.1.7",
     "lint-staged": "^16.1.2",
     "npm-run-all2": "^8.0.4",
-    "oxlint": "^1.8.0",
     "prettier": "^3.6.2",
     "tinybench": "^4.0.1",
     "typescript": "^5.8.3"
-  },
-  "lint-staged": {
-    "*.@(js|ts|tsx)": [
-      "oxlint --fix"
-    ],
-    "*.@(js|ts|tsx|yml|yaml|md|json)": [
-      "prettier --write"
-    ],
-    "*.toml": [
-      "taplo format"
-    ]
   },
   "ava": {
     "timeout": "2m",
