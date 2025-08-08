@@ -105,49 +105,101 @@ try {
 
 ### Core Transaction Functions
 
-#### `createDlcTransactions(outcomes, localParams, remoteParams, refundLocktime, feeRate, fundLockTime, cetLockTime, fundOutputSerialId)`
+```typescript
+// Creates a complete set of DLC transactions (funding, CETs, refund)
+createDlcTransactions(
+  outcomes: DlcOutcome[],
+  localParams: PartyParams,
+  remoteParams: PartyParams,
+  refundLocktime: number,
+  feeRate: bigint,
+  fundLockTime: number,
+  cetLockTime: number,
+  fundOutputSerialId: bigint
+): DlcTransactions;
 
-Creates a complete set of DLC transactions (funding, CETs, refund).
+// Generates the multisig locking script for the funding transaction
+createFundTxLockingScript(
+  localFundPubkey: string,
+  remoteFundPubkey: string
+): string;
 
-#### `createFundTxLockingScript(localFundPubkey, remoteFundPubkey)`
+// Creates multiple Contract Execution Transactions for different outcomes
+createCets(
+  fundTxId: string,
+  fundVout: number,
+  localScript: string,
+  remoteScript: string,
+  outcomes: DlcOutcome[],
+  lockTime: number,
+  localSerialId: bigint,
+  remoteSerialId: bigint
+): Tx[];
 
-Generates the multisig locking script for the funding transaction.
-
-#### `createCets(fundTxId, fundVout, localScript, remoteScript, outcomes, lockTime, localSerialId, remoteSerialId)`
-
-Creates multiple Contract Execution Transactions for different outcomes.
-
-#### `createRefundTransaction(localScript, remoteScript, localAmount, remoteAmount, lockTime, fundTxId, fundVout)`
-
-Creates a refund transaction with CSV timelock.
+// Creates a refund transaction with CSV timelock
+createRefundTransaction(
+  localScript: string,
+  remoteScript: string,
+  localAmount: bigint,
+  remoteAmount: bigint,
+  lockTime: number,
+  fundTxId: string,
+  fundVout: number
+): Tx;
+```
 
 ### Signing Functions
 
-#### `signFundTransactionInput(fundTx, privkey, prevTxId, prevTxVout, value)`
+```typescript
+// Signs a funding transaction input with the provided private key
+signFundTransactionInput(
+  fundTx: Tx,
+  privkey: string,
+  prevTxId: string,
+  prevTxVout: number,
+  value: bigint
+): Tx;
 
-Signs a funding transaction input with the provided private key.
+// Verifies a signature on a funding transaction input
+verifyFundTxSignature(
+  fundTx: Tx,
+  signature: string,
+  pubkey: string,
+  txid: string,
+  vout: number,
+  inputAmount: bigint
+): boolean;
 
-#### `verifyFundTxSignature(fundTx, signature, pubkey, txid, vout, inputAmount)`
-
-Verifies a signature on a funding transaction input.
-
-#### `createCetAdaptorSignatureFromOracleInfo(cet, oracleInfo, fundingSk, fundingScript, totalCollateral, msgs)`
-
-Creates adaptor signatures for oracle-based contract execution.
+// Creates adaptor signatures for oracle-based contract execution
+createCetAdaptorSignatureFromOracleInfo(
+  cet: Tx,
+  oracleInfo: OracleInfo,
+  fundingSk: string,
+  fundingScript: string,
+  totalCollateral: bigint,
+  msgs: Uint8Array[]
+): string;
+```
 
 ### Utility Functions
 
-#### `getChangeOutputAndFees(params, feeRate)`
+```typescript
+// Calculates change outputs and fee requirements for a party
+getChangeOutputAndFees(
+  params: PartyParams,
+  feeRate: bigint
+): ChangeAndFees;
 
-Calculates change outputs and fee requirements for a party.
+// Checks if a transaction output is below the dust threshold
+isDustOutput(
+  output: TxOut
+): boolean;
 
-#### `isDustOutput(output)`
-
-Checks if a transaction output is below the dust threshold.
-
-#### `getTotalInputVsize(inputs)`
-
-Calculates the virtual size of inputs for fee estimation.
+// Calculates the virtual size of inputs for fee estimation
+getTotalInputVsize(
+  inputs: TxInputInfo[]
+): bigint;
+```
 
 ### Error Handling
 
