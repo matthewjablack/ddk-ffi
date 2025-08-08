@@ -1,7 +1,124 @@
 namespace ddk_ffi {
+    // Demo functions
     string hello_world();
     string do_the_dlc();
     string lygos();
+    
+    // DLC Transaction Creation Functions
+    [Throws=DLCError]
+    sequence<u8> create_fund_tx_locking_script(
+        sequence<u8> local_fund_pubkey,
+        sequence<u8> remote_fund_pubkey
+    );
+    
+    [Throws=DLCError]
+    DlcTransactions create_dlc_transactions(
+        sequence<DlcOutcome> outcomes,
+        PartyParams local_params,
+        PartyParams remote_params,
+        u32 refund_locktime,
+        u64 fee_rate,
+        u32 fund_lock_time,
+        u32 cet_lock_time,
+        u64 fund_output_serial_id
+    );
+    
+    [Throws=DLCError]
+    DlcTransactions create_spliced_dlc_transactions(
+        sequence<DlcOutcome> outcomes,
+        PartyParams local_params,
+        PartyParams remote_params,
+        u32 refund_locktime,
+        u64 fee_rate,
+        u32 fund_lock_time,
+        u32 cet_lock_time,
+        u64 fund_output_serial_id
+    );
+    
+    [Throws=DLCError]
+    Transaction create_cet(
+        TxOutput local_output,
+        u64 local_payout_serial_id,
+        TxOutput remote_output,
+        u64 remote_payout_serial_id,
+        string fund_tx_id,
+        u32 fund_vout,
+        u32 lock_time
+    );
+    
+    [Throws=DLCError]
+    sequence<Transaction> create_cets(
+        string fund_tx_id,
+        u32 fund_vout,
+        sequence<u8> local_final_script_pubkey,
+        sequence<u8> remote_final_script_pubkey,
+        sequence<DlcOutcome> outcomes,
+        u32 lock_time,
+        u64 local_serial_id,
+        u64 remote_serial_id
+    );
+    
+    [Throws=DLCError]
+    Transaction create_refund_transaction(
+        sequence<u8> local_final_script_pubkey,
+        sequence<u8> remote_final_script_pubkey,
+        u64 local_amount,
+        u64 remote_amount,
+        u32 lock_time,
+        string fund_tx_id,
+        u32 fund_vout
+    );
+    
+    // Utility Functions
+    boolean is_dust_output(TxOutput output);
+    
+    [Throws=DLCError]
+    ChangeOutputAndFees get_change_output_and_fees(
+        PartyParams params,
+        u64 fee_rate
+    );
+    
+    u32 get_total_input_vsize(sequence<TxInputInfo> inputs);
+    
+    [Throws=DLCError]
+    boolean verify_fund_tx_signature(
+        Transaction fund_tx,
+        sequence<u8> signature,
+        sequence<u8> pubkey,
+        string txid,
+        u32 vout,
+        u64 input_amount
+    );
+    
+    // Signing Functions
+    [Throws=DLCError]
+    sequence<u8> get_raw_funding_transaction_input_signature(
+        Transaction funding_transaction,
+        sequence<u8> privkey,
+        string prev_tx_id,
+        u32 prev_tx_vout,
+        u64 value
+    );
+    
+    [Throws=DLCError]
+    Transaction sign_fund_transaction_input(
+        Transaction fund_transaction,
+        sequence<u8> privkey,
+        string prev_tx_id,
+        u32 prev_tx_vout,
+        u64 value
+    );
+    
+    // Adaptor Signature Functions
+    [Throws=DLCError]
+    AdaptorSignature create_cet_adaptor_signature_from_oracle_info(
+        Transaction cet,
+        OracleInfo oracle_info,
+        sequence<u8> funding_sk,
+        sequence<u8> funding_script_pubkey,
+        u64 total_collateral,
+        sequence<sequence<u8>> msgs
+    );
 };
 
 // Transaction representation

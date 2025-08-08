@@ -34,6 +34,7 @@ import {
   type UniffiByteArray,
   AbstractFfiConverterByteArray,
   FfiConverterArray,
+  FfiConverterBool,
   FfiConverterInt32,
   FfiConverterUInt32,
   FfiConverterUInt64,
@@ -59,6 +60,242 @@ const uniffiIsDebug =
   true;
 // Public interface members begin here.
 
+export function createCet(
+  localOutput: TxOutput,
+  localPayoutSerialId: /*u64*/ bigint,
+  remoteOutput: TxOutput,
+  remotePayoutSerialId: /*u64*/ bigint,
+  fundTxId: string,
+  fundVout: /*u32*/ number,
+  lockTime: /*u32*/ number
+): Transaction /*throws*/ {
+  return FfiConverterTypeTransaction.lift(
+    uniffiCaller.rustCallWithError(
+      /*liftError:*/ FfiConverterTypeDLCError.lift.bind(
+        FfiConverterTypeDLCError
+      ),
+      /*caller:*/ (callStatus) => {
+        return (() => {
+          console.debug(`-- uniffi_ddk_ffi_fn_func_create_cet`);
+          return nativeModule().ubrn_uniffi_ddk_ffi_fn_func_create_cet;
+        })()(
+          FfiConverterTypeTxOutput.lower(localOutput),
+          FfiConverterUInt64.lower(localPayoutSerialId),
+          FfiConverterTypeTxOutput.lower(remoteOutput),
+          FfiConverterUInt64.lower(remotePayoutSerialId),
+          FfiConverterString.lower(fundTxId),
+          FfiConverterUInt32.lower(fundVout),
+          FfiConverterUInt32.lower(lockTime),
+          callStatus
+        );
+      },
+      /*liftString:*/ FfiConverterString.lift
+    )
+  );
+}
+export function createCetAdaptorSignatureFromOracleInfo(
+  cet: Transaction,
+  oracleInfo: OracleInfo,
+  fundingSk: Array</*u8*/ number>,
+  fundingScriptPubkey: Array</*u8*/ number>,
+  totalCollateral: /*u64*/ bigint,
+  msgs: Array<Array</*u8*/ number>>
+): AdaptorSignature /*throws*/ {
+  return FfiConverterTypeAdaptorSignature.lift(
+    uniffiCaller.rustCallWithError(
+      /*liftError:*/ FfiConverterTypeDLCError.lift.bind(
+        FfiConverterTypeDLCError
+      ),
+      /*caller:*/ (callStatus) => {
+        return (() => {
+          console.debug(
+            `-- uniffi_ddk_ffi_fn_func_create_cet_adaptor_signature_from_oracle_info`
+          );
+          return nativeModule()
+            .ubrn_uniffi_ddk_ffi_fn_func_create_cet_adaptor_signature_from_oracle_info;
+        })()(
+          FfiConverterTypeTransaction.lower(cet),
+          FfiConverterTypeOracleInfo.lower(oracleInfo),
+          FfiConverterArrayUInt8.lower(fundingSk),
+          FfiConverterArrayUInt8.lower(fundingScriptPubkey),
+          FfiConverterUInt64.lower(totalCollateral),
+          FfiConverterArrayArrayUInt8.lower(msgs),
+          callStatus
+        );
+      },
+      /*liftString:*/ FfiConverterString.lift
+    )
+  );
+}
+export function createCets(
+  fundTxId: string,
+  fundVout: /*u32*/ number,
+  localFinalScriptPubkey: Array</*u8*/ number>,
+  remoteFinalScriptPubkey: Array</*u8*/ number>,
+  outcomes: Array<DlcOutcome>,
+  lockTime: /*u32*/ number,
+  localSerialId: /*u64*/ bigint,
+  remoteSerialId: /*u64*/ bigint
+): Array<Transaction> /*throws*/ {
+  return FfiConverterArrayTypeTransaction.lift(
+    uniffiCaller.rustCallWithError(
+      /*liftError:*/ FfiConverterTypeDLCError.lift.bind(
+        FfiConverterTypeDLCError
+      ),
+      /*caller:*/ (callStatus) => {
+        return (() => {
+          console.debug(`-- uniffi_ddk_ffi_fn_func_create_cets`);
+          return nativeModule().ubrn_uniffi_ddk_ffi_fn_func_create_cets;
+        })()(
+          FfiConverterString.lower(fundTxId),
+          FfiConverterUInt32.lower(fundVout),
+          FfiConverterArrayUInt8.lower(localFinalScriptPubkey),
+          FfiConverterArrayUInt8.lower(remoteFinalScriptPubkey),
+          FfiConverterArrayTypeDlcOutcome.lower(outcomes),
+          FfiConverterUInt32.lower(lockTime),
+          FfiConverterUInt64.lower(localSerialId),
+          FfiConverterUInt64.lower(remoteSerialId),
+          callStatus
+        );
+      },
+      /*liftString:*/ FfiConverterString.lift
+    )
+  );
+}
+export function createDlcTransactions(
+  outcomes: Array<DlcOutcome>,
+  localParams: PartyParams,
+  remoteParams: PartyParams,
+  refundLocktime: /*u32*/ number,
+  feeRate: /*u64*/ bigint,
+  fundLockTime: /*u32*/ number,
+  cetLockTime: /*u32*/ number,
+  fundOutputSerialId: /*u64*/ bigint
+): DlcTransactions /*throws*/ {
+  return FfiConverterTypeDlcTransactions.lift(
+    uniffiCaller.rustCallWithError(
+      /*liftError:*/ FfiConverterTypeDLCError.lift.bind(
+        FfiConverterTypeDLCError
+      ),
+      /*caller:*/ (callStatus) => {
+        return (() => {
+          console.debug(`-- uniffi_ddk_ffi_fn_func_create_dlc_transactions`);
+          return nativeModule()
+            .ubrn_uniffi_ddk_ffi_fn_func_create_dlc_transactions;
+        })()(
+          FfiConverterArrayTypeDlcOutcome.lower(outcomes),
+          FfiConverterTypePartyParams.lower(localParams),
+          FfiConverterTypePartyParams.lower(remoteParams),
+          FfiConverterUInt32.lower(refundLocktime),
+          FfiConverterUInt64.lower(feeRate),
+          FfiConverterUInt32.lower(fundLockTime),
+          FfiConverterUInt32.lower(cetLockTime),
+          FfiConverterUInt64.lower(fundOutputSerialId),
+          callStatus
+        );
+      },
+      /*liftString:*/ FfiConverterString.lift
+    )
+  );
+}
+export function createFundTxLockingScript(
+  localFundPubkey: Array</*u8*/ number>,
+  remoteFundPubkey: Array</*u8*/ number>
+): Array</*u8*/ number> /*throws*/ {
+  return FfiConverterArrayUInt8.lift(
+    uniffiCaller.rustCallWithError(
+      /*liftError:*/ FfiConverterTypeDLCError.lift.bind(
+        FfiConverterTypeDLCError
+      ),
+      /*caller:*/ (callStatus) => {
+        return (() => {
+          console.debug(
+            `-- uniffi_ddk_ffi_fn_func_create_fund_tx_locking_script`
+          );
+          return nativeModule()
+            .ubrn_uniffi_ddk_ffi_fn_func_create_fund_tx_locking_script;
+        })()(
+          FfiConverterArrayUInt8.lower(localFundPubkey),
+          FfiConverterArrayUInt8.lower(remoteFundPubkey),
+          callStatus
+        );
+      },
+      /*liftString:*/ FfiConverterString.lift
+    )
+  );
+}
+export function createRefundTransaction(
+  localFinalScriptPubkey: Array</*u8*/ number>,
+  remoteFinalScriptPubkey: Array</*u8*/ number>,
+  localAmount: /*u64*/ bigint,
+  remoteAmount: /*u64*/ bigint,
+  lockTime: /*u32*/ number,
+  fundTxId: string,
+  fundVout: /*u32*/ number
+): Transaction /*throws*/ {
+  return FfiConverterTypeTransaction.lift(
+    uniffiCaller.rustCallWithError(
+      /*liftError:*/ FfiConverterTypeDLCError.lift.bind(
+        FfiConverterTypeDLCError
+      ),
+      /*caller:*/ (callStatus) => {
+        return (() => {
+          console.debug(`-- uniffi_ddk_ffi_fn_func_create_refund_transaction`);
+          return nativeModule()
+            .ubrn_uniffi_ddk_ffi_fn_func_create_refund_transaction;
+        })()(
+          FfiConverterArrayUInt8.lower(localFinalScriptPubkey),
+          FfiConverterArrayUInt8.lower(remoteFinalScriptPubkey),
+          FfiConverterUInt64.lower(localAmount),
+          FfiConverterUInt64.lower(remoteAmount),
+          FfiConverterUInt32.lower(lockTime),
+          FfiConverterString.lower(fundTxId),
+          FfiConverterUInt32.lower(fundVout),
+          callStatus
+        );
+      },
+      /*liftString:*/ FfiConverterString.lift
+    )
+  );
+}
+export function createSplicedDlcTransactions(
+  outcomes: Array<DlcOutcome>,
+  localParams: PartyParams,
+  remoteParams: PartyParams,
+  refundLocktime: /*u32*/ number,
+  feeRate: /*u64*/ bigint,
+  fundLockTime: /*u32*/ number,
+  cetLockTime: /*u32*/ number,
+  fundOutputSerialId: /*u64*/ bigint
+): DlcTransactions /*throws*/ {
+  return FfiConverterTypeDlcTransactions.lift(
+    uniffiCaller.rustCallWithError(
+      /*liftError:*/ FfiConverterTypeDLCError.lift.bind(
+        FfiConverterTypeDLCError
+      ),
+      /*caller:*/ (callStatus) => {
+        return (() => {
+          console.debug(
+            `-- uniffi_ddk_ffi_fn_func_create_spliced_dlc_transactions`
+          );
+          return nativeModule()
+            .ubrn_uniffi_ddk_ffi_fn_func_create_spliced_dlc_transactions;
+        })()(
+          FfiConverterArrayTypeDlcOutcome.lower(outcomes),
+          FfiConverterTypePartyParams.lower(localParams),
+          FfiConverterTypePartyParams.lower(remoteParams),
+          FfiConverterUInt32.lower(refundLocktime),
+          FfiConverterUInt64.lower(feeRate),
+          FfiConverterUInt32.lower(fundLockTime),
+          FfiConverterUInt32.lower(cetLockTime),
+          FfiConverterUInt64.lower(fundOutputSerialId),
+          callStatus
+        );
+      },
+      /*liftString:*/ FfiConverterString.lift
+    )
+  );
+}
 export function doTheDlc(): string {
   return FfiConverterString.lift(
     uniffiCaller.rustCall(
@@ -67,6 +304,76 @@ export function doTheDlc(): string {
           console.debug(`-- uniffi_ddk_ffi_fn_func_do_the_dlc`);
           return nativeModule().ubrn_uniffi_ddk_ffi_fn_func_do_the_dlc;
         })()(callStatus);
+      },
+      /*liftString:*/ FfiConverterString.lift
+    )
+  );
+}
+export function getChangeOutputAndFees(
+  params: PartyParams,
+  feeRate: /*u64*/ bigint
+): ChangeOutputAndFees /*throws*/ {
+  return FfiConverterTypeChangeOutputAndFees.lift(
+    uniffiCaller.rustCallWithError(
+      /*liftError:*/ FfiConverterTypeDLCError.lift.bind(
+        FfiConverterTypeDLCError
+      ),
+      /*caller:*/ (callStatus) => {
+        return (() => {
+          console.debug(`-- uniffi_ddk_ffi_fn_func_get_change_output_and_fees`);
+          return nativeModule()
+            .ubrn_uniffi_ddk_ffi_fn_func_get_change_output_and_fees;
+        })()(
+          FfiConverterTypePartyParams.lower(params),
+          FfiConverterUInt64.lower(feeRate),
+          callStatus
+        );
+      },
+      /*liftString:*/ FfiConverterString.lift
+    )
+  );
+}
+export function getRawFundingTransactionInputSignature(
+  fundingTransaction: Transaction,
+  privkey: Array</*u8*/ number>,
+  prevTxId: string,
+  prevTxVout: /*u32*/ number,
+  value: /*u64*/ bigint
+): Array</*u8*/ number> /*throws*/ {
+  return FfiConverterArrayUInt8.lift(
+    uniffiCaller.rustCallWithError(
+      /*liftError:*/ FfiConverterTypeDLCError.lift.bind(
+        FfiConverterTypeDLCError
+      ),
+      /*caller:*/ (callStatus) => {
+        return (() => {
+          console.debug(
+            `-- uniffi_ddk_ffi_fn_func_get_raw_funding_transaction_input_signature`
+          );
+          return nativeModule()
+            .ubrn_uniffi_ddk_ffi_fn_func_get_raw_funding_transaction_input_signature;
+        })()(
+          FfiConverterTypeTransaction.lower(fundingTransaction),
+          FfiConverterArrayUInt8.lower(privkey),
+          FfiConverterString.lower(prevTxId),
+          FfiConverterUInt32.lower(prevTxVout),
+          FfiConverterUInt64.lower(value),
+          callStatus
+        );
+      },
+      /*liftString:*/ FfiConverterString.lift
+    )
+  );
+}
+export function getTotalInputVsize(inputs: Array<TxInputInfo>): /*u32*/ number {
+  return FfiConverterUInt32.lift(
+    uniffiCaller.rustCall(
+      /*caller:*/ (callStatus) => {
+        return (() => {
+          console.debug(`-- uniffi_ddk_ffi_fn_func_get_total_input_vsize`);
+          return nativeModule()
+            .ubrn_uniffi_ddk_ffi_fn_func_get_total_input_vsize;
+        })()(FfiConverterArrayTypeTxInputInfo.lower(inputs), callStatus);
       },
       /*liftString:*/ FfiConverterString.lift
     )
@@ -85,6 +392,19 @@ export function helloWorld(): string {
     )
   );
 }
+export function isDustOutput(output: TxOutput): boolean {
+  return FfiConverterBool.lift(
+    uniffiCaller.rustCall(
+      /*caller:*/ (callStatus) => {
+        return (() => {
+          console.debug(`-- uniffi_ddk_ffi_fn_func_is_dust_output`);
+          return nativeModule().ubrn_uniffi_ddk_ffi_fn_func_is_dust_output;
+        })()(FfiConverterTypeTxOutput.lower(output), callStatus);
+      },
+      /*liftString:*/ FfiConverterString.lift
+    )
+  );
+}
 export function lygos(): string {
   return FfiConverterString.lift(
     uniffiCaller.rustCall(
@@ -93,6 +413,70 @@ export function lygos(): string {
           console.debug(`-- uniffi_ddk_ffi_fn_func_lygos`);
           return nativeModule().ubrn_uniffi_ddk_ffi_fn_func_lygos;
         })()(callStatus);
+      },
+      /*liftString:*/ FfiConverterString.lift
+    )
+  );
+}
+export function signFundTransactionInput(
+  fundTransaction: Transaction,
+  privkey: Array</*u8*/ number>,
+  prevTxId: string,
+  prevTxVout: /*u32*/ number,
+  value: /*u64*/ bigint
+): Transaction /*throws*/ {
+  return FfiConverterTypeTransaction.lift(
+    uniffiCaller.rustCallWithError(
+      /*liftError:*/ FfiConverterTypeDLCError.lift.bind(
+        FfiConverterTypeDLCError
+      ),
+      /*caller:*/ (callStatus) => {
+        return (() => {
+          console.debug(
+            `-- uniffi_ddk_ffi_fn_func_sign_fund_transaction_input`
+          );
+          return nativeModule()
+            .ubrn_uniffi_ddk_ffi_fn_func_sign_fund_transaction_input;
+        })()(
+          FfiConverterTypeTransaction.lower(fundTransaction),
+          FfiConverterArrayUInt8.lower(privkey),
+          FfiConverterString.lower(prevTxId),
+          FfiConverterUInt32.lower(prevTxVout),
+          FfiConverterUInt64.lower(value),
+          callStatus
+        );
+      },
+      /*liftString:*/ FfiConverterString.lift
+    )
+  );
+}
+export function verifyFundTxSignature(
+  fundTx: Transaction,
+  signature: Array</*u8*/ number>,
+  pubkey: Array</*u8*/ number>,
+  txid: string,
+  vout: /*u32*/ number,
+  inputAmount: /*u64*/ bigint
+): boolean /*throws*/ {
+  return FfiConverterBool.lift(
+    uniffiCaller.rustCallWithError(
+      /*liftError:*/ FfiConverterTypeDLCError.lift.bind(
+        FfiConverterTypeDLCError
+      ),
+      /*caller:*/ (callStatus) => {
+        return (() => {
+          console.debug(`-- uniffi_ddk_ffi_fn_func_verify_fund_tx_signature`);
+          return nativeModule()
+            .ubrn_uniffi_ddk_ffi_fn_func_verify_fund_tx_signature;
+        })()(
+          FfiConverterTypeTransaction.lower(fundTx),
+          FfiConverterArrayUInt8.lower(signature),
+          FfiConverterArrayUInt8.lower(pubkey),
+          FfiConverterString.lower(txid),
+          FfiConverterUInt32.lower(vout),
+          FfiConverterUInt64.lower(inputAmount),
+          callStatus
+        );
       },
       /*liftString:*/ FfiConverterString.lift
     )
@@ -1204,6 +1588,11 @@ const FfiConverterArrayTypeDlcInputInfo = new FfiConverterArray(
   FfiConverterTypeDlcInputInfo
 );
 
+// FfiConverter for Array<DlcOutcome>
+const FfiConverterArrayTypeDlcOutcome = new FfiConverterArray(
+  FfiConverterTypeDlcOutcome
+);
+
 // FfiConverter for Array<Transaction>
 const FfiConverterArrayTypeTransaction = new FfiConverterArray(
   FfiConverterTypeTransaction
@@ -1254,9 +1643,85 @@ function uniffiEnsureInitialized() {
       bindingsContractVersion
     );
   }
+  if (nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_create_cet() !== 23081) {
+    throw new UniffiInternalError.ApiChecksumMismatch(
+      'uniffi_ddk_ffi_checksum_func_create_cet'
+    );
+  }
+  if (
+    nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_create_cet_adaptor_signature_from_oracle_info() !==
+    65174
+  ) {
+    throw new UniffiInternalError.ApiChecksumMismatch(
+      'uniffi_ddk_ffi_checksum_func_create_cet_adaptor_signature_from_oracle_info'
+    );
+  }
+  if (
+    nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_create_cets() !== 45293
+  ) {
+    throw new UniffiInternalError.ApiChecksumMismatch(
+      'uniffi_ddk_ffi_checksum_func_create_cets'
+    );
+  }
+  if (
+    nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_create_dlc_transactions() !==
+    9500
+  ) {
+    throw new UniffiInternalError.ApiChecksumMismatch(
+      'uniffi_ddk_ffi_checksum_func_create_dlc_transactions'
+    );
+  }
+  if (
+    nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_create_fund_tx_locking_script() !==
+    2761
+  ) {
+    throw new UniffiInternalError.ApiChecksumMismatch(
+      'uniffi_ddk_ffi_checksum_func_create_fund_tx_locking_script'
+    );
+  }
+  if (
+    nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_create_refund_transaction() !==
+    57261
+  ) {
+    throw new UniffiInternalError.ApiChecksumMismatch(
+      'uniffi_ddk_ffi_checksum_func_create_refund_transaction'
+    );
+  }
+  if (
+    nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_create_spliced_dlc_transactions() !==
+    51059
+  ) {
+    throw new UniffiInternalError.ApiChecksumMismatch(
+      'uniffi_ddk_ffi_checksum_func_create_spliced_dlc_transactions'
+    );
+  }
   if (nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_do_the_dlc() !== 58155) {
     throw new UniffiInternalError.ApiChecksumMismatch(
       'uniffi_ddk_ffi_checksum_func_do_the_dlc'
+    );
+  }
+  if (
+    nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_get_change_output_and_fees() !==
+    44150
+  ) {
+    throw new UniffiInternalError.ApiChecksumMismatch(
+      'uniffi_ddk_ffi_checksum_func_get_change_output_and_fees'
+    );
+  }
+  if (
+    nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_get_raw_funding_transaction_input_signature() !==
+    35708
+  ) {
+    throw new UniffiInternalError.ApiChecksumMismatch(
+      'uniffi_ddk_ffi_checksum_func_get_raw_funding_transaction_input_signature'
+    );
+  }
+  if (
+    nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_get_total_input_vsize() !==
+    38213
+  ) {
+    throw new UniffiInternalError.ApiChecksumMismatch(
+      'uniffi_ddk_ffi_checksum_func_get_total_input_vsize'
     );
   }
   if (
@@ -1266,9 +1731,32 @@ function uniffiEnsureInitialized() {
       'uniffi_ddk_ffi_checksum_func_hello_world'
     );
   }
+  if (
+    nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_is_dust_output() !== 64174
+  ) {
+    throw new UniffiInternalError.ApiChecksumMismatch(
+      'uniffi_ddk_ffi_checksum_func_is_dust_output'
+    );
+  }
   if (nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_lygos() !== 36696) {
     throw new UniffiInternalError.ApiChecksumMismatch(
       'uniffi_ddk_ffi_checksum_func_lygos'
+    );
+  }
+  if (
+    nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_sign_fund_transaction_input() !==
+    50531
+  ) {
+    throw new UniffiInternalError.ApiChecksumMismatch(
+      'uniffi_ddk_ffi_checksum_func_sign_fund_transaction_input'
+    );
+  }
+  if (
+    nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_verify_fund_tx_signature() !==
+    27316
+  ) {
+    throw new UniffiInternalError.ApiChecksumMismatch(
+      'uniffi_ddk_ffi_checksum_func_verify_fund_tx_signature'
     );
   }
 }

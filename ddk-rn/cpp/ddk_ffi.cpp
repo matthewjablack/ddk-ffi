@@ -133,11 +133,116 @@ extern "C" {
     uint64_t callback_data, 
     UniffiForeignFutureStructVoid result
     );
+    RustBuffer uniffi_ddk_ffi_fn_func_create_cet(
+        RustBuffer local_output, 
+        uint64_t local_payout_serial_id, 
+        RustBuffer remote_output, 
+        uint64_t remote_payout_serial_id, 
+        RustBuffer fund_tx_id, 
+        uint32_t fund_vout, 
+        uint32_t lock_time, 
+        RustCallStatus *uniffi_out_err
+    );
+    RustBuffer uniffi_ddk_ffi_fn_func_create_cet_adaptor_signature_from_oracle_info(
+        RustBuffer cet, 
+        RustBuffer oracle_info, 
+        RustBuffer funding_sk, 
+        RustBuffer funding_script_pubkey, 
+        uint64_t total_collateral, 
+        RustBuffer msgs, 
+        RustCallStatus *uniffi_out_err
+    );
+    RustBuffer uniffi_ddk_ffi_fn_func_create_cets(
+        RustBuffer fund_tx_id, 
+        uint32_t fund_vout, 
+        RustBuffer local_final_script_pubkey, 
+        RustBuffer remote_final_script_pubkey, 
+        RustBuffer outcomes, 
+        uint32_t lock_time, 
+        uint64_t local_serial_id, 
+        uint64_t remote_serial_id, 
+        RustCallStatus *uniffi_out_err
+    );
+    RustBuffer uniffi_ddk_ffi_fn_func_create_dlc_transactions(
+        RustBuffer outcomes, 
+        RustBuffer local_params, 
+        RustBuffer remote_params, 
+        uint32_t refund_locktime, 
+        uint64_t fee_rate, 
+        uint32_t fund_lock_time, 
+        uint32_t cet_lock_time, 
+        uint64_t fund_output_serial_id, 
+        RustCallStatus *uniffi_out_err
+    );
+    RustBuffer uniffi_ddk_ffi_fn_func_create_fund_tx_locking_script(
+        RustBuffer local_fund_pubkey, 
+        RustBuffer remote_fund_pubkey, 
+        RustCallStatus *uniffi_out_err
+    );
+    RustBuffer uniffi_ddk_ffi_fn_func_create_refund_transaction(
+        RustBuffer local_final_script_pubkey, 
+        RustBuffer remote_final_script_pubkey, 
+        uint64_t local_amount, 
+        uint64_t remote_amount, 
+        uint32_t lock_time, 
+        RustBuffer fund_tx_id, 
+        uint32_t fund_vout, 
+        RustCallStatus *uniffi_out_err
+    );
+    RustBuffer uniffi_ddk_ffi_fn_func_create_spliced_dlc_transactions(
+        RustBuffer outcomes, 
+        RustBuffer local_params, 
+        RustBuffer remote_params, 
+        uint32_t refund_locktime, 
+        uint64_t fee_rate, 
+        uint32_t fund_lock_time, 
+        uint32_t cet_lock_time, 
+        uint64_t fund_output_serial_id, 
+        RustCallStatus *uniffi_out_err
+    );
     RustBuffer uniffi_ddk_ffi_fn_func_do_the_dlc(RustCallStatus *uniffi_out_err
+    );
+    RustBuffer uniffi_ddk_ffi_fn_func_get_change_output_and_fees(
+        RustBuffer params, 
+        uint64_t fee_rate, 
+        RustCallStatus *uniffi_out_err
+    );
+    RustBuffer uniffi_ddk_ffi_fn_func_get_raw_funding_transaction_input_signature(
+        RustBuffer funding_transaction, 
+        RustBuffer privkey, 
+        RustBuffer prev_tx_id, 
+        uint32_t prev_tx_vout, 
+        uint64_t value, 
+        RustCallStatus *uniffi_out_err
+    );
+    uint32_t uniffi_ddk_ffi_fn_func_get_total_input_vsize(
+        RustBuffer inputs, 
+        RustCallStatus *uniffi_out_err
     );
     RustBuffer uniffi_ddk_ffi_fn_func_hello_world(RustCallStatus *uniffi_out_err
     );
+    int8_t uniffi_ddk_ffi_fn_func_is_dust_output(
+        RustBuffer output, 
+        RustCallStatus *uniffi_out_err
+    );
     RustBuffer uniffi_ddk_ffi_fn_func_lygos(RustCallStatus *uniffi_out_err
+    );
+    RustBuffer uniffi_ddk_ffi_fn_func_sign_fund_transaction_input(
+        RustBuffer fund_transaction, 
+        RustBuffer privkey, 
+        RustBuffer prev_tx_id, 
+        uint32_t prev_tx_vout, 
+        uint64_t value, 
+        RustCallStatus *uniffi_out_err
+    );
+    int8_t uniffi_ddk_ffi_fn_func_verify_fund_tx_signature(
+        RustBuffer fund_tx, 
+        RustBuffer signature, 
+        RustBuffer pubkey, 
+        RustBuffer txid, 
+        uint32_t vout, 
+        uint64_t input_amount, 
+        RustCallStatus *uniffi_out_err
     );
     RustBuffer ffi_ddk_ffi_rustbuffer_alloc(
         uint64_t size, 
@@ -351,11 +456,37 @@ extern "C" {
         /*handle*/ uint64_t handle, 
         RustCallStatus *uniffi_out_err
     );
+    uint16_t uniffi_ddk_ffi_checksum_func_create_cet(
+    );
+    uint16_t uniffi_ddk_ffi_checksum_func_create_cet_adaptor_signature_from_oracle_info(
+    );
+    uint16_t uniffi_ddk_ffi_checksum_func_create_cets(
+    );
+    uint16_t uniffi_ddk_ffi_checksum_func_create_dlc_transactions(
+    );
+    uint16_t uniffi_ddk_ffi_checksum_func_create_fund_tx_locking_script(
+    );
+    uint16_t uniffi_ddk_ffi_checksum_func_create_refund_transaction(
+    );
+    uint16_t uniffi_ddk_ffi_checksum_func_create_spliced_dlc_transactions(
+    );
     uint16_t uniffi_ddk_ffi_checksum_func_do_the_dlc(
+    );
+    uint16_t uniffi_ddk_ffi_checksum_func_get_change_output_and_fees(
+    );
+    uint16_t uniffi_ddk_ffi_checksum_func_get_raw_funding_transaction_input_signature(
+    );
+    uint16_t uniffi_ddk_ffi_checksum_func_get_total_input_vsize(
     );
     uint16_t uniffi_ddk_ffi_checksum_func_hello_world(
     );
+    uint16_t uniffi_ddk_ffi_checksum_func_is_dust_output(
+    );
     uint16_t uniffi_ddk_ffi_checksum_func_lygos(
+    );
+    uint16_t uniffi_ddk_ffi_checksum_func_sign_fund_transaction_input(
+    );
+    uint16_t uniffi_ddk_ffi_checksum_func_verify_fund_tx_signature(
     );
     uint32_t ffi_ddk_ffi_uniffi_contract_version(
     );
@@ -1901,12 +2032,92 @@ NativeDdkFfi::NativeDdkFfi(
             return this->cpp_uniffi_internal_fn_func_ffi__arraybuffer_to_string(rt, thisVal, args, count);
         }
     );
+    props["ubrn_uniffi_ddk_ffi_fn_func_create_cet"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_ddk_ffi_fn_func_create_cet"),
+        7,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_ddk_ffi_fn_func_create_cet(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_ddk_ffi_fn_func_create_cet_adaptor_signature_from_oracle_info"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_ddk_ffi_fn_func_create_cet_adaptor_signature_from_oracle_info"),
+        6,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_ddk_ffi_fn_func_create_cet_adaptor_signature_from_oracle_info(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_ddk_ffi_fn_func_create_cets"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_ddk_ffi_fn_func_create_cets"),
+        8,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_ddk_ffi_fn_func_create_cets(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_ddk_ffi_fn_func_create_dlc_transactions"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_ddk_ffi_fn_func_create_dlc_transactions"),
+        8,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_ddk_ffi_fn_func_create_dlc_transactions(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_ddk_ffi_fn_func_create_fund_tx_locking_script"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_ddk_ffi_fn_func_create_fund_tx_locking_script"),
+        2,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_ddk_ffi_fn_func_create_fund_tx_locking_script(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_ddk_ffi_fn_func_create_refund_transaction"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_ddk_ffi_fn_func_create_refund_transaction"),
+        7,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_ddk_ffi_fn_func_create_refund_transaction(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_ddk_ffi_fn_func_create_spliced_dlc_transactions"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_ddk_ffi_fn_func_create_spliced_dlc_transactions"),
+        8,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_ddk_ffi_fn_func_create_spliced_dlc_transactions(rt, thisVal, args, count);
+        }
+    );
     props["ubrn_uniffi_ddk_ffi_fn_func_do_the_dlc"] = jsi::Function::createFromHostFunction(
         rt,
         jsi::PropNameID::forAscii(rt, "ubrn_uniffi_ddk_ffi_fn_func_do_the_dlc"),
         0,
         [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
             return this->cpp_uniffi_ddk_ffi_fn_func_do_the_dlc(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_ddk_ffi_fn_func_get_change_output_and_fees"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_ddk_ffi_fn_func_get_change_output_and_fees"),
+        2,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_ddk_ffi_fn_func_get_change_output_and_fees(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_ddk_ffi_fn_func_get_raw_funding_transaction_input_signature"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_ddk_ffi_fn_func_get_raw_funding_transaction_input_signature"),
+        5,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_ddk_ffi_fn_func_get_raw_funding_transaction_input_signature(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_ddk_ffi_fn_func_get_total_input_vsize"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_ddk_ffi_fn_func_get_total_input_vsize"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_ddk_ffi_fn_func_get_total_input_vsize(rt, thisVal, args, count);
         }
     );
     props["ubrn_uniffi_ddk_ffi_fn_func_hello_world"] = jsi::Function::createFromHostFunction(
@@ -1917,12 +2128,92 @@ NativeDdkFfi::NativeDdkFfi(
             return this->cpp_uniffi_ddk_ffi_fn_func_hello_world(rt, thisVal, args, count);
         }
     );
+    props["ubrn_uniffi_ddk_ffi_fn_func_is_dust_output"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_ddk_ffi_fn_func_is_dust_output"),
+        1,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_ddk_ffi_fn_func_is_dust_output(rt, thisVal, args, count);
+        }
+    );
     props["ubrn_uniffi_ddk_ffi_fn_func_lygos"] = jsi::Function::createFromHostFunction(
         rt,
         jsi::PropNameID::forAscii(rt, "ubrn_uniffi_ddk_ffi_fn_func_lygos"),
         0,
         [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
             return this->cpp_uniffi_ddk_ffi_fn_func_lygos(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_ddk_ffi_fn_func_sign_fund_transaction_input"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_ddk_ffi_fn_func_sign_fund_transaction_input"),
+        5,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_ddk_ffi_fn_func_sign_fund_transaction_input(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_ddk_ffi_fn_func_verify_fund_tx_signature"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_ddk_ffi_fn_func_verify_fund_tx_signature"),
+        6,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_ddk_ffi_fn_func_verify_fund_tx_signature(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_ddk_ffi_checksum_func_create_cet"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_ddk_ffi_checksum_func_create_cet"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_ddk_ffi_checksum_func_create_cet(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_ddk_ffi_checksum_func_create_cet_adaptor_signature_from_oracle_info"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_ddk_ffi_checksum_func_create_cet_adaptor_signature_from_oracle_info"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_ddk_ffi_checksum_func_create_cet_adaptor_signature_from_oracle_info(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_ddk_ffi_checksum_func_create_cets"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_ddk_ffi_checksum_func_create_cets"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_ddk_ffi_checksum_func_create_cets(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_ddk_ffi_checksum_func_create_dlc_transactions"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_ddk_ffi_checksum_func_create_dlc_transactions"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_ddk_ffi_checksum_func_create_dlc_transactions(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_ddk_ffi_checksum_func_create_fund_tx_locking_script"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_ddk_ffi_checksum_func_create_fund_tx_locking_script"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_ddk_ffi_checksum_func_create_fund_tx_locking_script(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_ddk_ffi_checksum_func_create_refund_transaction"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_ddk_ffi_checksum_func_create_refund_transaction"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_ddk_ffi_checksum_func_create_refund_transaction(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_ddk_ffi_checksum_func_create_spliced_dlc_transactions"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_ddk_ffi_checksum_func_create_spliced_dlc_transactions"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_ddk_ffi_checksum_func_create_spliced_dlc_transactions(rt, thisVal, args, count);
         }
     );
     props["ubrn_uniffi_ddk_ffi_checksum_func_do_the_dlc"] = jsi::Function::createFromHostFunction(
@@ -1933,6 +2224,30 @@ NativeDdkFfi::NativeDdkFfi(
             return this->cpp_uniffi_ddk_ffi_checksum_func_do_the_dlc(rt, thisVal, args, count);
         }
     );
+    props["ubrn_uniffi_ddk_ffi_checksum_func_get_change_output_and_fees"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_ddk_ffi_checksum_func_get_change_output_and_fees"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_ddk_ffi_checksum_func_get_change_output_and_fees(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_ddk_ffi_checksum_func_get_raw_funding_transaction_input_signature"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_ddk_ffi_checksum_func_get_raw_funding_transaction_input_signature"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_ddk_ffi_checksum_func_get_raw_funding_transaction_input_signature(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_ddk_ffi_checksum_func_get_total_input_vsize"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_ddk_ffi_checksum_func_get_total_input_vsize"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_ddk_ffi_checksum_func_get_total_input_vsize(rt, thisVal, args, count);
+        }
+    );
     props["ubrn_uniffi_ddk_ffi_checksum_func_hello_world"] = jsi::Function::createFromHostFunction(
         rt,
         jsi::PropNameID::forAscii(rt, "ubrn_uniffi_ddk_ffi_checksum_func_hello_world"),
@@ -1941,12 +2256,36 @@ NativeDdkFfi::NativeDdkFfi(
             return this->cpp_uniffi_ddk_ffi_checksum_func_hello_world(rt, thisVal, args, count);
         }
     );
+    props["ubrn_uniffi_ddk_ffi_checksum_func_is_dust_output"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_ddk_ffi_checksum_func_is_dust_output"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_ddk_ffi_checksum_func_is_dust_output(rt, thisVal, args, count);
+        }
+    );
     props["ubrn_uniffi_ddk_ffi_checksum_func_lygos"] = jsi::Function::createFromHostFunction(
         rt,
         jsi::PropNameID::forAscii(rt, "ubrn_uniffi_ddk_ffi_checksum_func_lygos"),
         0,
         [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
             return this->cpp_uniffi_ddk_ffi_checksum_func_lygos(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_ddk_ffi_checksum_func_sign_fund_transaction_input"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_ddk_ffi_checksum_func_sign_fund_transaction_input"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_ddk_ffi_checksum_func_sign_fund_transaction_input(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_ddk_ffi_checksum_func_verify_fund_tx_signature"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_ddk_ffi_checksum_func_verify_fund_tx_signature"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_ddk_ffi_checksum_func_verify_fund_tx_signature(rt, thisVal, args, count);
         }
     );
     props["ubrn_ffi_ddk_ffi_uniffi_contract_version"] = jsi::Function::createFromHostFunction(
@@ -2012,6 +2351,76 @@ jsi::Value NativeDdkFfi::cpp_uniffi_internal_fn_func_ffi__arraybuffer_to_string(
 }
 
 // Methods calling directly into the uniffi generated C API of the Rust crate.
+jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_fn_func_create_cet(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::ddk_ffi::Bridging<RustCallStatus>::rustSuccess(rt);
+        auto value = uniffi_ddk_ffi_fn_func_create_cet(uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[0]), uniffi_jsi::Bridging<uint64_t>::fromJs(rt, callInvoker, args[1]), uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[2]), uniffi_jsi::Bridging<uint64_t>::fromJs(rt, callInvoker, args[3]), uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[4]), uniffi_jsi::Bridging<uint32_t>::fromJs(rt, callInvoker, args[5]), uniffi_jsi::Bridging<uint32_t>::fromJs(rt, callInvoker, args[6]), 
+            &status
+        );
+        uniffi::ddk_ffi::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return uniffi::ddk_ffi::Bridging<RustBuffer>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_fn_func_create_cet_adaptor_signature_from_oracle_info(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::ddk_ffi::Bridging<RustCallStatus>::rustSuccess(rt);
+        auto value = uniffi_ddk_ffi_fn_func_create_cet_adaptor_signature_from_oracle_info(uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[0]), uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1]), uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[2]), uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[3]), uniffi_jsi::Bridging<uint64_t>::fromJs(rt, callInvoker, args[4]), uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[5]), 
+            &status
+        );
+        uniffi::ddk_ffi::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return uniffi::ddk_ffi::Bridging<RustBuffer>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_fn_func_create_cets(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::ddk_ffi::Bridging<RustCallStatus>::rustSuccess(rt);
+        auto value = uniffi_ddk_ffi_fn_func_create_cets(uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[0]), uniffi_jsi::Bridging<uint32_t>::fromJs(rt, callInvoker, args[1]), uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[2]), uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[3]), uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[4]), uniffi_jsi::Bridging<uint32_t>::fromJs(rt, callInvoker, args[5]), uniffi_jsi::Bridging<uint64_t>::fromJs(rt, callInvoker, args[6]), uniffi_jsi::Bridging<uint64_t>::fromJs(rt, callInvoker, args[7]), 
+            &status
+        );
+        uniffi::ddk_ffi::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return uniffi::ddk_ffi::Bridging<RustBuffer>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_fn_func_create_dlc_transactions(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::ddk_ffi::Bridging<RustCallStatus>::rustSuccess(rt);
+        auto value = uniffi_ddk_ffi_fn_func_create_dlc_transactions(uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[0]), uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1]), uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[2]), uniffi_jsi::Bridging<uint32_t>::fromJs(rt, callInvoker, args[3]), uniffi_jsi::Bridging<uint64_t>::fromJs(rt, callInvoker, args[4]), uniffi_jsi::Bridging<uint32_t>::fromJs(rt, callInvoker, args[5]), uniffi_jsi::Bridging<uint32_t>::fromJs(rt, callInvoker, args[6]), uniffi_jsi::Bridging<uint64_t>::fromJs(rt, callInvoker, args[7]), 
+            &status
+        );
+        uniffi::ddk_ffi::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return uniffi::ddk_ffi::Bridging<RustBuffer>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_fn_func_create_fund_tx_locking_script(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::ddk_ffi::Bridging<RustCallStatus>::rustSuccess(rt);
+        auto value = uniffi_ddk_ffi_fn_func_create_fund_tx_locking_script(uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[0]), uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1]), 
+            &status
+        );
+        uniffi::ddk_ffi::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return uniffi::ddk_ffi::Bridging<RustBuffer>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_fn_func_create_refund_transaction(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::ddk_ffi::Bridging<RustCallStatus>::rustSuccess(rt);
+        auto value = uniffi_ddk_ffi_fn_func_create_refund_transaction(uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[0]), uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1]), uniffi_jsi::Bridging<uint64_t>::fromJs(rt, callInvoker, args[2]), uniffi_jsi::Bridging<uint64_t>::fromJs(rt, callInvoker, args[3]), uniffi_jsi::Bridging<uint32_t>::fromJs(rt, callInvoker, args[4]), uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[5]), uniffi_jsi::Bridging<uint32_t>::fromJs(rt, callInvoker, args[6]), 
+            &status
+        );
+        uniffi::ddk_ffi::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return uniffi::ddk_ffi::Bridging<RustBuffer>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_fn_func_create_spliced_dlc_transactions(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::ddk_ffi::Bridging<RustCallStatus>::rustSuccess(rt);
+        auto value = uniffi_ddk_ffi_fn_func_create_spliced_dlc_transactions(uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[0]), uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1]), uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[2]), uniffi_jsi::Bridging<uint32_t>::fromJs(rt, callInvoker, args[3]), uniffi_jsi::Bridging<uint64_t>::fromJs(rt, callInvoker, args[4]), uniffi_jsi::Bridging<uint32_t>::fromJs(rt, callInvoker, args[5]), uniffi_jsi::Bridging<uint32_t>::fromJs(rt, callInvoker, args[6]), uniffi_jsi::Bridging<uint64_t>::fromJs(rt, callInvoker, args[7]), 
+            &status
+        );
+        uniffi::ddk_ffi::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return uniffi::ddk_ffi::Bridging<RustBuffer>::toJs(rt, callInvoker, value);
+}
 jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_fn_func_do_the_dlc(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
         RustCallStatus status = uniffi::ddk_ffi::Bridging<RustCallStatus>::rustSuccess(rt);
         auto value = uniffi_ddk_ffi_fn_func_do_the_dlc(&status
@@ -2020,6 +2429,36 @@ jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_fn_func_do_the_dlc(jsi::Runtime& rt,
 
         
         return uniffi::ddk_ffi::Bridging<RustBuffer>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_fn_func_get_change_output_and_fees(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::ddk_ffi::Bridging<RustCallStatus>::rustSuccess(rt);
+        auto value = uniffi_ddk_ffi_fn_func_get_change_output_and_fees(uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[0]), uniffi_jsi::Bridging<uint64_t>::fromJs(rt, callInvoker, args[1]), 
+            &status
+        );
+        uniffi::ddk_ffi::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return uniffi::ddk_ffi::Bridging<RustBuffer>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_fn_func_get_raw_funding_transaction_input_signature(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::ddk_ffi::Bridging<RustCallStatus>::rustSuccess(rt);
+        auto value = uniffi_ddk_ffi_fn_func_get_raw_funding_transaction_input_signature(uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[0]), uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1]), uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[2]), uniffi_jsi::Bridging<uint32_t>::fromJs(rt, callInvoker, args[3]), uniffi_jsi::Bridging<uint64_t>::fromJs(rt, callInvoker, args[4]), 
+            &status
+        );
+        uniffi::ddk_ffi::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return uniffi::ddk_ffi::Bridging<RustBuffer>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_fn_func_get_total_input_vsize(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::ddk_ffi::Bridging<RustCallStatus>::rustSuccess(rt);
+        auto value = uniffi_ddk_ffi_fn_func_get_total_input_vsize(uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[0]), 
+            &status
+        );
+        uniffi::ddk_ffi::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return uniffi_jsi::Bridging<uint32_t>::toJs(rt, callInvoker, value);
 }
 jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_fn_func_hello_world(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
         RustCallStatus status = uniffi::ddk_ffi::Bridging<RustCallStatus>::rustSuccess(rt);
@@ -2030,6 +2469,16 @@ jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_fn_func_hello_world(jsi::Runtime& rt
         
         return uniffi::ddk_ffi::Bridging<RustBuffer>::toJs(rt, callInvoker, value);
 }
+jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_fn_func_is_dust_output(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::ddk_ffi::Bridging<RustCallStatus>::rustSuccess(rt);
+        auto value = uniffi_ddk_ffi_fn_func_is_dust_output(uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[0]), 
+            &status
+        );
+        uniffi::ddk_ffi::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return uniffi_jsi::Bridging<int8_t>::toJs(rt, callInvoker, value);
+}
 jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_fn_func_lygos(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
         RustCallStatus status = uniffi::ddk_ffi::Bridging<RustCallStatus>::rustSuccess(rt);
         auto value = uniffi_ddk_ffi_fn_func_lygos(&status
@@ -2039,8 +2488,98 @@ jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_fn_func_lygos(jsi::Runtime& rt, cons
         
         return uniffi::ddk_ffi::Bridging<RustBuffer>::toJs(rt, callInvoker, value);
 }
+jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_fn_func_sign_fund_transaction_input(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::ddk_ffi::Bridging<RustCallStatus>::rustSuccess(rt);
+        auto value = uniffi_ddk_ffi_fn_func_sign_fund_transaction_input(uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[0]), uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1]), uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[2]), uniffi_jsi::Bridging<uint32_t>::fromJs(rt, callInvoker, args[3]), uniffi_jsi::Bridging<uint64_t>::fromJs(rt, callInvoker, args[4]), 
+            &status
+        );
+        uniffi::ddk_ffi::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return uniffi::ddk_ffi::Bridging<RustBuffer>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_fn_func_verify_fund_tx_signature(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::ddk_ffi::Bridging<RustCallStatus>::rustSuccess(rt);
+        auto value = uniffi_ddk_ffi_fn_func_verify_fund_tx_signature(uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[0]), uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1]), uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[2]), uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[3]), uniffi_jsi::Bridging<uint32_t>::fromJs(rt, callInvoker, args[4]), uniffi_jsi::Bridging<uint64_t>::fromJs(rt, callInvoker, args[5]), 
+            &status
+        );
+        uniffi::ddk_ffi::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return uniffi_jsi::Bridging<int8_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_checksum_func_create_cet(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_ddk_ffi_checksum_func_create_cet(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_checksum_func_create_cet_adaptor_signature_from_oracle_info(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_ddk_ffi_checksum_func_create_cet_adaptor_signature_from_oracle_info(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_checksum_func_create_cets(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_ddk_ffi_checksum_func_create_cets(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_checksum_func_create_dlc_transactions(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_ddk_ffi_checksum_func_create_dlc_transactions(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_checksum_func_create_fund_tx_locking_script(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_ddk_ffi_checksum_func_create_fund_tx_locking_script(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_checksum_func_create_refund_transaction(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_ddk_ffi_checksum_func_create_refund_transaction(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_checksum_func_create_spliced_dlc_transactions(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_ddk_ffi_checksum_func_create_spliced_dlc_transactions(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
 jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_checksum_func_do_the_dlc(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
         auto value = uniffi_ddk_ffi_checksum_func_do_the_dlc(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_checksum_func_get_change_output_and_fees(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_ddk_ffi_checksum_func_get_change_output_and_fees(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_checksum_func_get_raw_funding_transaction_input_signature(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_ddk_ffi_checksum_func_get_raw_funding_transaction_input_signature(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_checksum_func_get_total_input_vsize(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_ddk_ffi_checksum_func_get_total_input_vsize(
         );
 
         
@@ -2053,8 +2592,29 @@ jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_checksum_func_hello_world(jsi::Runti
         
         return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
 }
+jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_checksum_func_is_dust_output(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_ddk_ffi_checksum_func_is_dust_output(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
 jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_checksum_func_lygos(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
         auto value = uniffi_ddk_ffi_checksum_func_lygos(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_checksum_func_sign_fund_transaction_input(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_ddk_ffi_checksum_func_sign_fund_transaction_input(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_checksum_func_verify_fund_tx_signature(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_ddk_ffi_checksum_func_verify_fund_tx_signature(
         );
 
         

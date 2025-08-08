@@ -23,18 +23,136 @@ interface NativeModuleInterface {
     buffer: Uint8Array,
     uniffi_out_err: UniffiRustCallStatus
   ): string;
+  ubrn_uniffi_ddk_ffi_fn_func_create_cet(
+    localOutput: Uint8Array,
+    localPayoutSerialId: bigint,
+    remoteOutput: Uint8Array,
+    remotePayoutSerialId: bigint,
+    fundTxId: Uint8Array,
+    fundVout: number,
+    lockTime: number,
+    uniffi_out_err: UniffiRustCallStatus
+  ): Uint8Array;
+  ubrn_uniffi_ddk_ffi_fn_func_create_cet_adaptor_signature_from_oracle_info(
+    cet: Uint8Array,
+    oracleInfo: Uint8Array,
+    fundingSk: Uint8Array,
+    fundingScriptPubkey: Uint8Array,
+    totalCollateral: bigint,
+    msgs: Uint8Array,
+    uniffi_out_err: UniffiRustCallStatus
+  ): Uint8Array;
+  ubrn_uniffi_ddk_ffi_fn_func_create_cets(
+    fundTxId: Uint8Array,
+    fundVout: number,
+    localFinalScriptPubkey: Uint8Array,
+    remoteFinalScriptPubkey: Uint8Array,
+    outcomes: Uint8Array,
+    lockTime: number,
+    localSerialId: bigint,
+    remoteSerialId: bigint,
+    uniffi_out_err: UniffiRustCallStatus
+  ): Uint8Array;
+  ubrn_uniffi_ddk_ffi_fn_func_create_dlc_transactions(
+    outcomes: Uint8Array,
+    localParams: Uint8Array,
+    remoteParams: Uint8Array,
+    refundLocktime: number,
+    feeRate: bigint,
+    fundLockTime: number,
+    cetLockTime: number,
+    fundOutputSerialId: bigint,
+    uniffi_out_err: UniffiRustCallStatus
+  ): Uint8Array;
+  ubrn_uniffi_ddk_ffi_fn_func_create_fund_tx_locking_script(
+    localFundPubkey: Uint8Array,
+    remoteFundPubkey: Uint8Array,
+    uniffi_out_err: UniffiRustCallStatus
+  ): Uint8Array;
+  ubrn_uniffi_ddk_ffi_fn_func_create_refund_transaction(
+    localFinalScriptPubkey: Uint8Array,
+    remoteFinalScriptPubkey: Uint8Array,
+    localAmount: bigint,
+    remoteAmount: bigint,
+    lockTime: number,
+    fundTxId: Uint8Array,
+    fundVout: number,
+    uniffi_out_err: UniffiRustCallStatus
+  ): Uint8Array;
+  ubrn_uniffi_ddk_ffi_fn_func_create_spliced_dlc_transactions(
+    outcomes: Uint8Array,
+    localParams: Uint8Array,
+    remoteParams: Uint8Array,
+    refundLocktime: number,
+    feeRate: bigint,
+    fundLockTime: number,
+    cetLockTime: number,
+    fundOutputSerialId: bigint,
+    uniffi_out_err: UniffiRustCallStatus
+  ): Uint8Array;
   ubrn_uniffi_ddk_ffi_fn_func_do_the_dlc(
     uniffi_out_err: UniffiRustCallStatus
   ): Uint8Array;
+  ubrn_uniffi_ddk_ffi_fn_func_get_change_output_and_fees(
+    params: Uint8Array,
+    feeRate: bigint,
+    uniffi_out_err: UniffiRustCallStatus
+  ): Uint8Array;
+  ubrn_uniffi_ddk_ffi_fn_func_get_raw_funding_transaction_input_signature(
+    fundingTransaction: Uint8Array,
+    privkey: Uint8Array,
+    prevTxId: Uint8Array,
+    prevTxVout: number,
+    value: bigint,
+    uniffi_out_err: UniffiRustCallStatus
+  ): Uint8Array;
+  ubrn_uniffi_ddk_ffi_fn_func_get_total_input_vsize(
+    inputs: Uint8Array,
+    uniffi_out_err: UniffiRustCallStatus
+  ): number;
   ubrn_uniffi_ddk_ffi_fn_func_hello_world(
     uniffi_out_err: UniffiRustCallStatus
   ): Uint8Array;
+  ubrn_uniffi_ddk_ffi_fn_func_is_dust_output(
+    output: Uint8Array,
+    uniffi_out_err: UniffiRustCallStatus
+  ): number;
   ubrn_uniffi_ddk_ffi_fn_func_lygos(
     uniffi_out_err: UniffiRustCallStatus
   ): Uint8Array;
+  ubrn_uniffi_ddk_ffi_fn_func_sign_fund_transaction_input(
+    fundTransaction: Uint8Array,
+    privkey: Uint8Array,
+    prevTxId: Uint8Array,
+    prevTxVout: number,
+    value: bigint,
+    uniffi_out_err: UniffiRustCallStatus
+  ): Uint8Array;
+  ubrn_uniffi_ddk_ffi_fn_func_verify_fund_tx_signature(
+    fundTx: Uint8Array,
+    signature: Uint8Array,
+    pubkey: Uint8Array,
+    txid: Uint8Array,
+    vout: number,
+    inputAmount: bigint,
+    uniffi_out_err: UniffiRustCallStatus
+  ): number;
+  ubrn_uniffi_ddk_ffi_checksum_func_create_cet(): number;
+  ubrn_uniffi_ddk_ffi_checksum_func_create_cet_adaptor_signature_from_oracle_info(): number;
+  ubrn_uniffi_ddk_ffi_checksum_func_create_cets(): number;
+  ubrn_uniffi_ddk_ffi_checksum_func_create_dlc_transactions(): number;
+  ubrn_uniffi_ddk_ffi_checksum_func_create_fund_tx_locking_script(): number;
+  ubrn_uniffi_ddk_ffi_checksum_func_create_refund_transaction(): number;
+  ubrn_uniffi_ddk_ffi_checksum_func_create_spliced_dlc_transactions(): number;
   ubrn_uniffi_ddk_ffi_checksum_func_do_the_dlc(): number;
+  ubrn_uniffi_ddk_ffi_checksum_func_get_change_output_and_fees(): number;
+  ubrn_uniffi_ddk_ffi_checksum_func_get_raw_funding_transaction_input_signature(): number;
+  ubrn_uniffi_ddk_ffi_checksum_func_get_total_input_vsize(): number;
   ubrn_uniffi_ddk_ffi_checksum_func_hello_world(): number;
+  ubrn_uniffi_ddk_ffi_checksum_func_is_dust_output(): number;
   ubrn_uniffi_ddk_ffi_checksum_func_lygos(): number;
+  ubrn_uniffi_ddk_ffi_checksum_func_sign_fund_transaction_input(): number;
+  ubrn_uniffi_ddk_ffi_checksum_func_verify_fund_tx_signature(): number;
   ubrn_ffi_ddk_ffi_uniffi_contract_version(): number;
 }
 
