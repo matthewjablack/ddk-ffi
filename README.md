@@ -20,6 +20,7 @@ npm install @bennyblader/ddk-ts
 ```
 
 **Features:**
+
 - Zero-copy data transfer via NAPI
 - Prebuilt binaries for macOS ARM64 and Linux x64
 - Full TypeScript support
@@ -36,6 +37,7 @@ npm install @bennyblader/ddk-rn
 ```
 
 **Features:**
+
 - JSI-based high-performance bridge
 - iOS and Android support
 - React Native 0.75+ with new architecture
@@ -50,6 +52,7 @@ Both packages expose the same API, ensuring complete compatibility across platfo
 ### Core Functions
 
 #### `version(): string`
+
 Returns the version of the DDK library.
 
 ```typescript
@@ -60,6 +63,7 @@ console.log(`DDK Version: ${ddkVersion}`);
 ### Transaction Creation
 
 #### `createDlcTransactions()`
+
 Creates a complete set of DLC transactions including funding, CETs, and refund.
 
 ```typescript
@@ -76,6 +80,7 @@ createDlcTransactions(
 ```
 
 #### `createFundTxLockingScript()`
+
 Creates a 2-of-2 multisig locking script for the funding transaction.
 
 ```typescript
@@ -86,6 +91,7 @@ createFundTxLockingScript(
 ```
 
 #### `createCets()`
+
 Creates Contract Execution Transactions for all possible outcomes.
 
 ```typescript
@@ -102,6 +108,7 @@ createCets(
 ```
 
 #### `createRefundTransaction()`
+
 Creates a refund transaction with CSV timelock.
 
 ```typescript
@@ -119,6 +126,7 @@ createRefundTransaction(
 ### Signing & Verification
 
 #### `signFundTransactionInput()`
+
 Signs a funding transaction input.
 
 ```typescript
@@ -132,6 +140,7 @@ signFundTransactionInput(
 ```
 
 #### `verifyFundTxSignature()`
+
 Verifies a signature on a funding transaction.
 
 ```typescript
@@ -146,6 +155,7 @@ verifyFundTxSignature(
 ```
 
 #### `createCetAdaptorSignatureFromOracleInfo()`
+
 Creates adaptor signatures for oracle-based execution.
 
 ```typescript
@@ -162,6 +172,7 @@ createCetAdaptorSignatureFromOracleInfo(
 ### Utility Functions
 
 #### `isDustOutput()`
+
 Checks if an output is below the dust threshold.
 
 ```typescript
@@ -169,6 +180,7 @@ isDustOutput(output: TxOutput): boolean
 ```
 
 #### `getTotalInputVsize()`
+
 Calculates the virtual size of inputs for fee estimation.
 
 ```typescript
@@ -176,6 +188,7 @@ getTotalInputVsize(inputs: TxInputInfo[]): number
 ```
 
 #### `getChangeOutputAndFees()`
+
 Calculates change outputs and fees for a party.
 
 ```typescript
@@ -341,7 +354,7 @@ MIT License - see [LICENSE](./LICENSE) file for details.
 
 Contributions welcome! Please ensure:
 
-1. All tests pass (`cargo test`, `yarn test`, `pnpm test`)
+1. All tests pass (`cargo test`, `pnpm test`)
 2. Bindings are regenerated when changing Rust code
 3. API compatibility is maintained
 4. Documentation is updated

@@ -45,7 +45,7 @@
     "format:prettier": "prettier . -w",
     "format:rs": "cargo fmt",
     "test": "ava",
-    "test:all": "yarn verify && cargo test && yarn test",
+    "test:all": "pnpm verify && cargo test && pnpm test",
     "verify": "node scripts/verify-parity.js && node scripts/verify-types.js",
     "verify:parity": "node scripts/verify-parity.js",
     "verify:types": "node scripts/verify-types.js",

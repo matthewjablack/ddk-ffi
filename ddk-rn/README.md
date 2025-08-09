@@ -7,7 +7,7 @@ React Native bindings for the DLC Dev Kit (DDK) - UniFFI-based native bindings f
 ```bash
 npm install @bennyblader/ddk-rn
 # or
-yarn add @bennyblader/ddk-rn
+pnpm add @bennyblader/ddk-rn
 ```
 
 ## Quick Start
@@ -26,7 +26,7 @@ For complete API documentation, see the [main README](../README.md#api-reference
 
 - Node.js >= 14
 - Rust >= 1.70
-- Yarn or pnpm
+- pnpm
 - UniFFI React Native: `npm install -g uniffi-bindgen-react-native`
 - iOS: Xcode 14+, CocoaPods
 - Android: Android Studio, NDK
@@ -107,13 +107,13 @@ ddk-rn/
 
 ### Platform Support
 
-| Platform | Architecture | Status |
-|----------|-------------|---------|
-| iOS      | ARM64 | ✅ Supported |
-| iOS Simulator | x64/ARM64 | ✅ Supported |
-| Android  | ARM64-v8a | ✅ Supported |
-| Android  | ARMv7 | ✅ Supported |
-| Android  | x86_64 | ✅ Supported |
+| Platform      | Architecture | Status       |
+| ------------- | ------------ | ------------ |
+| iOS           | ARM64        | ✅ Supported |
+| iOS Simulator | x64/ARM64    | ✅ Supported |
+| Android       | ARM64-v8a    | ✅ Supported |
+| Android       | ARMv7        | ✅ Supported |
+| Android       | x86_64       | ✅ Supported |
 
 ### Building the Example App
 
@@ -148,6 +148,7 @@ just release
 ```
 
 This will:
+
 1. Build all native bindings
 2. Run tests
 3. Update version
@@ -174,6 +175,7 @@ The React Native bindings maintain 100% API compatibility with the UniFFI defini
 ### iOS Build Issues
 
 If you encounter build issues on iOS:
+
 ```bash
 cd example/ios
 pod deintegrate
@@ -183,6 +185,7 @@ pod install
 ### Android Build Issues
 
 Clean and rebuild Android:
+
 ```bash
 cd example/android
 ./gradlew clean
@@ -192,6 +195,7 @@ cd example/android
 ### Missing Bindings
 
 If bindings are missing, regenerate them:
+
 ```bash
 just clean
 just uniffi

@@ -7,19 +7,20 @@ TypeScript/Node.js bindings for the DLC Dev Kit (DDK) - NAPI-RS based native bin
 ```bash
 npm install @bennyblader/ddk-ts
 # or
-yarn add @bennyblader/ddk-ts
+pnpm add @bennyblader/ddk-ts
 ```
 
 The package includes prebuilt binaries for:
-- macOS ARM64 (Apple Silicon) 
+
+- macOS ARM64 (Apple Silicon)
 - Linux x64 (glibc)
 
 ## Quick Start
 
 ```typescript
-import { version, createFundTxLockingScript } from '@bennyblader/ddk-ts';
+import { version, createFundTxLockingScript } from '@bennyblader/ddk-ts'
 
-console.log(`DDK Version: ${version()}`);
+console.log(`DDK Version: ${version()}`)
 ```
 
 For complete API documentation, see the [main README](../README.md#api-reference).
@@ -30,20 +31,20 @@ For complete API documentation, see the [main README](../README.md#api-reference
 
 - Node.js >= 14
 - Rust >= 1.70
-- Yarn
+- pnpm
 - NAPI-RS CLI: `npm install -g @napi-rs/cli`
 
 ### Building from Source
 
 ```bash
 # Install dependencies
-yarn install
+pnpm install
 
 # Build for current platform
-yarn build
+pnpm build
 
 # Build for all supported platforms (Darwin ARM64 and Linux x64)
-yarn build:all
+pnpm build:all
 ```
 
 ### Just Commands
@@ -92,23 +93,23 @@ ddk-ts/
 
 ```bash
 # Run all tests
-yarn test
+pnpm test
 
 # Run verification scripts
-yarn verify        # Run all verification checks
-yarn verify:parity # Check API parity with UDL definitions
-yarn verify:types  # Verify TypeScript types
+pnpm verify        # Run all verification checks
+pnpm verify:parity # Check API parity with UDL definitions
+pnpm verify:types  # Verify TypeScript types
 ```
 
 ### Platform Support
 
-| Platform | Architecture | Status |
-|----------|-------------|---------|
-| macOS    | ARM64 (Apple Silicon) | ✅ Supported |
-| Linux    | x64 (glibc) | ✅ Supported |
-| macOS    | x64 (Intel) | ❌ Not included |
-| Windows  | x64 | ❌ Not included |
-| Linux    | ARM64 | ❌ Not included |
+| Platform | Architecture          | Status          |
+| -------- | --------------------- | --------------- |
+| macOS    | ARM64 (Apple Silicon) | ✅ Supported    |
+| Linux    | x64 (glibc)           | ✅ Supported    |
+| macOS    | x64 (Intel)           | ❌ Not included |
+| Windows  | x64                   | ❌ Not included |
+| Linux    | ARM64                 | ❌ Not included |
 
 ### Release Process
 
@@ -119,6 +120,7 @@ just ts-release 0.2.0
 ```
 
 This will:
+
 1. Check working directory is clean
 2. Update version in package.json
 3. Build for all supported platforms
@@ -138,7 +140,7 @@ The TypeScript bindings maintain 100% API compatibility with the UniFFI definiti
 If you get an error about missing binaries, ensure your platform is supported or build from source:
 
 ```bash
-yarn build
+pnpm build
 ```
 
 ### BigInt Support
