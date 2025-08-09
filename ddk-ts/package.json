@@ -1,6 +1,6 @@
 {
   "name": "@bennyblader/ddk-ts",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "dlcdevkit typescript bindings",
   "main": "index.js",
   "repository": "https://github.com/bennyblader/ddk-ffi",
@@ -91,7 +91,7 @@
   ],
   "packageManager": "yarn@4.9.2",
   "optionalDependencies": {
-    "@bennyblader/ddk-ts-darwin-arm64": "0.1.5",
-    "@bennyblader/ddk-ts-linux-x64-gnu": "0.1.5"
+    "@bennyblader/ddk-ts-darwin-arm64": "0.1.7",
+    "@bennyblader/ddk-ts-linux-x64-gnu": "0.1.7"
   }
 }
