@@ -99,7 +99,7 @@ ts-release version:
     git tag "ddk-ts-v{{version}}"
     
     # Push to GitHub
-    git push origin main
+    git push -u origin node-bindings
     git push origin "ddk-ts-v{{version}}"
     
     # Publish to npm
