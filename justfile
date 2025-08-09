@@ -96,11 +96,11 @@ ts-release version:
     git commit -m "chore(ddk-ts): release v{{version}}"
     
     # Create tag
-    git tag "ddk-ts-v{{version}}"
+    git tag "v{{version}}"
     
     # Push to GitHub
     git push -u origin node-bindings
-    git push origin "ddk-ts-v{{version}}"
+    git push origin "v{{version}}"
     
     # Publish to npm
     echo "Publishing to npm..."
