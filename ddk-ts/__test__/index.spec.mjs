@@ -1,5 +1,5 @@
 import test from 'ava'
-import * as ddk from '../index.js'
+import * as ddk from '../dist/index.js'
 
 // Helper to create consistent test data
 const createTestData = () => ({
