@@ -8,10 +8,10 @@ uniffi:
   just uniffi-turbo
   just build-ios
   just build-android
-  echo ""
-  echo "🎉 Uniffi build complete! 🎉"
-  echo "🔥 Run 'just example-ios' to test the build"
-  echo "⚠️ modify cpp/bennyblader-ddk-rn.cpp to #include 'ddk_ffi.hpp' ⚠️"
+  @echo ""
+  @echo "🎉 Uniffi build complete! 🎉"
+  @echo "🔥 Run 'just example-ios' to test the build"
+  @echo "⚠️ modify cpp/bennyblader-ddk-rn.cpp to #include 'ddk_ffi.hpp' ⚠️"
 
 # Generate the JSI bindings
 uniffi-jsi:

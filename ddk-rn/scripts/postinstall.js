@@ -2,129 +2,82 @@
 
 const fs = require('fs');
 const path = require('path');
-const https = require('https');
-const { execSync } = require('child_process');
 
-// Get package version to determine which release to download
-// __dirname is ddk-rn/scripts/, so package.json is at ../package.json
-const packageJsonPath = path.join(__dirname, '..', 'package.json');
-const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
-const version = packageJson.version;
+console.log('📦 DDK-RN Post-install: Verifying native bindings...');
 
-const GITHUB_REPO = 'bennyhodl/ddk-ffi';
-const RELEASE_TAG = `v${version}`;
+const packageRoot = path.join(__dirname, '..');
 
-// Detect platform and architecture
+// Verify that all necessary files are present
+const requiredFiles = {
+  'TypeScript bindings': [
+    'src/ddk_ffi.ts',
+    'src/ddk_ffi-ffi.ts',
+    'src/NativeDdkRn.ts',
+    'src/index.tsx'
+  ],
+  'C++ bindings': [
+    'cpp/ddk_ffi.hpp',
+    'cpp/ddk_ffi.cpp',
+    'cpp/bennyblader-ddk-rn.h',
+    'cpp/bennyblader-ddk-rn.cpp'
+  ],
+  'Android libraries': [
+    'android/src/main/arm64-v8a/libddk_ffi.a',
+    'android/src/main/armeabi-v7a/libddk_ffi.a',
+    'android/src/main/x86/libddk_ffi.a',
+    'android/src/main/x86_64/libddk_ffi.a'
+  ],
+  'iOS framework': [
+    'ios/DdkRn.xcframework/Info.plist',
+    'ios/DdkRn.xcframework/ios-arm64/libddk_ffi.a',
+    'ios/DdkRn.xcframework/ios-arm64-simulator/libddk_ffi.a'
+  ],
+  'JavaScript modules': [
+    'lib/commonjs/index.js',
+    'lib/module/index.js'
+  ]
+};
+
+let allFilesPresent = true;
 const platform = process.platform;
-const arch = process.arch;
 
-console.log(`📦 Installing native binaries for ${platform}-${arch}...`);
-
-// Create directories if they don't exist
-const androidLibsDir = path.join(__dirname, '..', 'android', 'src', 'main', 'jniLibs');
-const iosFrameworksDir = path.join(__dirname, '..', 'ios');
-
-function ensureDir(dir) {
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
+for (const [category, files] of Object.entries(requiredFiles)) {
+  // Skip iOS files on non-macOS platforms
+  if (category === 'iOS framework' && platform !== 'darwin') {
+    console.log(`⚠️  Skipping ${category} verification (not on macOS)`);
+    continue;
   }
-}
-
-function downloadFile(url, dest) {
-  return new Promise((resolve, reject) => {
-    console.log(`⬇️  Downloading ${url}`);
-    
-    const file = fs.createWriteStream(dest);
-    
-    https.get(url, (response) => {
-      if (response.statusCode === 302 || response.statusCode === 301) {
-        // Follow redirect
-        return downloadFile(response.headers.location, dest).then(resolve).catch(reject);
-      }
-      
-      if (response.statusCode !== 200) {
-        reject(new Error(`Failed to download: ${response.statusCode} ${response.statusMessage}`));
-        return;
-      }
-      
-      response.pipe(file);
-      
-      file.on('finish', () => {
-        file.close();
-        console.log(`✅ Downloaded ${path.basename(dest)}`);
-        resolve();
-      });
-    }).on('error', (err) => {
-      fs.unlink(dest, () => {}); // Delete partial file
-      reject(err);
-    });
-  });
-}
-
-function extractTarGz(tarPath, extractDir) {
-  try {
-    console.log(`📂 Extracting ${path.basename(tarPath)}...`);
-    execSync(`tar -xzf "${tarPath}" -C "${extractDir}"`, { stdio: 'inherit' });
-    console.log(`✅ Extracted to ${extractDir}`);
-  } catch (error) {
-    throw new Error(`Failed to extract ${tarPath}: ${error.message}`);
-  }
-}
-
-async function downloadAndExtractBinaries() {
-  try {
-    // Download Android JNI libraries
-    const androidArchiveUrl = `https://github.com/${GITHUB_REPO}/releases/download/${RELEASE_TAG}/android-jni-libs.tar.gz`;
-    const androidTarPath = path.join(__dirname, '..', 'android-jni-libs.tar.gz');
-    
-    ensureDir(androidLibsDir);
-    await downloadFile(androidArchiveUrl, androidTarPath);
-    extractTarGz(androidTarPath, path.join(__dirname, '..', 'android', 'src', 'main'));
-    fs.unlinkSync(androidTarPath); // Clean up
-    
-    // Download iOS XCFramework (only on macOS for iOS development)
-    if (platform === 'darwin') {
-      const iosArchiveUrl = `https://github.com/${GITHUB_REPO}/releases/download/${RELEASE_TAG}/ios-xcframeworks.tar.gz`;
-      const iosTarPath = path.join(__dirname, '..', 'ios-xcframeworks.tar.gz');
-      
-      ensureDir(iosFrameworksDir);
-      await downloadFile(iosArchiveUrl, iosTarPath);
-      extractTarGz(iosTarPath, iosFrameworksDir);
-      fs.unlinkSync(iosTarPath); // Clean up
+  
+  console.log(`\n🔍 Checking ${category}...`);
+  
+  for (const file of files) {
+    const filePath = path.join(packageRoot, file);
+    if (fs.existsSync(filePath)) {
+      console.log(`  ✅ ${file}`);
     } else {
-      console.log('⚠️  Skipping iOS binaries (not on macOS)');
+      console.error(`  ❌ Missing: ${file}`);
+      allFilesPresent = false;
     }
-    
-    console.log('🎉 All native binaries installed successfully!');
-    
-  } catch (error) {
-    console.error('❌ Failed to install native binaries:', error.message);
-    console.error('');
-    console.error('📋 Manual installation:');
-    console.error(`   1. Download binaries from: https://github.com/${GITHUB_REPO}/releases/tag/${RELEASE_TAG}`);
-    console.error('   2. Extract android-jni-libs.tar.gz to android/src/main/');
-    console.error('   3. Extract ios-xcframeworks.tar.gz to ios/ (macOS only)');
-    console.error('');
-    
-    // Don't fail the installation - let users manually install if needed
-    process.exit(0);
   }
 }
 
-// Check if binaries already exist (skip if they do)
-const androidLibExists = fs.existsSync(path.join(androidLibsDir, 'arm64-v8a'));
-const iosFrameworkExists = fs.existsSync(path.join(iosFrameworksDir, 'DdkFFI.xcframework'));
-
-if (androidLibExists && (platform !== 'darwin' || iosFrameworkExists)) {
-  console.log('✅ Native binaries already installed, skipping download.');
-  process.exit(0);
+if (!allFilesPresent) {
+  console.error('\n❌ Some required files are missing!');
+  console.error('This package may not have been published correctly.');
+  console.error('Please report this issue at: https://github.com/bennyhodl/ddk-ffi/issues');
+  process.exit(1);
 }
 
-// Only download if we're not in a CI environment or explicit opt-in
-if (process.env.CI && !process.env.DOWNLOAD_BINARIES) {
-  console.log('⚠️  Skipping binary download in CI environment.');
-  console.log('   Set DOWNLOAD_BINARIES=1 to force download in CI.');
-  process.exit(0);
-}
+console.log('\n✅ All required bindings are present!');
+console.log('🎉 DDK-RN is ready to use!\n');
 
-downloadAndExtractBinaries();
+// Fix the C++ include path issue if needed
+const cppFile = path.join(packageRoot, 'cpp', 'bennyblader-ddk-rn.cpp');
+if (fs.existsSync(cppFile)) {
+  let content = fs.readFileSync(cppFile, 'utf8');
+  if (content.includes('#include "/ddk_ffi.hpp"')) {
+    content = content.replace('#include "/ddk_ffi.hpp"', '#include "ddk_ffi.hpp"');
+    fs.writeFileSync(cppFile, content);
+    console.log('🔧 Fixed include path in C++ bindings');
+  }
+}
