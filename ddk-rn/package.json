@@ -82,6 +82,19 @@
     "access": "public",
     "registry": "https://registry.npmjs.org/"
   },
+  "codegenConfig": {
+    "name": "RNDdkRnSpec",
+    "type": "modules",
+    "jsSrcsDir": "src",
+    "android": {
+      "javaPackageName": "com.ddkrn"
+    },
+    "ios": {
+      "modulesProvider": {
+        "DdkRn": "DdkRn"
+      }
+    }
+  },
   "devDependencies": {
     "@commitlint/config-conventional": "^17.0.2",
     "@react-native-community/cli": "15.0.0-alpha.2",
@@ -199,14 +212,6 @@
         }
       ]
     ]
-  },
-  "codegenConfig": {
-    "name": "RNDdkRnSpec",
-    "type": "modules",
-    "jsSrcsDir": "src",
-    "android": {
-      "javaPackageName": "com.ddkrn"
-    }
   },
   "dependencies": {
     "@babel/runtime": "^7.20.0",
