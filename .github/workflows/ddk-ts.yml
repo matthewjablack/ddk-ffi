@@ -1,0 +1,189 @@
+name: ddk-ts CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: ["*"]
+
+jobs:
+  build-darwin-arm64:
+    name: Build Darwin ARM64
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18.17"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Cache cargo
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            ddk-ts/target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Cache pnpm store
+        uses: actions/cache@v3
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+
+      - name: Install Dependencies
+        run: |
+          cd ddk-ts
+          pnpm install --no-frozen-lockfile
+
+      - name: Build for Darwin ARM64
+        run: |
+          cd ddk-ts
+          pnpm build:darwin-arm64
+
+      - name: Verify Build Output
+        run: |
+          if [ ! -f "ddk-ts/dist/index.js" ]; then
+            echo "Error: index.js not generated"
+            exit 1
+          fi
+          if [ ! -f "ddk-ts/dist/index.d.ts" ]; then
+            echo "Error: index.d.ts not generated"
+            exit 1
+          fi
+          echo "✅ Darwin ARM64 build successful"
+
+  build-linux-x64:
+    name: Build Linux x64
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-unknown-linux-gnu
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18.17"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Cache cargo
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            ddk-ts/target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Cache pnpm store
+        uses: actions/cache@v3
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+
+      - name: Install Dependencies
+        run: |
+          cd ddk-ts
+          pnpm install --no-frozen-lockfile
+
+      - name: Build for Linux x64
+        run: |
+          cd ddk-ts
+          pnpm build:linux-x64
+
+      - name: Verify Build Output
+        run: |
+          if [ ! -f "ddk-ts/dist/index.js" ]; then
+            tree -L 2
+            echo "Error: index.js not generated"
+            exit 1
+          fi
+          if [ ! -f "ddk-ts/dist/index.d.ts" ]; then
+            tree -L 2
+            echo "Error: index.d.ts not generated"
+            exit 1
+          fi
+          echo "✅ Linux x64 build successful"
+
+  test-typescript:
+    name: Test TypeScript Package
+    runs-on: ubuntu-latest
+    needs: [build-darwin-arm64, build-linux-x64]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18.17"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Cache cargo
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            ddk-ts/target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Cache pnpm store
+        uses: actions/cache@v3
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+
+      - name: Install Dependencies
+        run: |
+          cd ddk-ts
+          pnpm install --no-frozen-lockfile
+
+      - name: Build for Tests
+        run: |
+          cd ddk-ts
+          pnpm build
+
+      - name: Run Tests
+        run: |
+          cd ddk-ts
+          pnpm test
+
+      - name: Verify Parity
+        run: |
+          cd ddk-ts
+          pnpm verify:parity
+
+      - name: Verify Types
+        run: |
+          cd ddk-ts
+          pnpm verify:types

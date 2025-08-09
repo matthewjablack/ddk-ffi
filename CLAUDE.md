@@ -110,3 +110,169 @@ After running `just uniffi`, manually fix the include path:
 ## Code Generation
 
 All TypeScript, C++, iOS, and Android code is automatically generated from the Rust code and UDL definitions. Do not manually edit generated files as they will be overwritten on the next build.
+
+## Changelog Management
+
+When making changes or releases, update the appropriate changelog:
+
+- **ddk-rn/CHANGELOG.md**: For React Native library changes
+- **ddk-ts/CHANGELOG.md**: For TypeScript/Node.js library changes
+
+### Changelog Entry Format
+
+Keep entries concise - just the main idea of the change:
+
+```markdown
+## [VERSION] - DATE
+- Brief description of change
+- Another change description
+```
+
+### When to Update Changelog
+
+- After creating a new release
+- After implementing significant features
+- After fixing important bugs
+
+Example entry:
+```markdown
+## [0.1.5] - 2025-01-16
+- Added new DLC validation functions
+- Fixed memory leak in native bindings
+- Improved error handling
+```
+
+## GitHub Issue Management
+
+### Creating Issues
+
+When asked to create a GitHub issue, use the `gh` CLI tool:
+
+```bash
+# Basic issue creation
+gh issue create --title "Issue title" --body "Issue description"
+
+# With labels
+gh issue create --title "Issue title" --body "Issue description" --label "bug,enhancement"
+
+# Assign to someone
+gh issue create --title "Issue title" --body "Issue description" --assignee "@username"
+
+# With milestone
+gh issue create --title "Issue title" --body "Issue description" --milestone "v1.0"
+```
+
+### Issue Body Format
+
+Use markdown for clear, structured issue descriptions:
+
+```markdown
+## Summary
+Brief description of the issue
+
+## Details
+- Detailed point 1
+- Detailed point 2
+
+## Tasks
+- [ ] Task 1
+- [ ] Task 2
+
+## Notes
+Any additional context
+```
+
+### Listing and Viewing Issues
+
+```bash
+# List all open issues
+gh issue list
+
+# List issues with specific labels
+gh issue list --label "bug"
+
+# View a specific issue
+gh issue view <issue-number>
+
+# Search issues
+gh issue list --search "keyword"
+```
+
+## GitHub Pull Request Management
+
+### Creating Pull Requests
+
+When asked to create a pull request, use the `gh` CLI tool:
+
+```bash
+# Create PR with title and body
+gh pr create --title "PR title" --body "$(cat <<'EOF'
+## Summary
+Brief description of changes
+
+## Changes
+- Change 1
+- Change 2
+
+## Testing
+- How to test these changes
+
+## Related Issues
+Closes #123
+EOF
+)"
+
+# Create PR with specific base branch
+gh pr create --base main --title "PR title" --body "PR description"
+
+# Create PR and assign reviewers
+gh pr create --title "PR title" --body "PR description" --reviewer @username
+
+# Create PR with labels
+gh pr create --title "PR title" --body "PR description" --label "enhancement,documentation"
+
+# Create PR as draft
+gh pr create --draft --title "WIP: PR title" --body "Work in progress"
+```
+
+### PR Body Template
+
+```markdown
+## Summary
+Brief description of what this PR does
+
+## Changes
+- Specific change 1
+- Specific change 2
+- Specific change 3
+
+## Testing
+Describe how to test these changes
+
+## Checklist
+- [ ] Tests pass
+- [ ] Documentation updated
+- [ ] Changelog updated (if applicable)
+
+## Related Issues
+Closes #issue-number
+```
+
+### Managing Pull Requests
+
+```bash
+# List all open PRs
+gh pr list
+
+# View a specific PR
+gh pr view <pr-number>
+
+# Check PR status
+gh pr status
+
+# Checkout a PR locally
+gh pr checkout <pr-number>
+
+# Merge a PR
+gh pr merge <pr-number> --merge  # or --squash, --rebase
+```

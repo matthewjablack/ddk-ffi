@@ -265,6 +265,7 @@ dependencies = [
 [[package]]
 name = "dlc"
 version = "0.7.1"
+source = "git+https://github.com/bennyhodl/dlcdevkit.git?branch=deterministic-contract-keys#2583cd4b75d5ec6d11438187281ae44cc61a968b"
 dependencies = [
  "bitcoin",
  "miniscript",
