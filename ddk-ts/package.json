@@ -41,9 +41,8 @@
     "prepublishOnly": "napi prepublish -t npm --npm-dir dist/npm",
     "build:darwin-arm64": "napi build --release --js index.js --dts index.d.ts --output-dir dist --target aarch64-apple-darwin",
     "build:linux-x64": "napi build --release --js index.js --dts index.d.ts --output-dir dist --target x86_64-unknown-linux-gnu",
-    "format": "run-p format:prettier format:rs format:toml",
+    "format": "run-p format:prettier format:rs",
     "format:prettier": "prettier . -w",
-    "format:toml": "taplo format",
     "format:rs": "cargo fmt",
     "test": "ava",
     "test:all": "yarn verify && cargo test && yarn test",
@@ -56,7 +55,6 @@
     "@emnapi/core": "^1.4.5",
     "@emnapi/runtime": "^1.4.5",
     "@napi-rs/cli": "^3.0.3",
-    "@taplo/cli": "^0.7.0",
     "@tybys/wasm-util": "^0.10.0",
     "ava": "^6.4.1",
     "chalk": "^5.4.1",
@@ -85,7 +83,7 @@
   ],
   "packageManager": "yarn@4.9.2",
   "optionalDependencies": {
-    "@bennyblader/ddk-ts-darwin-arm64": "0.1.9",
-    "@bennyblader/ddk-ts-linux-x64-gnu": "0.1.9"
+    "@bennyblader/ddk-ts-darwin-arm64": "0.1.11",
+    "@bennyblader/ddk-ts-linux-x64-gnu": "0.1.11"
   }
 }
