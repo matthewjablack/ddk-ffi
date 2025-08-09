@@ -1,6 +1,6 @@
 {
   "name": "@bennyblader/ddk-ts",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "dlcdevkit typescript bindings",
   "main": "index.js",
   "repository": "https://github.com/bennyblader/ddk-ffi",
@@ -19,6 +19,7 @@
   ],
   "napi": {
     "binaryName": "ddk-ts",
+    "packageName": "@bennyblader/ddk-ts",
     "targets": [
       "aarch64-apple-darwin",
       "x86_64-unknown-linux-gnu"
@@ -54,8 +55,7 @@
     "verify": "node scripts/verify-parity.js && node scripts/verify-types.js",
     "verify:parity": "node scripts/verify-parity.js",
     "verify:types": "node scripts/verify-types.js",
-    "version": "napi version",
-    "prepare": "husky"
+    "version": "napi version"
   },
   "devDependencies": {
     "@emnapi/core": "^1.4.5",
@@ -65,7 +65,6 @@
     "@tybys/wasm-util": "^0.10.0",
     "ava": "^6.4.1",
     "chalk": "^5.4.1",
-    "husky": "^9.1.7",
     "lint-staged": "^16.1.2",
     "npm-run-all2": "^8.0.4",
     "prettier": "^3.6.2",
@@ -91,7 +90,7 @@
   ],
   "packageManager": "yarn@4.9.2",
   "optionalDependencies": {
-    "@bennyblader/ddk-ts-darwin-arm64": "0.1.7",
-    "@bennyblader/ddk-ts-linux-x64-gnu": "0.1.7"
+    "@bennyblader/ddk-ts-darwin-arm64": "0.1.8",
+    "@bennyblader/ddk-ts-linux-x64-gnu": "0.1.8"
   }
 }
