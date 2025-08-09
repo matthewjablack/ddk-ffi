@@ -173,7 +173,6 @@ pub fn create_refund_transaction(
 
 #[napi]
 pub fn is_dust_output(output: TxOutput) -> Result<bool> {
-  eprintln!("is_dust_output called with value: {:?}", output.value);
   let ffi_output = output.try_into()?;
   Ok(ddk_ffi::is_dust_output(ffi_output))
 }
