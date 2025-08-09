@@ -17,9 +17,6 @@ importers:
       '@napi-rs/cli':
         specifier: ^3.0.3
         version: 3.1.2(@emnapi/runtime@1.4.5)(@types/node@20.19.10)
-      '@taplo/cli':
-        specifier: ^0.7.0
-        version: 0.7.0
       '@tybys/wasm-util':
         specifier: ^0.10.0
         version: 0.10.0
@@ -44,12 +41,6 @@ importers:
       typescript:
         specifier: ^5.8.3
         version: 5.9.2
-
-  __test__:
-    dependencies:
-      '@types/node':
-        specifier: ^20.0.0
-        version: 20.19.10
 
   example:
     dependencies:
@@ -1076,11 +1067,6 @@ packages:
     engines: {node: '>=18'}
     dev: true
 
-  /@taplo/cli@0.7.0:
-    resolution: {integrity: sha512-Ck3zFhQhIhi02Hl6T4ZmJsXdnJE+wXcJz5f8klxd4keRYgenMnip3JDPMGDRLbnC/2iGd8P0sBIQqI3KxfVjBg==}
-    hasBin: true
-    dev: true
-
   /@tsconfig/node10@1.0.11:
     resolution: {integrity: sha512-DcRjDCujK/kCk/cUe8Xz8ZSpm8mS3mNNpta+jGCA6USEDfktlNvm1+IuZ9eTcDbNk41BHwpHHeW+N1lKCz4zOw==}
     dev: true
@@ -1111,6 +1097,7 @@ packages:
     resolution: {integrity: sha512-iAFpG6DokED3roLSP0K+ybeDdIX6Bc0Vd3mLW5uDqThPWtNos3E+EqOM11mPQHKzfWHqEBuLjIlsBQQ8CsISmQ==}
     dependencies:
       undici-types: 6.21.0
+    dev: true
 
   /@vercel/nft@0.29.4:
     resolution: {integrity: sha512-6lLqMNX3TuycBPABycx7A9F1bHQR7kiQln6abjFbPrf5C/05qHM9M5E4PeTE59c7z8g6vHnx1Ioihb2AQl7BTA==}
@@ -2388,6 +2375,7 @@ packages:
 
   /undici-types@6.21.0:
     resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
+    dev: true
 
   /unicorn-magic@0.1.0:
     resolution: {integrity: sha512-lRfVq8fE8gz6QMBuDM6a+LO3IAzTi05H6gCVaUpir2E1Rwpo4ZUog45KpNXKC/Mn3Yb9UDuHumeFTo9iV/D9FQ==}

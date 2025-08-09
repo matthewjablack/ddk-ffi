@@ -72,20 +72,20 @@ rn-release-archives:
 
 # Build TypeScript bindings for current platform
 ts-build:
-    cd {{justfile_directory()}}/ddk-ts && yarn install && yarn build
+    cd {{justfile_directory()}}/ddk-ts && pnpm install && pnpm build
 
 # Build TypeScript bindings for all supported platforms (Darwin ARM64 and Linux x64)
 ts-build-all:
-    cd {{justfile_directory()}}/ddk-ts && yarn install && yarn build:darwin-arm64 && yarn build:linux-x64
+    cd {{justfile_directory()}}/ddk-ts && pnpm install && pnpm build:darwin-arm64 && pnpm build:linux-x64
 
 # Run TypeScript example
 ts-example:
-    cd {{justfile_directory()}}/ddk-ts && yarn build
-    cd {{justfile_directory()}}/ddk-ts/example && yarn install && yarn build && yarn start
+    cd {{justfile_directory()}}/ddk-ts && pnpm build
+    cd {{justfile_directory()}}/ddk-ts/example && pnpm install && pnpm build && pnpm start
 
 # Run TypeScript tests
 ts-test:
-    cd {{justfile_directory()}}/ddk-ts && yarn test
+    cd {{justfile_directory()}}/ddk-ts && pnpm test
 
 # Release TypeScript package to npm
 ts-release version:
@@ -104,12 +104,12 @@ ts-release version:
     
     # Build for all platforms
     echo "Building for all platforms..."
-    # yarn build:darwin-arm64
-    yarn build
+    # pnpm build:darwin-arm64
+    pnpm build
     
     # Run tests
     echo "Running tests..."
-    yarn test
+    pnpm test
     
     # Commit changes
     git add -A

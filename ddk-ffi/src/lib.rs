@@ -1,4 +1,5 @@
 #![allow(unused_imports, unused_variables)]
+#![allow(clippy::too_many_arguments)]
 use bitcoin::consensus::{Decodable, Encodable};
 use bitcoin::hashes::Hash;
 use bitcoin::sighash::{EcdsaSighashType, SighashCache};
