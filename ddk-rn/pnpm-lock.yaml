@@ -21,9 +21,6 @@ importers:
       '@commitlint/config-conventional':
         specifier: ^17.0.2
         version: 17.8.1
-      '@evilmartians/lefthook':
-        specifier: ^1.5.0
-        version: 1.12.2
       '@react-native-community/cli':
         specifier: 15.0.0-alpha.2
         version: 15.0.0-alpha.2(typescript@5.9.2)
@@ -1743,14 +1740,6 @@ packages:
   /@eslint/js@8.57.1:
     resolution: {integrity: sha512-d9zaMRSTIKDLhctzH12MtXvJKSSUhaHcjV+2Z+GK+EEY7XKpP5yR4x+N3TAcHTcu963nIr+TMcCb4DBCYX1z6Q==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
-    dev: true
-
-  /@evilmartians/lefthook@1.12.2:
-    resolution: {integrity: sha512-PQ7ZE08JiRNWydJpDeVijg8GjoTFiXQTy5/mVXf5U7epNZWYUEfnwjfXFa+HvsegodQcTenl05twrRxB/vOR8Q==}
-    cpu: [x64, arm64, ia32]
-    os: [darwin, linux, win32]
-    hasBin: true
-    requiresBuild: true
     dev: true
 
   /@hapi/hoek@9.3.0:
