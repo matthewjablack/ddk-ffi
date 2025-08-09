@@ -1,7 +1,7 @@
 {
   "name": "@bennyblader/ddk-rn",
   "version": "0.1.4",
-  "description": "rust-dlc bindings for react-native",
+  "description": "dlcdevkit bindings for react-native",
   "source": "./src/index.tsx",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/module/index.js",
