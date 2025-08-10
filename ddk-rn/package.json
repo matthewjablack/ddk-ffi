@@ -94,8 +94,10 @@
       "javaPackageName": "com.ddkrn"
     },
     "ios": {
-      "modulesProvider": {
-        "DdkRn": "DdkRn"
+      "modules": {
+        "DdkRn": {
+          "className": "DdkRn"
+        }
       }
     }
   },
