@@ -24,7 +24,7 @@ uniffi-jsi:
 # Generate the TurboModule bindings
 uniffi-turbo:
   cd {{justfile_directory()}}/ddk-rn && uniffi-bindgen-react-native generate jsi turbo-module ddk_ffi \
-    --config ./ubrn.config.yaml \
+    --config {{justfile_directory()}}/ddk-rn/ubrn.config.yaml \
     --native-bindings
 
 # Build the iOS bindings
