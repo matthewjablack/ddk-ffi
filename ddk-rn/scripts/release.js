@@ -145,6 +145,16 @@ function runTests() {
   console.log('✅ All tests passed');
 }
 
+function prepareRustSource() {
+  console.log('📦 Preparing Rust source for npm package...');
+  runCommand(
+    'node scripts/prepare-rust-src.js',
+    ddkRnRoot,
+    'Copying Rust source into package'
+  );
+  console.log('✅ Rust source prepared');
+}
+
 function buildPackage() {
   console.log('🔨 Building package...');
   runCommand(
@@ -209,10 +219,18 @@ function releaseWithPnpm() {
 
 function main() {
   try {
+    if (dryRun) {
+      console.log('🏃 Running in DRY RUN mode - no commits or publishing will occur\n');
+    }
+    
     console.log('🔍 Pre-flight checks...');
 
-    // 1. Check git status
-    checkGitStatus();
+    // 1. Check git status (skip if dry run)
+    if (!dryRun) {
+      checkGitStatus();
+    } else {
+      console.log('⚠️  Skipping git status check (dry run)');
+    }
 
     // 2. Get current version from package.json
     const currentVersion = getCurrentVersion();
@@ -230,19 +248,34 @@ function main() {
     // console.log('\n🔧 Generating bindings...');
     // generateBindings();
 
-    // 6. Build package
+    // 6. Prepare Rust source for npm package
+    console.log('\n📦 Preparing Rust source...');
+    prepareRustSource();
+
+    // 7. Build package
     console.log('\n🔨 Building package...');
     buildPackage();
 
-    // 7. Commit Rust version changes
+    if (dryRun) {
+      console.log('\n✅ Dry run completed successfully!');
+      console.log('📝 All preparation steps completed. Skipped:');
+      console.log('   - Git commit');
+      console.log('   - Git tag');
+      console.log('   - npm publish');
+      console.log('   - GitHub release');
+      console.log('\n💡 To perform actual release, run without --dry-run flag');
+      return;
+    }
+
+    // 8. Commit Rust version changes
     console.log('\n📝 Committing changes...');
     commitVersionChanges(currentVersion);
 
-    // 8. Release with pnpm (this will bump version, create tag, publish to npm, create GitHub release)
+    // 9. Release with pnpm (this will bump version, create tag, publish to npm, create GitHub release)
     console.log('\n🚀 Releasing...');
     releaseWithPnpm();
 
-    // 9. Get the new version (release-it will have bumped it)
+    // 10. Get the new version (release-it will have bumped it)
     const newVersion = getCurrentVersion();
     console.log(`🎉 Released version: ${newVersion}`);
 
@@ -264,19 +297,26 @@ function main() {
       '   - Turbo module files (NativeDdkRn.ts, index.tsx, bennyblader-ddk-rn.cpp/h)'
     );
     console.log(
+      '   - Complete Rust source (ddk-ffi directory)'
+    );
+    console.log(
       '   Native libraries will be built during postinstall on the client side.'
     );
   } catch (error) {
     console.error('\n❌ Release failed:', error.message);
     console.error('\n🔧 You may need to clean up manually:');
     console.error('   - Check git status and reset if needed');
-    console.error('   - Check npm and GitHub releases');
+    if (!dryRun) {
+      console.error('   - Check npm and GitHub releases');
+    }
     process.exit(1);
   }
 }
 
 // Handle CLI arguments
 const args = process.argv.slice(2);
+const dryRun = args.includes('--dry-run');
+
 if (args.includes('--help') || args.includes('-h')) {
   console.log(`
 🚀 Automated Release Script
@@ -285,26 +325,29 @@ This script automates the entire release process:
 1. Checks git status is clean
 2. Updates Rust version to match package.json
 3. Runs all tests (Rust + React Native)
-4. Generates JSI bindings ONLY (ddk_ffi.ts, ddk_ffi-ffi.ts, ddk_ffi.cpp, ddk_ffi.hpp)
+4. Prepares Rust source for npm package
 5. Builds the npm package
-6. Commits Rust version changes
-7. Runs 'pnpm release' (version bump, git tag, npm publish, GitHub release)
+6. Commits Rust version changes (skipped with --dry-run)
+7. Runs 'pnpm release' (version bump, git tag, npm publish, GitHub release) (skipped with --dry-run)
 
-Note: This script now only generates JSI bindings. Turbo modules and native
-libraries will be generated during postinstall on the client side.
+Options:
+  --dry-run    Run all preparation steps but skip commit, tag, release, and publish
+  --help, -h   Show this help message
 
 Prerequisites:
-- Clean git working directory
-- npm authentication (npm login)
-- GitHub CLI authentication (gh auth login)
+- Clean git working directory (unless --dry-run)
+- npm authentication (npm login) (unless --dry-run)
+- GitHub CLI authentication (gh auth login) (unless --dry-run)
 - All dependencies installed (pnpm install)
 - uniffi-bindgen-react-native installed globally
 
 Usage:
-  node scripts/release.js
-  pnpm run release-full
+  node scripts/release.js              # Full release
+  node scripts/release.js --dry-run    # Test run without publishing
+  pnpm run release-full                # Full release
+  pnpm run release-full -- --dry-run   # Test run without publishing
 
-The script will prompt for version bump during the release process.
+The script will prompt for version bump during the release process (unless --dry-run).
 `);
   process.exit(0);
 }

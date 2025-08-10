@@ -5,6 +5,7 @@ const path = require('path');
 const { execSync } = require('child_process');
 
 const packageRoot = path.join(__dirname, '..');
+const ddkFfiRoot = path.join(packageRoot, 'ddk-ffi');
 
 console.log('📦 DDK-RN Post-install: Building native libraries...');
 
@@ -52,6 +53,9 @@ function buildIOS() {
   console.log('\n🍎 Building iOS libraries...');
   const uniffiCmd = getUniffiCommand();
   
+  // Update ubrn.config.yaml to point to the included Rust source
+  updateConfigFile();
+  
   try {
     const cmd = `${uniffiCmd} build ios --and-generate`;
     console.log(`Running: ${cmd}`);
@@ -78,6 +82,9 @@ function buildAndroid() {
   
   const uniffiCmd = getUniffiCommand();
   
+  // Update ubrn.config.yaml to point to the included Rust source
+  updateConfigFile();
+  
   try {
     const cmd = `${uniffiCmd} build android --and-generate`;
     console.log(`Running: ${cmd}`);
@@ -89,6 +96,25 @@ function buildAndroid() {
   } catch (error) {
     console.warn(`⚠️  Android build failed: ${error.message}`);
     console.warn('   This may be due to missing Android NDK or Rust toolchains.');
+  }
+}
+
+// Update the ubrn.config.yaml to use the local Rust source
+function updateConfigFile() {
+  const configPath = path.join(packageRoot, 'ubrn.config.yaml');
+  
+  if (fs.existsSync(configPath)) {
+    let config = fs.readFileSync(configPath, 'utf8');
+    
+    // Update the Rust directory to point to the included ddk-ffi
+    if (!config.includes('directory: ddk-ffi')) {
+      config = config.replace(
+        /rust:\s*\n\s*directory:\s*[^\n]+/,
+        'rust:\n  directory: ddk-ffi'
+      );
+      fs.writeFileSync(configPath, config);
+      console.log('📝 Updated config to use included Rust source');
+    }
   }
 }
 
@@ -119,7 +145,11 @@ function verifyAllFiles() {
     'src/NativeDdkRn.ts',
     'src/index.tsx',
     'cpp/bennyblader-ddk-rn.cpp',
-    'cpp/bennyblader-ddk-rn.h'
+    'cpp/bennyblader-ddk-rn.h',
+    // Rust source (shipped with package)
+    'ddk-ffi/Cargo.toml',
+    'ddk-ffi/src/lib.rs',
+    'ddk-ffi/src/ddk_ffi.udl'
   ];
   
   const platform = process.platform;
@@ -144,7 +174,7 @@ function verifyAllFiles() {
     if (fs.existsSync(iosFramework)) {
       console.log(`  ✅ ios/DdkRn.xcframework`);
     } else {
-      console.log(`  ⚠️  iOS framework not built yet (will be built on first use)`);
+      console.log(`  ⚠️  iOS framework not built yet (will be built now)`);
     }
   }
   
@@ -189,6 +219,14 @@ async function main() {
     process.exit(1);
   }
   
+  // Check if Rust source is included
+  if (!fs.existsSync(ddkFfiRoot)) {
+    console.error('❌ Rust source not found in package!');
+    console.error(`   Expected at: ${ddkFfiRoot}`);
+    console.error('   This indicates a problem with the NPM package.');
+    process.exit(1);
+  }
+  
   // Verify source files are present (should be included in NPM package)
   const sourceFiles = [
     'src/ddk_ffi.ts',
@@ -198,7 +236,10 @@ async function main() {
     'cpp/ddk_ffi.hpp',
     'cpp/ddk_ffi.cpp',
     'cpp/bennyblader-ddk-rn.cpp',
-    'cpp/bennyblader-ddk-rn.h'
+    'cpp/bennyblader-ddk-rn.h',
+    'ddk-ffi/Cargo.toml',
+    'ddk-ffi/src/lib.rs',
+    'ddk-ffi/src/ddk_ffi.udl'
   ];
   
   console.log('🔍 Checking source files...');
@@ -239,6 +280,7 @@ async function main() {
     console.error('   - Missing uniffi-bindgen-react-native (install globally)');
     console.error('   - Missing Android NDK (for Android builds)');
     console.error('   - Missing Xcode/iOS toolchain (for iOS builds on macOS)');
+    console.error('   - Missing Rust toolchain');
     console.error('');
     console.error('Report issues at: https://github.com/bennyhodl/ddk-ffi/issues');
     process.exit(1);

@@ -112,6 +112,9 @@ ddk-rn/cpp/UniffiCallInvoker.h
 # Build outputs
 ddk-rn/lib/
 
+# Rust source copy for npm package (created during release)
+ddk-rn/ddk-ffi/
+
 # ====================
 # Environment & Config
 # ====================
