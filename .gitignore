@@ -105,13 +105,9 @@ ddk-rn/ios/*.xcframework/
 # ====================
 # Generated Files (from uniffi)
 # ====================
-# Generated C++ bindings (keep ddk_ffi.cpp/hpp as source)
-ddk-rn/cpp/bennyblader-ddk-rn.*
+# Note: We now include generated turbo module files in git for npm package
+# Only ignore helper files
 ddk-rn/cpp/UniffiCallInvoker.h
-
-# Generated TypeScript bindings (keep ddk_ffi.ts/ddk_ffi-ffi.ts as source)
-ddk-rn/src/NativeDdkRn.ts
-ddk-rn/src/index.tsx
 
 # Build outputs
 ddk-rn/lib/

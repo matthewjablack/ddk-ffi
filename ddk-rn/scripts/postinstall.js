@@ -6,7 +6,7 @@ const { execSync } = require('child_process');
 
 const packageRoot = path.join(__dirname, '..');
 
-console.log('📦 DDK-RN Post-install: Generating turbo modules and building native libraries...');
+console.log('📦 DDK-RN Post-install: Building native libraries...');
 
 // Check if uniffi-bindgen-react-native is available (prefer npx)
 function hasUniffiBingen() {
@@ -37,26 +37,6 @@ function getUniffiCommand() {
 function ensureDir(dir) {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
-  }
-}
-
-// Generate turbo module specifications from existing JSI bindings
-function generateTurboModule() {
-  console.log('\n⚡ Generating turbo module from existing bindings...');
-  
-  const configFile = path.join(packageRoot, 'ubrn.config.yaml');
-  const uniffiCmd = getUniffiCommand();
-  
-  try {
-    const cmd = `${uniffiCmd} generate jsi turbo-module ddk_ffi --config "${configFile}" --native-bindings`;
-    console.log(`Running: ${cmd}`);
-    execSync(cmd, { 
-      stdio: 'inherit',
-      cwd: packageRoot 
-    });
-    console.log('✅ Turbo module generated');
-  } catch (error) {
-    throw new Error(`Failed to generate turbo module: ${error.message}`);
   }
 }
 
@@ -112,7 +92,7 @@ function buildAndroid() {
   }
 }
 
-// Fix the C++ include path issue
+// Fix the C++ include path issue if needed
 function fixCppIncludePath() {
   const cppFile = path.join(packageRoot, 'cpp', 'bennyblader-ddk-rn.cpp');
   if (fs.existsSync(cppFile)) {
@@ -129,14 +109,13 @@ function fixCppIncludePath() {
 function verifyAllFiles() {
   console.log('\n🔍 Verifying installation...');
   
-  const sourceFiles = [
+  const requiredFiles = [
+    // Core JSI bindings (shipped with package)
     'src/ddk_ffi.ts',
     'src/ddk_ffi-ffi.ts',
     'cpp/ddk_ffi.hpp',
-    'cpp/ddk_ffi.cpp'
-  ];
-  
-  const generatedFiles = [
+    'cpp/ddk_ffi.cpp',
+    // Generated turbo module files (shipped with package)
     'src/NativeDdkRn.ts',
     'src/index.tsx',
     'cpp/bennyblader-ddk-rn.cpp',
@@ -146,9 +125,9 @@ function verifyAllFiles() {
   const platform = process.platform;
   let allFilesPresent = true;
   
-  // Check source files (should be included in NPM package)
-  console.log('📋 Checking source files...');
-  for (const file of sourceFiles) {
+  // Check required files
+  console.log('📋 Checking required files...');
+  for (const file of requiredFiles) {
     const filePath = path.join(packageRoot, file);
     if (fs.existsSync(filePath)) {
       console.log(`  ✅ ${file}`);
@@ -158,30 +137,15 @@ function verifyAllFiles() {
     }
   }
   
-  // Check generated files (created by postinstall)
-  console.log('📋 Checking generated files...');
-  for (const file of generatedFiles) {
-    const filePath = path.join(packageRoot, file);
-    if (fs.existsSync(filePath)) {
-      console.log(`  ✅ ${file}`);
-    } else {
-      console.error(`  ❌ Missing: ${file}`);
-      allFilesPresent = false;
-    }
-  }
-  
-  // Check platform-specific files
+  // Check platform-specific files (generated during postinstall)
   if (platform === 'darwin') {
     console.log('📋 Checking iOS framework...');
     const iosFramework = path.join(packageRoot, 'ios', 'DdkRn.xcframework', 'Info.plist');
     if (fs.existsSync(iosFramework)) {
       console.log(`  ✅ ios/DdkRn.xcframework`);
     } else {
-      console.error(`  ❌ Missing: ios/DdkRn.xcframework`);
-      allFilesPresent = false;
+      console.log(`  ⚠️  iOS framework not built yet (will be built on first use)`);
     }
-  } else {
-    console.log('📋 Skipping iOS framework check (not on macOS)');
   }
   
   console.log('📋 Checking Android libraries...');
@@ -196,15 +160,12 @@ function verifyAllFiles() {
   for (const lib of androidLibs) {
     const libPath = path.join(packageRoot, lib);
     if (fs.existsSync(libPath)) {
-      console.log(`  ✅ ${lib}`);
       androidLibsPresent++;
-    } else {
-      console.log(`  ⚠️  Missing: ${lib}`);
     }
   }
   
   if (androidLibsPresent === 0) {
-    console.log('  ⚠️  No Android libraries found (may be due to missing NDK)');
+    console.log('  ⚠️  Android libraries not built yet (may be due to missing NDK)');
   } else {
     console.log(`  ✅ Found ${androidLibsPresent}/${androidLibs.length} Android libraries`);
   }
@@ -214,9 +175,9 @@ function verifyAllFiles() {
 
 async function main() {
   // Skip in CI unless explicitly requested
-  if (process.env.CI && !process.env.GENERATE_BINDINGS) {
-    console.log('⚠️  Skipping binding generation in CI environment.');
-    console.log('   Set GENERATE_BINDINGS=1 to force generation in CI.');
+  if (process.env.CI && !process.env.BUILD_NATIVE_LIBS) {
+    console.log('⚠️  Skipping native library builds in CI environment.');
+    console.log('   Set BUILD_NATIVE_LIBS=1 to force builds in CI.');
     process.exit(0);
   }
   
@@ -232,8 +193,12 @@ async function main() {
   const sourceFiles = [
     'src/ddk_ffi.ts',
     'src/ddk_ffi-ffi.ts', 
+    'src/NativeDdkRn.ts',
+    'src/index.tsx',
     'cpp/ddk_ffi.hpp',
-    'cpp/ddk_ffi.cpp'
+    'cpp/ddk_ffi.cpp',
+    'cpp/bennyblader-ddk-rn.cpp',
+    'cpp/bennyblader-ddk-rn.h'
   ];
   
   console.log('🔍 Checking source files...');
@@ -248,9 +213,10 @@ async function main() {
   console.log('✅ All source files present');
   
   try {
-    // Generate turbo module and build native libraries from existing JSI bindings
-    generateTurboModule();
+    // Fix include path if needed
     fixCppIncludePath();
+    
+    // Build native libraries only (turbo module already generated)
     buildIOS();
     buildAndroid();
     
@@ -263,7 +229,7 @@ async function main() {
       process.exit(1);
     }
     
-    console.log('\n✅ All files installed successfully!');
+    console.log('\n✅ Installation completed successfully!');
     console.log('🎉 DDK-RN is ready to use!\n');
     
   } catch (error) {

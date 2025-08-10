@@ -19,10 +19,8 @@
     }
   },
   "files": [
-    "src/ddk_ffi.ts",
-    "src/ddk_ffi-ffi.ts",
-    "cpp/ddk_ffi.hpp",
-    "cpp/ddk_ffi.cpp",
+    "src",
+    "cpp",
     "lib",
     "android/build.gradle",
     "android/CMakeLists.txt",

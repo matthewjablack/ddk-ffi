@@ -65,8 +65,8 @@ function updateRustVersion(version) {
   console.log(`✅ Updated Cargo.toml version to ${version}`);
 }
 
-function generateJSIBindings() {
-  console.log('🔧 Generating JSI bindings only...');
+function generateBindings() {
+  console.log('🔧 Generating JSI bindings and turbo module...');
   
   const srcDir = path.join(ddkRnRoot, 'src');
   const cppDir = path.join(ddkRnRoot, 'cpp');
@@ -83,21 +83,39 @@ function generateJSIBindings() {
   }
   
   try {
-    // Generate JSI bindings ONLY (TypeScript and C++)
-    const cmd = `uniffi-bindgen-react-native generate jsi bindings --crate ddk_ffi --config "${configFile}" --ts-dir "${srcDir}" --cpp-dir "${cppDir}" "${udlFile}"`;
-    console.log(`   Running: ${cmd}`);
-    execSync(cmd, { 
+    // Step 1: Generate JSI bindings (TypeScript and C++)
+    const jsiCmd = `uniffi-bindgen-react-native generate jsi bindings --crate ddk_ffi --config "${configFile}" --ts-dir "${srcDir}" --cpp-dir "${cppDir}" "${udlFile}"`;
+    console.log(`   Running: ${jsiCmd}`);
+    execSync(jsiCmd, { 
       stdio: 'inherit',
       cwd: ddkFfiRoot 
     });
     console.log('✅ JSI bindings generated (ddk_ffi.ts, ddk_ffi-ffi.ts, ddk_ffi.cpp, ddk_ffi.hpp)');
     
-    // Note: NOT generating turbo modules or building native libraries
-    console.log('ℹ️  Skipping turbo module generation - will be done during postinstall');
-    console.log('ℹ️  Skipping native library builds - will be done during postinstall');
+    // Step 2: Generate turbo module files
+    const turboCmd = `uniffi-bindgen-react-native generate jsi turbo-module ddk_ffi --config "${configFile}" --native-bindings`;
+    console.log(`   Running: ${turboCmd}`);
+    execSync(turboCmd, { 
+      stdio: 'inherit',
+      cwd: ddkRnRoot 
+    });
+    console.log('✅ Turbo module generated (NativeDdkRn.ts, index.tsx, bennyblader-ddk-rn.cpp, bennyblader-ddk-rn.h)');
+    
+    // Fix the C++ include path issue
+    const cppFile = path.join(cppDir, 'bennyblader-ddk-rn.cpp');
+    if (fs.existsSync(cppFile)) {
+      let content = fs.readFileSync(cppFile, 'utf8');
+      if (content.includes('#include "/ddk_ffi.hpp"')) {
+        content = content.replace('#include "/ddk_ffi.hpp"', '#include "ddk_ffi.hpp"');
+        fs.writeFileSync(cppFile, content);
+        console.log('🔧 Fixed include path in C++ bindings');
+      }
+    }
+    
+    console.log('ℹ️  Native library builds will be done during postinstall on client side');
     
   } catch (error) {
-    throw new Error(`Failed to generate JSI bindings: ${error.message}`);
+    throw new Error(`Failed to generate bindings: ${error.message}`);
   }
 }
 
@@ -199,9 +217,9 @@ function main() {
     console.log('\n🧪 Running tests...');
     runTests();
 
-    // 5. Generate JSI bindings only (not turbo modules or builds)
-    console.log('\n🔧 Generating JSI bindings...');
-    generateJSIBindings();
+    // 5. Generate JSI bindings and turbo module (not native builds)
+    console.log('\n🔧 Generating bindings...');
+    generateBindings();
 
     // 6. Build package
     console.log('\n🔨 Building package...');
@@ -229,8 +247,10 @@ function main() {
     console.log(
       `📋 npm package: https://www.npmjs.com/package/@bennyblader/ddk-rn/v/${newVersion}`
     );
-    console.log('\n📝 Note: This release only includes JSI bindings (ddk_ffi.ts, ddk_ffi-ffi.ts, ddk_ffi.cpp, ddk_ffi.hpp)');
-    console.log('   Turbo modules and native libraries will be generated during postinstall on the client side.');
+    console.log('\n📝 Note: This release includes all generated bindings:');
+    console.log('   - JSI bindings (ddk_ffi.ts, ddk_ffi-ffi.ts, ddk_ffi.cpp, ddk_ffi.hpp)');
+    console.log('   - Turbo module files (NativeDdkRn.ts, index.tsx, bennyblader-ddk-rn.cpp/h)');
+    console.log('   Native libraries will be built during postinstall on the client side.');
   } catch (error) {
     console.error('\n❌ Release failed:', error.message);
     console.error('\n🔧 You may need to clean up manually:');
