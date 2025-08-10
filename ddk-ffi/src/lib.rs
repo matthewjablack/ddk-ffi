@@ -206,6 +206,10 @@ pub fn btc_tx_to_transaction(tx: &BtcTransaction) -> Transaction {
     }
 }
 
+pub fn plz_work() -> String {
+    "heyhowareya".to_string()
+}
+
 pub fn transaction_to_btc_tx(tx: &Transaction) -> Result<BtcTransaction, DLCError> {
     use bitcoin::consensus::Decodable;
     BtcTransaction::consensus_decode(&mut &tx.raw_bytes[..])

@@ -8,41 +8,148 @@ import {
   type UniffiRustArcPtr,
   type UniffiRustFutureContinuationCallback as RuntimeUniffiRustFutureContinuationCallback,
   type UniffiResult,
- } from 'uniffi-bindgen-react-native';
+} from 'uniffi-bindgen-react-native';
 
 interface NativeModuleInterface {
-    ubrn_uniffi_internal_fn_func_ffi__string_to_byte_length(string: string, uniffi_out_err: UniffiRustCallStatus): number;
-    ubrn_uniffi_internal_fn_func_ffi__string_to_arraybuffer(string: string, uniffi_out_err: UniffiRustCallStatus): Uint8Array;
-    ubrn_uniffi_internal_fn_func_ffi__arraybuffer_to_string(buffer: Uint8Array, uniffi_out_err: UniffiRustCallStatus): string;
-    ubrn_uniffi_ddk_ffi_fn_func_create_cet(localOutput: Uint8Array, localPayoutSerialId: bigint, remoteOutput: Uint8Array, remotePayoutSerialId: bigint, fundTxId: Uint8Array, fundVout: number, lockTime: number, uniffi_out_err: UniffiRustCallStatus): Uint8Array;
-    ubrn_uniffi_ddk_ffi_fn_func_create_cet_adaptor_signature_from_oracle_info(cet: Uint8Array, oracleInfo: Uint8Array, fundingSk: Uint8Array, fundingScriptPubkey: Uint8Array, totalCollateral: bigint, msgs: Uint8Array, uniffi_out_err: UniffiRustCallStatus): Uint8Array;
-    ubrn_uniffi_ddk_ffi_fn_func_create_cets(fundTxId: Uint8Array, fundVout: number, localFinalScriptPubkey: Uint8Array, remoteFinalScriptPubkey: Uint8Array, outcomes: Uint8Array, lockTime: number, localSerialId: bigint, remoteSerialId: bigint, uniffi_out_err: UniffiRustCallStatus): Uint8Array;
-    ubrn_uniffi_ddk_ffi_fn_func_create_dlc_transactions(outcomes: Uint8Array, localParams: Uint8Array, remoteParams: Uint8Array, refundLocktime: number, feeRate: bigint, fundLockTime: number, cetLockTime: number, fundOutputSerialId: bigint, uniffi_out_err: UniffiRustCallStatus): Uint8Array;
-    ubrn_uniffi_ddk_ffi_fn_func_create_fund_tx_locking_script(localFundPubkey: Uint8Array, remoteFundPubkey: Uint8Array, uniffi_out_err: UniffiRustCallStatus): Uint8Array;
-    ubrn_uniffi_ddk_ffi_fn_func_create_refund_transaction(localFinalScriptPubkey: Uint8Array, remoteFinalScriptPubkey: Uint8Array, localAmount: bigint, remoteAmount: bigint, lockTime: number, fundTxId: Uint8Array, fundVout: number, uniffi_out_err: UniffiRustCallStatus): Uint8Array;
-    ubrn_uniffi_ddk_ffi_fn_func_create_spliced_dlc_transactions(outcomes: Uint8Array, localParams: Uint8Array, remoteParams: Uint8Array, refundLocktime: number, feeRate: bigint, fundLockTime: number, cetLockTime: number, fundOutputSerialId: bigint, uniffi_out_err: UniffiRustCallStatus): Uint8Array;
-    ubrn_uniffi_ddk_ffi_fn_func_get_change_output_and_fees(params: Uint8Array, feeRate: bigint, uniffi_out_err: UniffiRustCallStatus): Uint8Array;
-    ubrn_uniffi_ddk_ffi_fn_func_get_raw_funding_transaction_input_signature(fundingTransaction: Uint8Array, privkey: Uint8Array, prevTxId: Uint8Array, prevTxVout: number, value: bigint, uniffi_out_err: UniffiRustCallStatus): Uint8Array;
-    ubrn_uniffi_ddk_ffi_fn_func_get_total_input_vsize(inputs: Uint8Array, uniffi_out_err: UniffiRustCallStatus): number;
-    ubrn_uniffi_ddk_ffi_fn_func_is_dust_output(output: Uint8Array, uniffi_out_err: UniffiRustCallStatus): number;
-    ubrn_uniffi_ddk_ffi_fn_func_sign_fund_transaction_input(fundTransaction: Uint8Array, privkey: Uint8Array, prevTxId: Uint8Array, prevTxVout: number, value: bigint, uniffi_out_err: UniffiRustCallStatus): Uint8Array;
-    ubrn_uniffi_ddk_ffi_fn_func_verify_fund_tx_signature(fundTx: Uint8Array, signature: Uint8Array, pubkey: Uint8Array, txid: Uint8Array, vout: number, inputAmount: bigint, uniffi_out_err: UniffiRustCallStatus): number;
-    ubrn_uniffi_ddk_ffi_fn_func_version(uniffi_out_err: UniffiRustCallStatus): Uint8Array;
-    ubrn_uniffi_ddk_ffi_checksum_func_create_cet(): number;
-    ubrn_uniffi_ddk_ffi_checksum_func_create_cet_adaptor_signature_from_oracle_info(): number;
-    ubrn_uniffi_ddk_ffi_checksum_func_create_cets(): number;
-    ubrn_uniffi_ddk_ffi_checksum_func_create_dlc_transactions(): number;
-    ubrn_uniffi_ddk_ffi_checksum_func_create_fund_tx_locking_script(): number;
-    ubrn_uniffi_ddk_ffi_checksum_func_create_refund_transaction(): number;
-    ubrn_uniffi_ddk_ffi_checksum_func_create_spliced_dlc_transactions(): number;
-    ubrn_uniffi_ddk_ffi_checksum_func_get_change_output_and_fees(): number;
-    ubrn_uniffi_ddk_ffi_checksum_func_get_raw_funding_transaction_input_signature(): number;
-    ubrn_uniffi_ddk_ffi_checksum_func_get_total_input_vsize(): number;
-    ubrn_uniffi_ddk_ffi_checksum_func_is_dust_output(): number;
-    ubrn_uniffi_ddk_ffi_checksum_func_sign_fund_transaction_input(): number;
-    ubrn_uniffi_ddk_ffi_checksum_func_verify_fund_tx_signature(): number;
-    ubrn_uniffi_ddk_ffi_checksum_func_version(): number;
-    ubrn_ffi_ddk_ffi_uniffi_contract_version(): number;
+  ubrn_uniffi_internal_fn_func_ffi__string_to_byte_length(
+    string: string,
+    uniffi_out_err: UniffiRustCallStatus
+  ): number;
+  ubrn_uniffi_internal_fn_func_ffi__string_to_arraybuffer(
+    string: string,
+    uniffi_out_err: UniffiRustCallStatus
+  ): Uint8Array;
+  ubrn_uniffi_internal_fn_func_ffi__arraybuffer_to_string(
+    buffer: Uint8Array,
+    uniffi_out_err: UniffiRustCallStatus
+  ): string;
+  ubrn_uniffi_ddk_ffi_fn_func_create_cet(
+    localOutput: Uint8Array,
+    localPayoutSerialId: bigint,
+    remoteOutput: Uint8Array,
+    remotePayoutSerialId: bigint,
+    fundTxId: Uint8Array,
+    fundVout: number,
+    lockTime: number,
+    uniffi_out_err: UniffiRustCallStatus
+  ): Uint8Array;
+  ubrn_uniffi_ddk_ffi_fn_func_create_cet_adaptor_signature_from_oracle_info(
+    cet: Uint8Array,
+    oracleInfo: Uint8Array,
+    fundingSk: Uint8Array,
+    fundingScriptPubkey: Uint8Array,
+    totalCollateral: bigint,
+    msgs: Uint8Array,
+    uniffi_out_err: UniffiRustCallStatus
+  ): Uint8Array;
+  ubrn_uniffi_ddk_ffi_fn_func_create_cets(
+    fundTxId: Uint8Array,
+    fundVout: number,
+    localFinalScriptPubkey: Uint8Array,
+    remoteFinalScriptPubkey: Uint8Array,
+    outcomes: Uint8Array,
+    lockTime: number,
+    localSerialId: bigint,
+    remoteSerialId: bigint,
+    uniffi_out_err: UniffiRustCallStatus
+  ): Uint8Array;
+  ubrn_uniffi_ddk_ffi_fn_func_create_dlc_transactions(
+    outcomes: Uint8Array,
+    localParams: Uint8Array,
+    remoteParams: Uint8Array,
+    refundLocktime: number,
+    feeRate: bigint,
+    fundLockTime: number,
+    cetLockTime: number,
+    fundOutputSerialId: bigint,
+    uniffi_out_err: UniffiRustCallStatus
+  ): Uint8Array;
+  ubrn_uniffi_ddk_ffi_fn_func_create_fund_tx_locking_script(
+    localFundPubkey: Uint8Array,
+    remoteFundPubkey: Uint8Array,
+    uniffi_out_err: UniffiRustCallStatus
+  ): Uint8Array;
+  ubrn_uniffi_ddk_ffi_fn_func_create_refund_transaction(
+    localFinalScriptPubkey: Uint8Array,
+    remoteFinalScriptPubkey: Uint8Array,
+    localAmount: bigint,
+    remoteAmount: bigint,
+    lockTime: number,
+    fundTxId: Uint8Array,
+    fundVout: number,
+    uniffi_out_err: UniffiRustCallStatus
+  ): Uint8Array;
+  ubrn_uniffi_ddk_ffi_fn_func_create_spliced_dlc_transactions(
+    outcomes: Uint8Array,
+    localParams: Uint8Array,
+    remoteParams: Uint8Array,
+    refundLocktime: number,
+    feeRate: bigint,
+    fundLockTime: number,
+    cetLockTime: number,
+    fundOutputSerialId: bigint,
+    uniffi_out_err: UniffiRustCallStatus
+  ): Uint8Array;
+  ubrn_uniffi_ddk_ffi_fn_func_get_change_output_and_fees(
+    params: Uint8Array,
+    feeRate: bigint,
+    uniffi_out_err: UniffiRustCallStatus
+  ): Uint8Array;
+  ubrn_uniffi_ddk_ffi_fn_func_get_raw_funding_transaction_input_signature(
+    fundingTransaction: Uint8Array,
+    privkey: Uint8Array,
+    prevTxId: Uint8Array,
+    prevTxVout: number,
+    value: bigint,
+    uniffi_out_err: UniffiRustCallStatus
+  ): Uint8Array;
+  ubrn_uniffi_ddk_ffi_fn_func_get_total_input_vsize(
+    inputs: Uint8Array,
+    uniffi_out_err: UniffiRustCallStatus
+  ): number;
+  ubrn_uniffi_ddk_ffi_fn_func_is_dust_output(
+    output: Uint8Array,
+    uniffi_out_err: UniffiRustCallStatus
+  ): number;
+  ubrn_uniffi_ddk_ffi_fn_func_plz_work(
+    uniffi_out_err: UniffiRustCallStatus
+  ): Uint8Array;
+  ubrn_uniffi_ddk_ffi_fn_func_sign_fund_transaction_input(
+    fundTransaction: Uint8Array,
+    privkey: Uint8Array,
+    prevTxId: Uint8Array,
+    prevTxVout: number,
+    value: bigint,
+    uniffi_out_err: UniffiRustCallStatus
+  ): Uint8Array;
+  ubrn_uniffi_ddk_ffi_fn_func_verify_fund_tx_signature(
+    fundTx: Uint8Array,
+    signature: Uint8Array,
+    pubkey: Uint8Array,
+    txid: Uint8Array,
+    vout: number,
+    inputAmount: bigint,
+    uniffi_out_err: UniffiRustCallStatus
+  ): number;
+  ubrn_uniffi_ddk_ffi_fn_func_version(
+    uniffi_out_err: UniffiRustCallStatus
+  ): Uint8Array;
+  ubrn_uniffi_ddk_ffi_checksum_func_create_cet(): number;
+  ubrn_uniffi_ddk_ffi_checksum_func_create_cet_adaptor_signature_from_oracle_info(): number;
+  ubrn_uniffi_ddk_ffi_checksum_func_create_cets(): number;
+  ubrn_uniffi_ddk_ffi_checksum_func_create_dlc_transactions(): number;
+  ubrn_uniffi_ddk_ffi_checksum_func_create_fund_tx_locking_script(): number;
+  ubrn_uniffi_ddk_ffi_checksum_func_create_refund_transaction(): number;
+  ubrn_uniffi_ddk_ffi_checksum_func_create_spliced_dlc_transactions(): number;
+  ubrn_uniffi_ddk_ffi_checksum_func_get_change_output_and_fees(): number;
+  ubrn_uniffi_ddk_ffi_checksum_func_get_raw_funding_transaction_input_signature(): number;
+  ubrn_uniffi_ddk_ffi_checksum_func_get_total_input_vsize(): number;
+  ubrn_uniffi_ddk_ffi_checksum_func_is_dust_output(): number;
+  ubrn_uniffi_ddk_ffi_checksum_func_plz_work(): number;
+  ubrn_uniffi_ddk_ffi_checksum_func_sign_fund_transaction_input(): number;
+  ubrn_uniffi_ddk_ffi_checksum_func_verify_fund_tx_signature(): number;
+  ubrn_uniffi_ddk_ffi_checksum_func_version(): number;
+  ubrn_ffi_ddk_ffi_uniffi_contract_version(): number;
 }
 
 // Casting globalThis to any allows us to look for `NativeDdkFfi`
@@ -50,11 +157,15 @@ interface NativeModuleInterface {
 //
 // We use a getter here rather than simply `globalThis.NativeDdkFfi` so that
 // if/when the startup sequence isn't just so, an empty value isn't inadvertantly cached.
-const getter: () => NativeModuleInterface = () => (globalThis as any).NativeDdkFfi;
+const getter: () => NativeModuleInterface = () =>
+  (globalThis as any).NativeDdkFfi;
 export default getter;
 
 // Structs and function types for calling back into Typescript from Rust.
-export type UniffiRustFutureContinuationCallback = (data: bigint, pollResult: number) => void;
+export type UniffiRustFutureContinuationCallback = (
+  data: bigint,
+  pollResult: number
+) => void;
 type UniffiForeignFutureFree = (handle: bigint) => void;
 type UniffiCallbackInterfaceFree = (handle: bigint) => void;
 export type UniffiForeignFuture = {
@@ -65,66 +176,105 @@ export type UniffiForeignFutureStructU8 = {
   returnValue: number;
   callStatus: UniffiRustCallStatus;
 };
-export type UniffiForeignFutureCompleteU8 = (callbackData: bigint, result: UniffiForeignFutureStructU8) => void;
+export type UniffiForeignFutureCompleteU8 = (
+  callbackData: bigint,
+  result: UniffiForeignFutureStructU8
+) => void;
 export type UniffiForeignFutureStructI8 = {
   returnValue: number;
   callStatus: UniffiRustCallStatus;
 };
-export type UniffiForeignFutureCompleteI8 = (callbackData: bigint, result: UniffiForeignFutureStructI8) => void;
+export type UniffiForeignFutureCompleteI8 = (
+  callbackData: bigint,
+  result: UniffiForeignFutureStructI8
+) => void;
 export type UniffiForeignFutureStructU16 = {
   returnValue: number;
   callStatus: UniffiRustCallStatus;
 };
-export type UniffiForeignFutureCompleteU16 = (callbackData: bigint, result: UniffiForeignFutureStructU16) => void;
+export type UniffiForeignFutureCompleteU16 = (
+  callbackData: bigint,
+  result: UniffiForeignFutureStructU16
+) => void;
 export type UniffiForeignFutureStructI16 = {
   returnValue: number;
   callStatus: UniffiRustCallStatus;
 };
-export type UniffiForeignFutureCompleteI16 = (callbackData: bigint, result: UniffiForeignFutureStructI16) => void;
+export type UniffiForeignFutureCompleteI16 = (
+  callbackData: bigint,
+  result: UniffiForeignFutureStructI16
+) => void;
 export type UniffiForeignFutureStructU32 = {
   returnValue: number;
   callStatus: UniffiRustCallStatus;
 };
-export type UniffiForeignFutureCompleteU32 = (callbackData: bigint, result: UniffiForeignFutureStructU32) => void;
+export type UniffiForeignFutureCompleteU32 = (
+  callbackData: bigint,
+  result: UniffiForeignFutureStructU32
+) => void;
 export type UniffiForeignFutureStructI32 = {
   returnValue: number;
   callStatus: UniffiRustCallStatus;
 };
-export type UniffiForeignFutureCompleteI32 = (callbackData: bigint, result: UniffiForeignFutureStructI32) => void;
+export type UniffiForeignFutureCompleteI32 = (
+  callbackData: bigint,
+  result: UniffiForeignFutureStructI32
+) => void;
 export type UniffiForeignFutureStructU64 = {
   returnValue: bigint;
   callStatus: UniffiRustCallStatus;
 };
-export type UniffiForeignFutureCompleteU64 = (callbackData: bigint, result: UniffiForeignFutureStructU64) => void;
+export type UniffiForeignFutureCompleteU64 = (
+  callbackData: bigint,
+  result: UniffiForeignFutureStructU64
+) => void;
 export type UniffiForeignFutureStructI64 = {
   returnValue: bigint;
   callStatus: UniffiRustCallStatus;
 };
-export type UniffiForeignFutureCompleteI64 = (callbackData: bigint, result: UniffiForeignFutureStructI64) => void;
+export type UniffiForeignFutureCompleteI64 = (
+  callbackData: bigint,
+  result: UniffiForeignFutureStructI64
+) => void;
 export type UniffiForeignFutureStructF32 = {
   returnValue: number;
   callStatus: UniffiRustCallStatus;
 };
-export type UniffiForeignFutureCompleteF32 = (callbackData: bigint, result: UniffiForeignFutureStructF32) => void;
+export type UniffiForeignFutureCompleteF32 = (
+  callbackData: bigint,
+  result: UniffiForeignFutureStructF32
+) => void;
 export type UniffiForeignFutureStructF64 = {
   returnValue: number;
   callStatus: UniffiRustCallStatus;
 };
-export type UniffiForeignFutureCompleteF64 = (callbackData: bigint, result: UniffiForeignFutureStructF64) => void;
+export type UniffiForeignFutureCompleteF64 = (
+  callbackData: bigint,
+  result: UniffiForeignFutureStructF64
+) => void;
 export type UniffiForeignFutureStructPointer = {
   returnValue: bigint;
   callStatus: UniffiRustCallStatus;
 };
-export type UniffiForeignFutureCompletePointer = (callbackData: bigint, result: UniffiForeignFutureStructPointer) => void;
+export type UniffiForeignFutureCompletePointer = (
+  callbackData: bigint,
+  result: UniffiForeignFutureStructPointer
+) => void;
 export type UniffiForeignFutureStructRustBuffer = {
   returnValue: Uint8Array;
   callStatus: UniffiRustCallStatus;
 };
-export type UniffiForeignFutureCompleteRustBuffer = (callbackData: bigint, result: UniffiForeignFutureStructRustBuffer) => void;
+export type UniffiForeignFutureCompleteRustBuffer = (
+  callbackData: bigint,
+  result: UniffiForeignFutureStructRustBuffer
+) => void;
 export type UniffiForeignFutureStructVoid = {
   callStatus: UniffiRustCallStatus;
 };
-export type UniffiForeignFutureCompleteVoid = (callbackData: bigint, result: UniffiForeignFutureStructVoid) => void;
+export type UniffiForeignFutureCompleteVoid = (
+  callbackData: bigint,
+  result: UniffiForeignFutureStructVoid
+) => void;
 
 // UniffiRustFutureContinuationCallback is generated as part of the component interface's
 // ffi_definitions. However, we need it in the runtime.

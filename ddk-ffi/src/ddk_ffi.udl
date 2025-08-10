@@ -1,5 +1,6 @@
 namespace ddk_ffi {
     string version();
+    string plz_work();
     
     // DLC Transaction Creation Functions
     [Throws=DLCError]

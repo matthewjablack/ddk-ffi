@@ -105,12 +105,15 @@ ddk-rn/ios/*.xcframework/
 # ====================
 # Generated Files (from uniffi)
 # ====================
-ddk-rn/cpp/ddk_ffi.*
+# Generated C++ bindings (keep ddk_ffi.cpp/hpp as source)
 ddk-rn/cpp/bennyblader-ddk-rn.*
 ddk-rn/cpp/UniffiCallInvoker.h
-ddk-rn/src/ddk_ffi*.ts
+
+# Generated TypeScript bindings (keep ddk_ffi.ts/ddk_ffi-ffi.ts as source)
 ddk-rn/src/NativeDdkRn.ts
 ddk-rn/src/index.tsx
+
+# Build outputs
 ddk-rn/lib/
 
 # ====================

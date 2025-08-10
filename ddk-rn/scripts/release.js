@@ -6,6 +6,7 @@ const { execSync } = require('child_process');
 
 const projectRoot = path.join(__dirname, '..', '..');
 const ddkRnRoot = path.join(__dirname, '..');
+const ddkFfiRoot = path.join(projectRoot, 'ddk-ffi');
 
 console.log('🚀 Starting automated release process...\n');
 
@@ -64,13 +65,40 @@ function updateRustVersion(version) {
   console.log(`✅ Updated Cargo.toml version to ${version}`);
 }
 
-function createBinaryArchives() {
-  console.log('📦 Creating binary archives...');
-  runCommand(
-    'node scripts/create-binary-archives.js',
-    ddkRnRoot,
-    'Creating binary archives'
-  );
+function generateJSIBindings() {
+  console.log('🔧 Generating JSI bindings only...');
+  
+  const srcDir = path.join(ddkRnRoot, 'src');
+  const cppDir = path.join(ddkRnRoot, 'cpp');
+  const udlFile = path.join(ddkFfiRoot, 'src', 'ddk_ffi.udl');
+  const configFile = path.join(ddkRnRoot, 'ubrn.config.toml');
+  
+  // Check if uniffi-bindgen-react-native is available
+  try {
+    execSync('uniffi-bindgen-react-native --help', { stdio: 'ignore' });
+  } catch (error) {
+    console.error('❌ uniffi-bindgen-react-native not found!');
+    console.error('   Install it with: npm install -g uniffi-bindgen-react-native');
+    process.exit(1);
+  }
+  
+  try {
+    // Generate JSI bindings ONLY (TypeScript and C++)
+    const cmd = `uniffi-bindgen-react-native generate jsi bindings --crate ddk_ffi --config "${configFile}" --ts-dir "${srcDir}" --cpp-dir "${cppDir}" "${udlFile}"`;
+    console.log(`   Running: ${cmd}`);
+    execSync(cmd, { 
+      stdio: 'inherit',
+      cwd: ddkFfiRoot 
+    });
+    console.log('✅ JSI bindings generated (ddk_ffi.ts, ddk_ffi-ffi.ts, ddk_ffi.cpp, ddk_ffi.hpp)');
+    
+    // Note: NOT generating turbo modules or building native libraries
+    console.log('ℹ️  Skipping turbo module generation - will be done during postinstall');
+    console.log('ℹ️  Skipping native library builds - will be done during postinstall');
+    
+  } catch (error) {
+    throw new Error(`Failed to generate JSI bindings: ${error.message}`);
+  }
 }
 
 function runTests() {
@@ -152,56 +180,6 @@ function releaseWithPnpm() {
   runCommand('pnpm release', ddkRnRoot, 'Running pnpm release');
 }
 
-function uploadBinaryArchives(version) {
-  console.log(`📤 Uploading binary archives to GitHub release v${version}...`);
-
-  const archiveDir = path.join(projectRoot, 'release-archives');
-  const androidArchive = path.join(archiveDir, 'android-jni-libs.tar.gz');
-  const iosArchive = path.join(archiveDir, 'ios-xcframeworks.tar.gz');
-
-  const archives = [];
-  if (fs.existsSync(androidArchive)) {
-    archives.push(androidArchive);
-  }
-  if (fs.existsSync(iosArchive)) {
-    archives.push(iosArchive);
-  }
-
-  if (archives.length === 0) {
-    console.warn('⚠️  No binary archives found, skipping upload');
-    return;
-  }
-
-  try {
-    const uploadCommand = `gh release upload v${version} ${archives.join(' ')}`;
-    runCommand(
-      uploadCommand,
-      projectRoot,
-      'Uploading archives to GitHub release'
-    );
-    console.log('✅ Binary archives uploaded successfully');
-  } catch (error) {
-    console.warn(
-      '⚠️  Failed to upload binary archives. You can upload them manually:'
-    );
-    archives.forEach((archive) => {
-      console.warn(`   gh release upload v${version} ${archive}`);
-    });
-  }
-}
-
-function cleanupArchives() {
-  const archiveDir = path.join(projectRoot, 'release-archives');
-  if (fs.existsSync(archiveDir)) {
-    runCommand(
-      `rm -rf "${archiveDir}"`,
-      projectRoot,
-      'Cleaning up archive directory'
-    );
-    console.log('✅ Cleaned up temporary archives');
-  }
-}
-
 function main() {
   try {
     console.log('🔍 Pre-flight checks...');
@@ -221,9 +199,9 @@ function main() {
     console.log('\n🧪 Running tests...');
     runTests();
 
-    // 5. Create binary archives
-    console.log('\n📦 Creating archives...');
-    createBinaryArchives();
+    // 5. Generate JSI bindings only (not turbo modules or builds)
+    console.log('\n🔧 Generating JSI bindings...');
+    generateJSIBindings();
 
     // 6. Build package
     console.log('\n🔨 Building package...');
@@ -241,14 +219,6 @@ function main() {
     const newVersion = getCurrentVersion();
     console.log(`🎉 Released version: ${newVersion}`);
 
-    // 10. Upload binary archives to the GitHub release
-    console.log('\n📤 Uploading binaries...');
-    uploadBinaryArchives(newVersion);
-
-    // 11. Cleanup
-    console.log('\n🧹 Cleaning up...');
-    cleanupArchives();
-
     console.log('\n🎉 Release completed successfully!');
     console.log(
       `📦 Package @bennyblader/ddk-rn@${newVersion} is now available on npm`
@@ -259,11 +229,12 @@ function main() {
     console.log(
       `📋 npm package: https://www.npmjs.com/package/@bennyblader/ddk-rn/v/${newVersion}`
     );
+    console.log('\n📝 Note: This release only includes JSI bindings (ddk_ffi.ts, ddk_ffi-ffi.ts, ddk_ffi.cpp, ddk_ffi.hpp)');
+    console.log('   Turbo modules and native libraries will be generated during postinstall on the client side.');
   } catch (error) {
     console.error('\n❌ Release failed:', error.message);
     console.error('\n🔧 You may need to clean up manually:');
     console.error('   - Check git status and reset if needed');
-    console.error('   - Remove release-archives/ directory');
     console.error('   - Check npm and GitHub releases');
     process.exit(1);
   }
@@ -278,19 +249,21 @@ if (args.includes('--help') || args.includes('-h')) {
 This script automates the entire release process:
 1. Checks git status is clean
 2. Updates Rust version to match package.json
-4. Runs all tests (Rust + React Native)
-5. Creates binary archives
-6. Builds the npm package
-7. Commits Rust version changes
-8. Runs 'pnpm release' (version bump, git tag, npm publish, GitHub release)
-9. Uploads binary archives to GitHub release
-10. Cleans up temporary files
+3. Runs all tests (Rust + React Native)
+4. Generates JSI bindings ONLY (ddk_ffi.ts, ddk_ffi-ffi.ts, ddk_ffi.cpp, ddk_ffi.hpp)
+5. Builds the npm package
+6. Commits Rust version changes
+7. Runs 'pnpm release' (version bump, git tag, npm publish, GitHub release)
+
+Note: This script now only generates JSI bindings. Turbo modules and native
+libraries will be generated during postinstall on the client side.
 
 Prerequisites:
 - Clean git working directory
 - npm authentication (npm login)
 - GitHub CLI authentication (gh auth login)
 - All dependencies installed (pnpm install)
+- uniffi-bindgen-react-native installed globally
 
 Usage:
   node scripts/release.js
