@@ -15,6 +15,7 @@ ios:
   targets:
     - aarch64-apple-ios
     - aarch64-apple-ios-sim
+    - x86_64-apple-ios
   frameworkName: ios/DdkRn
 
 turboModule:

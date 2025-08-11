@@ -17,6 +17,9 @@ Pod::Spec.new do |s|
 
   s.source_files = "ios/**/*.{h,m,mm,swift}", "ios/generated/**/*.{h,m,mm}", "cpp/**/*.{hpp,cpp,c,h}", "cpp/**/*.{hpp,cpp,c,h}"
   s.vendored_frameworks = "ios/DdkRn.xcframework"
+  s.xcconfig = {
+    'LIBRARY_SEARCH_PATHS' => '$(SRCROOT)/../node_modules/@bennyblader/ddk-rn/ios/DdkRn.xcframework/ios-arm64-simulator $(SRCROOT)/../node_modules/@bennyblader/ddk-rn/ios/DdkRn.xcframework/ios-arm64 $(SRCROOT)/../node_modules/@bennyblader/ddk-rn/ios/DdkRn.xcframework/ios-x86_64-simulator $(SRCROOT)/../node_modules/@bennyblader/ddk-rn/ios/DdkRn.xcframework/ios-x86_64'
+  }
   s.dependency    "uniffi-bindgen-react-native", "0.29.3-1"
 
   # Use install_modules_dependencies helper to install the dependencies if React Native version >=0.71.0.
