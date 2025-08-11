@@ -25,7 +25,7 @@ uniffi::include_scaffolding!("ddk_ffi");
 static SECP_CONTEXT: OnceLock<Secp256k1<All>> = OnceLock::new();
 
 pub fn get_secp_context() -> &'static Secp256k1<All> {
-    SECP_CONTEXT.get_or_init(|| Secp256k1::new())
+    SECP_CONTEXT.get_or_init(Secp256k1::new)
 }
 
 pub fn version() -> String {
@@ -651,7 +651,7 @@ pub fn get_raw_funding_transaction_input_signature(
     let script = bitcoin::ScriptBuf::new_p2wpkh(&wpkh);
 
     let sig = dlc::util::get_raw_sig_for_tx_input(
-        &secp,
+        secp,
         &btc_tx,
         input_index,
         &script,
@@ -736,7 +736,7 @@ pub fn create_cet_adaptor_signature_from_oracle_info(
 
     let secp = get_secp_context();
     let adaptor_sig = dlc::create_cet_adaptor_sig_from_oracle_info(
-        &secp,
+        secp,
         &btc_tx,
         &[dlc_oracle_info],
         &sk,
@@ -788,7 +788,7 @@ pub fn create_xpriv_from_parent_path(
     let full_path = base_path.extend(app_path);
 
     let derived_xpriv = xpriv
-        .derive_priv(&secp, &full_path)
+        .derive_priv(secp, &full_path)
         .map_err(|_| DLCError::KeyError(ExtendedKey::InvalidXpriv))?;
 
     Ok(derived_xpriv.encode().to_vec())
@@ -799,7 +799,7 @@ pub fn get_xpub_from_xpriv(xpriv: Vec<u8>, network: String) -> Result<Vec<u8>, D
     let network = Network::from_str(&network).map_err(|_| DLCError::InvalidNetwork)?;
     let xpriv = Xpriv::new_master(network, &xpriv)
         .map_err(|_| DLCError::KeyError(ExtendedKey::InvalidXpriv))?;
-    let xpub = Xpub::from_priv(&secp, &xpriv);
+    let xpub = Xpub::from_priv(secp, &xpriv);
     Ok(xpub.encode().to_vec())
 }
 
