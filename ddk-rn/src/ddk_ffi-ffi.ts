@@ -23,6 +23,11 @@ interface NativeModuleInterface {
     buffer: Uint8Array,
     uniffi_out_err: UniffiRustCallStatus
   ): string;
+  ubrn_uniffi_ddk_ffi_fn_func_convert_mnemonic_to_seed(
+    mnemonic: Uint8Array,
+    passphrase: Uint8Array,
+    uniffi_out_err: UniffiRustCallStatus
+  ): Uint8Array;
   ubrn_uniffi_ddk_ffi_fn_func_create_cet(
     localOutput: Uint8Array,
     localPayoutSerialId: bigint,
@@ -90,6 +95,13 @@ interface NativeModuleInterface {
     fundOutputSerialId: bigint,
     uniffi_out_err: UniffiRustCallStatus
   ): Uint8Array;
+  ubrn_uniffi_ddk_ffi_fn_func_create_xpriv_from_parent_path(
+    xpriv: Uint8Array,
+    baseDerivationPath: Uint8Array,
+    network: Uint8Array,
+    path: Uint8Array,
+    uniffi_out_err: UniffiRustCallStatus
+  ): Uint8Array;
   ubrn_uniffi_ddk_ffi_fn_func_get_change_output_and_fees(
     params: Uint8Array,
     feeRate: bigint,
@@ -107,13 +119,15 @@ interface NativeModuleInterface {
     inputs: Uint8Array,
     uniffi_out_err: UniffiRustCallStatus
   ): number;
+  ubrn_uniffi_ddk_ffi_fn_func_get_xpub_from_xpriv(
+    xpriv: Uint8Array,
+    network: Uint8Array,
+    uniffi_out_err: UniffiRustCallStatus
+  ): Uint8Array;
   ubrn_uniffi_ddk_ffi_fn_func_is_dust_output(
     output: Uint8Array,
     uniffi_out_err: UniffiRustCallStatus
   ): number;
-  ubrn_uniffi_ddk_ffi_fn_func_plz_work(
-    uniffi_out_err: UniffiRustCallStatus
-  ): Uint8Array;
   ubrn_uniffi_ddk_ffi_fn_func_sign_fund_transaction_input(
     fundTransaction: Uint8Array,
     privkey: Uint8Array,
@@ -134,6 +148,7 @@ interface NativeModuleInterface {
   ubrn_uniffi_ddk_ffi_fn_func_version(
     uniffi_out_err: UniffiRustCallStatus
   ): Uint8Array;
+  ubrn_uniffi_ddk_ffi_checksum_func_convert_mnemonic_to_seed(): number;
   ubrn_uniffi_ddk_ffi_checksum_func_create_cet(): number;
   ubrn_uniffi_ddk_ffi_checksum_func_create_cet_adaptor_signature_from_oracle_info(): number;
   ubrn_uniffi_ddk_ffi_checksum_func_create_cets(): number;
@@ -141,11 +156,12 @@ interface NativeModuleInterface {
   ubrn_uniffi_ddk_ffi_checksum_func_create_fund_tx_locking_script(): number;
   ubrn_uniffi_ddk_ffi_checksum_func_create_refund_transaction(): number;
   ubrn_uniffi_ddk_ffi_checksum_func_create_spliced_dlc_transactions(): number;
+  ubrn_uniffi_ddk_ffi_checksum_func_create_xpriv_from_parent_path(): number;
   ubrn_uniffi_ddk_ffi_checksum_func_get_change_output_and_fees(): number;
   ubrn_uniffi_ddk_ffi_checksum_func_get_raw_funding_transaction_input_signature(): number;
   ubrn_uniffi_ddk_ffi_checksum_func_get_total_input_vsize(): number;
+  ubrn_uniffi_ddk_ffi_checksum_func_get_xpub_from_xpriv(): number;
   ubrn_uniffi_ddk_ffi_checksum_func_is_dust_output(): number;
-  ubrn_uniffi_ddk_ffi_checksum_func_plz_work(): number;
   ubrn_uniffi_ddk_ffi_checksum_func_sign_fund_transaction_input(): number;
   ubrn_uniffi_ddk_ffi_checksum_func_verify_fund_tx_signature(): number;
   ubrn_uniffi_ddk_ffi_checksum_func_version(): number;

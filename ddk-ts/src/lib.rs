@@ -282,3 +282,35 @@ pub fn create_cet_adaptor_signature_from_oracle_info(
 
   Ok(result.into())
 }
+
+#[napi]
+pub fn convert_mnemonic_to_seed(mnemonic: String, passphrase: Option<String>) -> Result<Buffer> {
+  let result = ddk_ffi::convert_mnemonic_to_seed(mnemonic, passphrase)
+    .map_err(|e| Error::from_reason(format!("{:?}", e)))?;
+
+  Ok(vec_to_buffer(result))
+}
+
+#[napi]
+pub fn create_xpriv_from_parent_path(
+  xpriv: Buffer,
+  base_derivation_path: String,
+  network: String,
+  path: String,
+) -> Result<Buffer> {
+  let xpriv_bytes = buffer_to_vec(&xpriv);
+  let result =
+    ddk_ffi::create_xpriv_from_parent_path(xpriv_bytes, base_derivation_path, network, path)
+      .map_err(|e| Error::from_reason(format!("{:?}", e)))?;
+
+  Ok(vec_to_buffer(result))
+}
+
+#[napi]
+pub fn get_xpub_from_xpriv(xpriv: Buffer, network: String) -> Result<Buffer> {
+  let xpriv_bytes = buffer_to_vec(&xpriv);
+  let result = ddk_ffi::get_xpub_from_xpriv(xpriv_bytes, network)
+    .map_err(|e| Error::from_reason(format!("{:?}", e)))?;
+
+  Ok(vec_to_buffer(result))
+}

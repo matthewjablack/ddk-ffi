@@ -36,6 +36,7 @@ import {
   FfiConverterArray,
   FfiConverterBool,
   FfiConverterInt32,
+  FfiConverterOptional,
   FfiConverterUInt32,
   FfiConverterUInt64,
   FfiConverterUInt8,
@@ -60,6 +61,30 @@ const uniffiIsDebug =
   true;
 // Public interface members begin here.
 
+export function convertMnemonicToSeed(
+  mnemonic: string,
+  passphrase: string | undefined
+): Array</*u8*/ number> /*throws*/ {
+  return FfiConverterArrayUInt8.lift(
+    uniffiCaller.rustCallWithError(
+      /*liftError:*/ FfiConverterTypeDLCError.lift.bind(
+        FfiConverterTypeDLCError
+      ),
+      /*caller:*/ (callStatus) => {
+        return (() => {
+          console.debug(`-- uniffi_ddk_ffi_fn_func_convert_mnemonic_to_seed`);
+          return nativeModule()
+            .ubrn_uniffi_ddk_ffi_fn_func_convert_mnemonic_to_seed;
+        })()(
+          FfiConverterString.lower(mnemonic),
+          FfiConverterOptionalString.lower(passphrase),
+          callStatus
+        );
+      },
+      /*liftString:*/ FfiConverterString.lift
+    )
+  );
+}
 export function createCet(
   localOutput: TxOutput,
   localPayoutSerialId: /*u64*/ bigint,
@@ -296,6 +321,36 @@ export function createSplicedDlcTransactions(
     )
   );
 }
+export function createXprivFromParentPath(
+  xpriv: Array</*u8*/ number>,
+  baseDerivationPath: string,
+  network: string,
+  path: string
+): Array</*u8*/ number> /*throws*/ {
+  return FfiConverterArrayUInt8.lift(
+    uniffiCaller.rustCallWithError(
+      /*liftError:*/ FfiConverterTypeDLCError.lift.bind(
+        FfiConverterTypeDLCError
+      ),
+      /*caller:*/ (callStatus) => {
+        return (() => {
+          console.debug(
+            `-- uniffi_ddk_ffi_fn_func_create_xpriv_from_parent_path`
+          );
+          return nativeModule()
+            .ubrn_uniffi_ddk_ffi_fn_func_create_xpriv_from_parent_path;
+        })()(
+          FfiConverterArrayUInt8.lower(xpriv),
+          FfiConverterString.lower(baseDerivationPath),
+          FfiConverterString.lower(network),
+          FfiConverterString.lower(path),
+          callStatus
+        );
+      },
+      /*liftString:*/ FfiConverterString.lift
+    )
+  );
+}
 export function getChangeOutputAndFees(
   params: PartyParams,
   feeRate: /*u64*/ bigint
@@ -366,6 +421,29 @@ export function getTotalInputVsize(inputs: Array<TxInputInfo>): /*u32*/ number {
     )
   );
 }
+export function getXpubFromXpriv(
+  xpriv: Array</*u8*/ number>,
+  network: string
+): Array</*u8*/ number> /*throws*/ {
+  return FfiConverterArrayUInt8.lift(
+    uniffiCaller.rustCallWithError(
+      /*liftError:*/ FfiConverterTypeDLCError.lift.bind(
+        FfiConverterTypeDLCError
+      ),
+      /*caller:*/ (callStatus) => {
+        return (() => {
+          console.debug(`-- uniffi_ddk_ffi_fn_func_get_xpub_from_xpriv`);
+          return nativeModule().ubrn_uniffi_ddk_ffi_fn_func_get_xpub_from_xpriv;
+        })()(
+          FfiConverterArrayUInt8.lower(xpriv),
+          FfiConverterString.lower(network),
+          callStatus
+        );
+      },
+      /*liftString:*/ FfiConverterString.lift
+    )
+  );
+}
 export function isDustOutput(output: TxOutput): boolean {
   return FfiConverterBool.lift(
     uniffiCaller.rustCall(
@@ -374,19 +452,6 @@ export function isDustOutput(output: TxOutput): boolean {
           console.debug(`-- uniffi_ddk_ffi_fn_func_is_dust_output`);
           return nativeModule().ubrn_uniffi_ddk_ffi_fn_func_is_dust_output;
         })()(FfiConverterTypeTxOutput.lower(output), callStatus);
-      },
-      /*liftString:*/ FfiConverterString.lift
-    )
-  );
-}
-export function plzWork(): string {
-  return FfiConverterString.lift(
-    uniffiCaller.rustCall(
-      /*caller:*/ (callStatus) => {
-        return (() => {
-          console.debug(`-- uniffi_ddk_ffi_fn_func_plz_work`);
-          return nativeModule().ubrn_uniffi_ddk_ffi_fn_func_plz_work;
-        })()(callStatus);
       },
       /*liftString:*/ FfiConverterString.lift
     )
@@ -1295,7 +1360,8 @@ export enum DlcError_Tags {
   SerializationError = 'SerializationError',
   Secp256k1Error = 'Secp256k1Error',
   MiniscriptError = 'MiniscriptError',
-  NetworkError = 'NetworkError',
+  InvalidNetwork = 'InvalidNetwork',
+  KeyError = 'KeyError',
 }
 export const DlcError = (() => {
   class InvalidSignature extends UniffiError {
@@ -1474,7 +1540,7 @@ export const DlcError = (() => {
       return instanceOf(e) && (e as any)[variantOrdinalSymbol] === 8;
     }
   }
-  class NetworkError extends UniffiError {
+  class InvalidNetwork extends UniffiError {
     /**
      * @private
      * This field is private and should not be used.
@@ -1486,14 +1552,36 @@ export const DlcError = (() => {
      */
     readonly [variantOrdinalSymbol] = 9;
 
-    public readonly tag = DlcError_Tags.NetworkError;
+    public readonly tag = DlcError_Tags.InvalidNetwork;
 
     constructor(message: string) {
-      super('DlcError', 'NetworkError', message);
+      super('DlcError', 'InvalidNetwork', message);
     }
 
-    static instanceOf(e: any): e is NetworkError {
+    static instanceOf(e: any): e is InvalidNetwork {
       return instanceOf(e) && (e as any)[variantOrdinalSymbol] === 9;
+    }
+  }
+  class KeyError extends UniffiError {
+    /**
+     * @private
+     * This field is private and should not be used.
+     */
+    readonly [uniffiTypeNameSymbol]: string = 'DlcError';
+    /**
+     * @private
+     * This field is private and should not be used.
+     */
+    readonly [variantOrdinalSymbol] = 10;
+
+    public readonly tag = DlcError_Tags.KeyError;
+
+    constructor(message: string) {
+      super('DlcError', 'KeyError', message);
+    }
+
+    static instanceOf(e: any): e is KeyError {
+      return instanceOf(e) && (e as any)[variantOrdinalSymbol] === 10;
     }
   }
 
@@ -1510,7 +1598,8 @@ export const DlcError = (() => {
     SerializationError,
     Secp256k1Error,
     MiniscriptError,
-    NetworkError,
+    InvalidNetwork,
+    KeyError,
     instanceOf,
   };
 })();
@@ -1552,7 +1641,10 @@ const FfiConverterTypeDLCError = (() => {
           return new DlcError.MiniscriptError(FfiConverterString.read(from));
 
         case 9:
-          return new DlcError.NetworkError(FfiConverterString.read(from));
+          return new DlcError.InvalidNetwork(FfiConverterString.read(from));
+
+        case 10:
+          return new DlcError.KeyError(FfiConverterString.read(from));
 
         default:
           throw new UniffiInternalError.UnexpectedEnumCase();
@@ -1569,6 +1661,161 @@ const FfiConverterTypeDLCError = (() => {
   }
   return new FfiConverter();
 })();
+
+// Flat error type: ExtendedKey
+export enum ExtendedKey_Tags {
+  InvalidMnemonic = 'InvalidMnemonic',
+  InvalidXpriv = 'InvalidXpriv',
+  InvalidXpub = 'InvalidXpub',
+  InvalidDerivationPath = 'InvalidDerivationPath',
+}
+export const ExtendedKey = (() => {
+  class InvalidMnemonic extends UniffiError {
+    /**
+     * @private
+     * This field is private and should not be used.
+     */
+    readonly [uniffiTypeNameSymbol]: string = 'ExtendedKey';
+    /**
+     * @private
+     * This field is private and should not be used.
+     */
+    readonly [variantOrdinalSymbol] = 1;
+
+    public readonly tag = ExtendedKey_Tags.InvalidMnemonic;
+
+    constructor(message: string) {
+      super('ExtendedKey', 'InvalidMnemonic', message);
+    }
+
+    static instanceOf(e: any): e is InvalidMnemonic {
+      return instanceOf(e) && (e as any)[variantOrdinalSymbol] === 1;
+    }
+  }
+  class InvalidXpriv extends UniffiError {
+    /**
+     * @private
+     * This field is private and should not be used.
+     */
+    readonly [uniffiTypeNameSymbol]: string = 'ExtendedKey';
+    /**
+     * @private
+     * This field is private and should not be used.
+     */
+    readonly [variantOrdinalSymbol] = 2;
+
+    public readonly tag = ExtendedKey_Tags.InvalidXpriv;
+
+    constructor(message: string) {
+      super('ExtendedKey', 'InvalidXpriv', message);
+    }
+
+    static instanceOf(e: any): e is InvalidXpriv {
+      return instanceOf(e) && (e as any)[variantOrdinalSymbol] === 2;
+    }
+  }
+  class InvalidXpub extends UniffiError {
+    /**
+     * @private
+     * This field is private and should not be used.
+     */
+    readonly [uniffiTypeNameSymbol]: string = 'ExtendedKey';
+    /**
+     * @private
+     * This field is private and should not be used.
+     */
+    readonly [variantOrdinalSymbol] = 3;
+
+    public readonly tag = ExtendedKey_Tags.InvalidXpub;
+
+    constructor(message: string) {
+      super('ExtendedKey', 'InvalidXpub', message);
+    }
+
+    static instanceOf(e: any): e is InvalidXpub {
+      return instanceOf(e) && (e as any)[variantOrdinalSymbol] === 3;
+    }
+  }
+  class InvalidDerivationPath extends UniffiError {
+    /**
+     * @private
+     * This field is private and should not be used.
+     */
+    readonly [uniffiTypeNameSymbol]: string = 'ExtendedKey';
+    /**
+     * @private
+     * This field is private and should not be used.
+     */
+    readonly [variantOrdinalSymbol] = 4;
+
+    public readonly tag = ExtendedKey_Tags.InvalidDerivationPath;
+
+    constructor(message: string) {
+      super('ExtendedKey', 'InvalidDerivationPath', message);
+    }
+
+    static instanceOf(e: any): e is InvalidDerivationPath {
+      return instanceOf(e) && (e as any)[variantOrdinalSymbol] === 4;
+    }
+  }
+
+  // Utility function which does not rely on instanceof.
+  function instanceOf(e: any): e is ExtendedKey {
+    return (e as any)[uniffiTypeNameSymbol] === 'ExtendedKey';
+  }
+  return {
+    InvalidMnemonic,
+    InvalidXpriv,
+    InvalidXpub,
+    InvalidDerivationPath,
+    instanceOf,
+  };
+})();
+
+// Union type for ExtendedKey error type.
+
+export type ExtendedKey = InstanceType<
+  (typeof ExtendedKey)[keyof Omit<typeof ExtendedKey, 'instanceOf'>]
+>;
+
+const FfiConverterTypeExtendedKey = (() => {
+  const intConverter = FfiConverterInt32;
+  type TypeName = ExtendedKey;
+  class FfiConverter extends AbstractFfiConverterByteArray<TypeName> {
+    read(from: RustBuffer): TypeName {
+      switch (intConverter.read(from)) {
+        case 1:
+          return new ExtendedKey.InvalidMnemonic(FfiConverterString.read(from));
+
+        case 2:
+          return new ExtendedKey.InvalidXpriv(FfiConverterString.read(from));
+
+        case 3:
+          return new ExtendedKey.InvalidXpub(FfiConverterString.read(from));
+
+        case 4:
+          return new ExtendedKey.InvalidDerivationPath(
+            FfiConverterString.read(from)
+          );
+
+        default:
+          throw new UniffiInternalError.UnexpectedEnumCase();
+      }
+    }
+    write(value: TypeName, into: RustBuffer): void {
+      const obj = value as any;
+      const index = obj[variantOrdinalSymbol] as number;
+      intConverter.write(index, into);
+    }
+    allocationSize(value: TypeName): number {
+      return intConverter.allocationSize(0);
+    }
+  }
+  return new FfiConverter();
+})();
+
+// FfiConverter for string | undefined
+const FfiConverterOptionalString = new FfiConverterOptional(FfiConverterString);
 
 // FfiConverter for Array<DlcInputInfo>
 const FfiConverterArrayTypeDlcInputInfo = new FfiConverterArray(
@@ -1630,6 +1877,14 @@ function uniffiEnsureInitialized() {
       bindingsContractVersion
     );
   }
+  if (
+    nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_convert_mnemonic_to_seed() !==
+    65049
+  ) {
+    throw new UniffiInternalError.ApiChecksumMismatch(
+      'uniffi_ddk_ffi_checksum_func_convert_mnemonic_to_seed'
+    );
+  }
   if (nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_create_cet() !== 23081) {
     throw new UniffiInternalError.ApiChecksumMismatch(
       'uniffi_ddk_ffi_checksum_func_create_cet'
@@ -1683,6 +1938,14 @@ function uniffiEnsureInitialized() {
     );
   }
   if (
+    nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_create_xpriv_from_parent_path() !==
+    50010
+  ) {
+    throw new UniffiInternalError.ApiChecksumMismatch(
+      'uniffi_ddk_ffi_checksum_func_create_xpriv_from_parent_path'
+    );
+  }
+  if (
     nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_get_change_output_and_fees() !==
     44150
   ) {
@@ -1707,15 +1970,18 @@ function uniffiEnsureInitialized() {
     );
   }
   if (
+    nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_get_xpub_from_xpriv() !==
+    44344
+  ) {
+    throw new UniffiInternalError.ApiChecksumMismatch(
+      'uniffi_ddk_ffi_checksum_func_get_xpub_from_xpriv'
+    );
+  }
+  if (
     nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_is_dust_output() !== 64174
   ) {
     throw new UniffiInternalError.ApiChecksumMismatch(
       'uniffi_ddk_ffi_checksum_func_is_dust_output'
-    );
-  }
-  if (nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_plz_work() !== 32972) {
-    throw new UniffiInternalError.ApiChecksumMismatch(
-      'uniffi_ddk_ffi_checksum_func_plz_work'
     );
   }
   if (
@@ -1750,6 +2016,7 @@ export default Object.freeze({
     FfiConverterTypeDlcInputInfo,
     FfiConverterTypeDlcOutcome,
     FfiConverterTypeDlcTransactions,
+    FfiConverterTypeExtendedKey,
     FfiConverterTypeOracleInfo,
     FfiConverterTypePartyParams,
     FfiConverterTypePayout,

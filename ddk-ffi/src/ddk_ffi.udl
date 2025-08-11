@@ -1,7 +1,18 @@
 namespace ddk_ffi {
     string version();
-    string plz_work();
-    
+    [Throws=DLCError]
+    sequence<u8> convert_mnemonic_to_seed(string mnemonic, string? passphrase);
+    [Throws=DLCError]
+    sequence<u8> create_xpriv_from_parent_path(
+        sequence<u8> xpriv,
+        string base_derivation_path,
+        string network,
+        string path
+    );
+    [Throws=DLCError]
+    sequence<u8> get_xpub_from_xpriv(sequence<u8> xpriv, string network);
+
+
     // DLC Transaction Creation Functions
     [Throws=DLCError]
     sequence<u8> create_fund_tx_locking_script(
@@ -226,5 +237,14 @@ enum DLCError {
     "SerializationError",
     "Secp256k1Error",
     "MiniscriptError",
-    "NetworkError",
+    "InvalidNetwork",
+    "KeyError",
+};
+
+[Error]
+enum ExtendedKey {
+    "InvalidMnemonic",
+    "InvalidXpriv",
+    "InvalidXpub",
+    "InvalidDerivationPath",
 };

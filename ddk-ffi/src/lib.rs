@@ -1,26 +1,32 @@
-#![allow(unused_imports, unused_variables)]
 #![allow(clippy::too_many_arguments)]
-use bitcoin::consensus::{Decodable, Encodable};
+use bip39::{Language, Mnemonic};
+use bitcoin::bip32::{DerivationPath, IntoDerivationPath, Xpriv, Xpub};
 use bitcoin::hashes::Hash;
-use bitcoin::sighash::{EcdsaSighashType, SighashCache};
-use bitcoin::transaction::Version;
+use bitcoin::sighash::EcdsaSighashType;
+use bitcoin::WPubkeyHash;
 use bitcoin::{
-    Amount, OutPoint, ScriptBuf, Sequence, Transaction as BtcTransaction, TxIn, TxOut as BtcTxOut,
-    Txid, Witness,
+    Amount, Network, OutPoint, ScriptBuf, Sequence, Transaction as BtcTransaction, TxIn,
+    TxOut as BtcTxOut, Txid, Witness,
 };
-use bitcoin::{PubkeyHash, WPubkeyHash};
 use dlc::{
     self, dlc_input::DlcInputInfo as RustDlcInputInfo, DlcTransactions as RustDlcTransactions,
     OracleInfo as DlcOracleInfo, PartyParams as DlcPartyParams, Payout as DlcPayout,
     TxInputInfo as DlcTxInputInfo,
 };
+use secp256k1_zkp::All;
 use secp256k1_zkp::{
     ecdsa::Signature as EcdsaSignature, Message, PublicKey, Secp256k1, SecretKey, XOnlyPublicKey,
 };
-use secp256k1_zkp::{schnorr::Signature as SchnorrSignature, EcdsaAdaptorSignature};
 use std::str::FromStr;
+use std::sync::OnceLock;
 
 uniffi::include_scaffolding!("ddk_ffi");
+
+static SECP_CONTEXT: OnceLock<Secp256k1<All>> = OnceLock::new();
+
+pub fn get_secp_context() -> &'static Secp256k1<All> {
+    SECP_CONTEXT.get_or_init(|| Secp256k1::new())
+}
 
 pub fn version() -> String {
     env!("CARGO_PKG_VERSION").to_string()
@@ -54,8 +60,22 @@ pub enum DLCError {
     Secp256k1Error(String),
     #[error("Miniscript error")]
     MiniscriptError,
-    #[error("Network error")]
-    NetworkError,
+    #[error("Invalid network")]
+    InvalidNetwork,
+    #[error("Extended key error: {0}")]
+    KeyError(ExtendedKey),
+}
+
+#[derive(Debug, thiserror::Error)]
+pub enum ExtendedKey {
+    #[error("Invalid mnemonic")]
+    InvalidMnemonic,
+    #[error("Invalid xpriv")]
+    InvalidXpriv,
+    #[error("Invalid xpub")]
+    InvalidXpub,
+    #[error("Invalid derivation path")]
+    InvalidDerivationPath,
 }
 
 impl From<dlc::Error> for DLCError {
@@ -624,12 +644,12 @@ pub fn get_raw_funding_transaction_input_signature(
         })
         .ok_or(DLCError::InvalidArgument)?;
 
+    let secp = get_secp_context();
     // Create P2WPKH script for signing
-    let pk = PublicKey::from_secret_key(&Secp256k1::new(), &sk);
+    let pk = PublicKey::from_secret_key(secp, &sk);
     let wpkh = WPubkeyHash::hash(&pk.serialize());
     let script = bitcoin::ScriptBuf::new_p2wpkh(&wpkh);
 
-    let secp = Secp256k1::signing_only();
     let sig = dlc::util::get_raw_sig_for_tx_input(
         &secp,
         &btc_tx,
@@ -714,7 +734,7 @@ pub fn create_cet_adaptor_signature_from_oracle_info(
     let msg_vec = messages.map_err(|_| DLCError::InvalidArgument)?;
     let nested_msgs = vec![msg_vec]; // Wrap in vector for single oracle
 
-    let secp = Secp256k1::new();
+    let secp = get_secp_context();
     let adaptor_sig = dlc::create_cet_adaptor_sig_from_oracle_info(
         &secp,
         &btc_tx,
@@ -730,6 +750,57 @@ pub fn create_cet_adaptor_signature_from_oracle_info(
         signature: adaptor_sig.as_ref().to_vec(),
         proof: Vec::new(), // EcdsaAdaptorSignature doesn't expose proof directly
     })
+}
+
+pub fn convert_mnemonic_to_seed(
+    mnemonic: String,
+    passphrase: Option<String>,
+) -> Result<Vec<u8>, DLCError> {
+    let seed_mnemonic = Mnemonic::parse_in_normalized(Language::English, &mnemonic)
+        .map_err(|_| DLCError::KeyError(ExtendedKey::InvalidMnemonic))?;
+    let passphrase = passphrase.unwrap_or("".to_string());
+    let seed = seed_mnemonic.to_seed(&passphrase);
+    Ok(seed.to_vec())
+}
+
+pub fn create_xpriv_from_parent_path(
+    xpriv: Vec<u8>,
+    base_derivation_path: String,
+    network: String,
+    path: String,
+) -> Result<Vec<u8>, DLCError> {
+    if xpriv.len() != 64 {
+        return Err(DLCError::KeyError(ExtendedKey::InvalidXpriv));
+    }
+    let secp = get_secp_context();
+    let network = Network::from_str(&network).map_err(|_| DLCError::InvalidNetwork)?;
+    let xpriv = Xpriv::new_master(network, &xpriv)
+        .map_err(|_| DLCError::KeyError(ExtendedKey::InvalidXpriv))?;
+    // Base path: 84'/0'/0'
+    let base_path = DerivationPath::from_str(&base_derivation_path)
+        .map_err(|_| DLCError::KeyError(ExtendedKey::InvalidDerivationPath))?;
+
+    // App path: {0 || 1}/{child_number}
+    let app_path = path
+        .into_derivation_path()
+        .map_err(|_| DLCError::KeyError(ExtendedKey::InvalidDerivationPath))?;
+
+    let full_path = base_path.extend(app_path);
+
+    let derived_xpriv = xpriv
+        .derive_priv(&secp, &full_path)
+        .map_err(|_| DLCError::KeyError(ExtendedKey::InvalidXpriv))?;
+
+    Ok(derived_xpriv.encode().to_vec())
+}
+
+pub fn get_xpub_from_xpriv(xpriv: Vec<u8>, network: String) -> Result<Vec<u8>, DLCError> {
+    let secp = get_secp_context();
+    let network = Network::from_str(&network).map_err(|_| DLCError::InvalidNetwork)?;
+    let xpriv = Xpriv::new_master(network, &xpriv)
+        .map_err(|_| DLCError::KeyError(ExtendedKey::InvalidXpriv))?;
+    let xpub = Xpub::from_priv(&secp, &xpriv);
+    Ok(xpub.encode().to_vec())
 }
 
 #[cfg(test)]
@@ -760,7 +831,6 @@ mod tests {
         fund_pubkey: Vec<u8>,
         serial_id: u64,
     ) -> PartyParams {
-        let secp = Secp256k1::new();
         let mut rng = thread_rng();
 
         // Create a realistic P2WPKH script
@@ -791,6 +861,50 @@ mod tests {
             collateral,
             dlc_inputs: vec![],
         }
+    }
+
+    #[test]
+    fn mnemonic_to_seed_test() {
+        let mnemonic = Mnemonic::generate(24).unwrap();
+        let rust_seed = mnemonic.to_seed_normalized("").to_vec();
+        let ffi_seed = convert_mnemonic_to_seed(mnemonic.to_string(), None).unwrap();
+        assert_eq!(rust_seed, ffi_seed);
+    }
+
+    #[test]
+    fn xpriv_to_xpub_test() {
+        let mnemonic = Mnemonic::generate(24).unwrap();
+        let rust_xpriv =
+            Xpriv::new_master(Network::Bitcoin, &mnemonic.to_seed_normalized("").to_vec()).unwrap();
+        let ffi_xpriv = convert_mnemonic_to_seed(mnemonic.to_string(), None).unwrap();
+        let rust_xpub = Xpub::from_priv(get_secp_context(), &rust_xpriv);
+        let ffi_xpub = get_xpub_from_xpriv(ffi_xpriv, "bitcoin".to_string()).unwrap();
+        assert_eq!(rust_xpub.encode().to_vec(), ffi_xpub);
+    }
+
+    #[test]
+    fn xpriv_to_path() {
+        let base_derivation_path = "84'/0'/0'";
+        let app_path = "0/1";
+        let network = "bitcoin";
+        let secp = get_secp_context();
+
+        let mnemonic = Mnemonic::generate(24).unwrap();
+        let rust_xpriv =
+            Xpriv::new_master(Network::Bitcoin, &mnemonic.to_seed_normalized("")).unwrap();
+        let rust_path =
+            DerivationPath::from_str(&format!("{}/{}", base_derivation_path, app_path)).unwrap();
+        let rust_xpriv = rust_xpriv.derive_priv(&secp, &rust_path).unwrap();
+
+        let ffi_xpriv_bytes = convert_mnemonic_to_seed(mnemonic.to_string(), None).unwrap();
+        let ffi_xpub = create_xpriv_from_parent_path(
+            ffi_xpriv_bytes,
+            base_derivation_path.to_string(),
+            network.to_string(),
+            app_path.to_string(),
+        )
+        .unwrap();
+        assert_eq!(rust_xpriv.encode().to_vec(), ffi_xpub);
     }
 
     #[test]
@@ -997,7 +1111,7 @@ mod tests {
 
     #[test]
     fn test_conversion_functions() {
-        let (_offer_sk, offer_pk, _accept_sk, accept_pk) = create_test_keys();
+        let (_offer_sk, offer_pk, _accept_sk, _accept_pk) = create_test_keys();
 
         // Test party params conversion
         let params =
