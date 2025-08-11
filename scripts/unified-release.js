@@ -232,6 +232,11 @@ function generateTypeScriptBindings() {
     description: "Building for current platform",
   });
 
+  // Run prepublish to update optionalDependencies versions
+  runCommand("pnpm prepublish", ddkTsRoot, {
+    description: "Running napi prepublish to update optionalDependencies",
+  });
+
   console.log();
 }
 

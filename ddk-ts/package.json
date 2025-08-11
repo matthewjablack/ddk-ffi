@@ -83,7 +83,7 @@
   ],
   "packageManager": "yarn@4.9.2",
   "optionalDependencies": {
-    "@bennyblader/ddk-ts-darwin-arm64": "0.1.11",
-    "@bennyblader/ddk-ts-linux-x64-gnu": "0.1.11"
+    "@bennyblader/ddk-ts-darwin-arm64": "0.3.0",
+    "@bennyblader/ddk-ts-linux-x64-gnu": "0.3.0"
   }
 }
