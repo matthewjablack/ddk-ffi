@@ -35,6 +35,7 @@
     "ios/DdkRn.mm",
     "scripts/postinstall.js",
     "scripts/prepare-rust-src.js",
+    "scripts/apply-hotfix.js",
     "ubrn.config.yaml",
     "*.podspec",
     "react-native.config.js",

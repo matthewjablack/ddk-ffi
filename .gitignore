@@ -135,6 +135,7 @@ ddk-rn/ddk-ffi/
 
 # Release artifacts
 release-archives/
+release-artifacts/
 
 # Ruby
 .bundle/

@@ -261,6 +261,10 @@ async function main() {
     buildIOS();
     buildAndroid();
     
+    // Apply hot fixes after all generation steps
+    const { applyHotFix } = require('./apply-hotfix.js');
+    applyHotFix();
+    
     // Verify all files are present
     const allFilesPresent = verifyAllFiles();
     
