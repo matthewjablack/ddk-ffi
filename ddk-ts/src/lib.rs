@@ -239,6 +239,41 @@ pub fn get_raw_funding_transaction_input_signature(
 }
 
 #[napi]
+pub fn verify_cet_adaptor_sig_from_oracle_info(
+  adaptor_sig: AdaptorSignature,
+  cet: Transaction,
+  oracle_info: Vec<OracleInfo>,
+  pubkey: Buffer,
+  funding_script_pubkey: Buffer,
+  total_collateral: BigInt,
+  msgs: Vec<Vec<Buffer>>,
+) -> bool {
+  let ffi_oracle_info = oracle_info.into_iter().map(|info| info.into()).collect();
+  let ffi_msgs = msgs
+    .into_iter()
+    .map(|msg| msg.iter().map(buffer_to_vec).collect())
+    .collect();
+
+  let Ok(ffi_cet) = cet.try_into() else {
+    return false;
+  };
+
+  let Ok(ffi_amount) = bigint_to_u64(&total_collateral) else {
+    return false;
+  };
+
+  ddk_ffi::verify_cet_adaptor_sig_from_oracle_info(
+    adaptor_sig.into(),
+    ffi_cet,
+    ffi_oracle_info,
+    buffer_to_vec(&pubkey),
+    buffer_to_vec(&funding_script_pubkey),
+    ffi_amount,
+    ffi_msgs,
+  )
+}
+
+#[napi]
 pub fn sign_fund_transaction_input(
   fund_transaction: Transaction,
   privkey: Buffer,

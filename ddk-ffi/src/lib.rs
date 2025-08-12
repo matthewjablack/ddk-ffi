@@ -808,6 +808,71 @@ pub fn create_cet_adaptor_sigs_from_oracle_info(
     Ok(adaptor_sigs)
 }
 
+pub fn verify_cet_adaptor_sig_from_oracle_info(
+    adaptor_sig: AdaptorSignature,
+    cet: Transaction,
+    oracle_infos: Vec<OracleInfo>,
+    pubkey: Vec<u8>,
+    funding_script_pubkey: Vec<u8>,
+    total_collateral: u64,
+    msgs: Vec<Vec<Vec<u8>>>,
+) -> bool {
+    let secp = get_secp_context();
+    let Ok(btc_tx) = transaction_to_btc_tx(&cet) else {
+        return false;
+    };
+    let Ok(adaptor_sig) = vec_to_ecdsa_adaptor_signature(adaptor_sig.signature) else {
+        return false;
+    };
+    let Ok(oracle_infos) = oracle_infos
+        .iter()
+        .map(|info| {
+            let public_key = XOnlyPublicKey::from_slice(&info.public_key)?;
+            let nonces = info
+                .nonces
+                .iter()
+                .map(|nonce| XOnlyPublicKey::from_slice(nonce))
+                .collect::<Result<Vec<_>, _>>()?;
+            Ok(DlcOracleInfo { public_key, nonces })
+        })
+        .collect::<Result<Vec<_>, dlc::Error>>()
+    else {
+        return false;
+    };
+    let Ok(pubkey) = PublicKey::from_slice(&pubkey) else {
+        return false;
+    };
+    let funding_script = Script::from_bytes(&funding_script_pubkey);
+    let Ok(msgs) = msgs
+        .into_iter()
+        .map(|msg| {
+            msg.iter()
+                .map(|m| Message::from_digest_slice(m).map_err(|_| DLCError::InvalidArgument))
+                .collect::<Result<Vec<_>, _>>()
+        })
+        .collect::<Result<Vec<_>, _>>()
+    else {
+        return false;
+    };
+    let Ok(adaptor_point) = dlc::get_adaptor_point_from_oracle_info(secp, &oracle_infos, &msgs)
+    else {
+        return false;
+    };
+    let Ok(_) = dlc::verify_cet_adaptor_sig_from_point(
+        secp,
+        &adaptor_sig,
+        &btc_tx,
+        &adaptor_point,
+        &pubkey,
+        &funding_script,
+        Amount::from_sat(total_collateral),
+    ) else {
+        return false;
+    };
+
+    true
+}
+
 /// Create CET adaptor signature from oracle info
 pub fn create_cet_adaptor_signature_from_oracle_info(
     cet: Transaction,

@@ -119,6 +119,16 @@ namespace ddk_ffi {
         u64 fund_output_value,
         sequence<sequence<sequence<u8>>> msgs
     );
+
+    boolean verify_cet_adaptor_sig_from_oracle_info(
+        AdaptorSignature adaptor_sig,
+        Transaction cet,
+        sequence<OracleInfo> oracle_info,
+        sequence<u8> pubkey,
+        sequence<u8> funding_script_pubkey,
+        u64 total_collateral,
+        sequence<sequence<sequence<u8>>> msgs
+    );
     
     // Signing Functions
     [Throws=DLCError]

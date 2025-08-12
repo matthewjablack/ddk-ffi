@@ -266,3 +266,12 @@ impl From<ddk_ffi::AdaptorSignature> for AdaptorSignature {
     }
   }
 }
+
+impl From<AdaptorSignature> for ddk_ffi::AdaptorSignature {
+  fn from(sig: AdaptorSignature) -> Self {
+    ddk_ffi::AdaptorSignature {
+      signature: sig.signature.to_vec(),
+      proof: sig.proof.to_vec(),
+    }
+  }
+}
