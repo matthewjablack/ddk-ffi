@@ -6,9 +6,9 @@ const createTestData = () => ({
   offerPubkey: Buffer.alloc(33, 0x02), // Valid compressed pubkey format
   acceptPubkey: Buffer.alloc(33, 0x03),
   outcomes: [
-    { localPayout: 100000000n, remotePayout: 0n },
-    { localPayout: 50000000n, remotePayout: 50000000n },
-    { localPayout: 0n, remotePayout: 100000000n },
+    { offer: 100000000n, accept: 0n },
+    { offer: 50000000n, accept: 50000000n },
+    { offer: 0n, accept: 100000000n },
   ],
   partyParams: {
     fundPubkey: Buffer.alloc(33, 0x02),
