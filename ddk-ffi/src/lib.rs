@@ -816,7 +816,7 @@ pub fn create_cet_adaptor_sigs_from_oracle_info(
         Amount::from_sat(fund_output_value),
         &[msgs],
     )
-    .map_err(|_| DLCError::InvalidSignature)?;
+    .map_err(|e| DLCError::InvalidArgument(format!("Error from rust-dlc: {:?}", e)))?;
 
     let adaptor_sigs = adaptor_sigs
         .iter()
