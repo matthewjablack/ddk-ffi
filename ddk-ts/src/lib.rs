@@ -32,7 +32,7 @@ pub fn create_fund_tx_locking_script(
 
 #[napi]
 pub fn create_dlc_transactions(
-  outcomes: Vec<DlcOutcome>,
+  outcomes: Vec<Payout>,
   local_params: PartyParams,
   remote_params: PartyParams,
   refund_locktime: u32,
@@ -41,12 +41,11 @@ pub fn create_dlc_transactions(
   cet_lock_time: u32,
   fund_output_serial_id: BigInt,
 ) -> Result<DlcTransactions> {
-  let ffi_outcomes: Result<Vec<ddk_ffi::DlcOutcome>> =
+  let ffi_outcomes: Result<Vec<ddk_ffi::Payout>> =
     outcomes.into_iter().map(TryInto::try_into).collect();
 
   let ffi_local_params = local_params.try_into()?;
   let ffi_remote_params = remote_params.try_into()?;
-
   let result = ddk_ffi::create_dlc_transactions(
     ffi_outcomes?,
     ffi_local_params,
@@ -64,7 +63,7 @@ pub fn create_dlc_transactions(
 
 #[napi]
 pub fn create_spliced_dlc_transactions(
-  outcomes: Vec<DlcOutcome>,
+  outcomes: Vec<Payout>,
   local_params: PartyParams,
   remote_params: PartyParams,
   refund_locktime: u32,
@@ -73,7 +72,7 @@ pub fn create_spliced_dlc_transactions(
   cet_lock_time: u32,
   fund_output_serial_id: BigInt,
 ) -> Result<DlcTransactions> {
-  let ffi_outcomes: Result<Vec<ddk_ffi::DlcOutcome>> =
+  let ffi_outcomes: Result<Vec<ddk_ffi::Payout>> =
     outcomes.into_iter().map(TryInto::try_into).collect();
 
   let ffi_local_params = local_params.try_into()?;
@@ -124,12 +123,12 @@ pub fn create_cets(
   fund_vout: u32,
   local_final_script_pubkey: Buffer,
   remote_final_script_pubkey: Buffer,
-  outcomes: Vec<DlcOutcome>,
+  outcomes: Vec<Payout>,
   lock_time: u32,
   local_serial_id: BigInt,
   remote_serial_id: BigInt,
 ) -> Result<Vec<Transaction>> {
-  let ffi_outcomes: Result<Vec<ddk_ffi::DlcOutcome>> =
+  let ffi_outcomes: Result<Vec<ddk_ffi::Payout>> =
     outcomes.into_iter().map(TryInto::try_into).collect();
 
   let result = ddk_ffi::create_cets(
@@ -444,4 +443,119 @@ pub fn get_xpub_from_xpriv(xpriv: Buffer, network: String) -> Result<Buffer> {
     .map_err(|e| Error::from_reason(format!("{:?}", e)))?;
 
   Ok(vec_to_buffer(result))
+}
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  struct DlcTransactionsInput {
+    outcomes: Vec<Payout>,
+    local_params: PartyParams,
+    remote_params: PartyParams,
+    refund_lock_time: u32,
+    feerate: BigInt,
+    fund_lock_time: u32,
+    cet_lock_time: u32,
+    fund_output_serial_id: BigInt,
+  }
+
+  fn convert_test_input() -> DlcTransactionsInput {
+    let outcomes = vec![
+      Payout {
+        offer: BigInt::from(1000000 as u64),
+        accept: BigInt::from(0 as u64),
+      },
+      Payout {
+        offer: BigInt::from(0 as u64),
+        accept: BigInt::from(1000000 as u64),
+      },
+      Payout {
+        offer: BigInt::from(500000 as u64),
+        accept: BigInt::from(500000 as u64),
+      },
+    ];
+
+    let local_params = PartyParams {
+      fund_pubkey: Buffer::from(
+        hex::decode("02ce79d1a726ffb61582b0273a1467b0bf9015334fa092c0814d7e8eb438f18406").unwrap(),
+      ),
+      change_script_pubkey: Buffer::from(
+        hex::decode("00141c40b566b9dfb4a99033fab17a42c12928b7298a").unwrap(),
+      ),
+      change_serial_id: BigInt::from(13503 as u64),
+      payout_script_pubkey: Buffer::from(
+        hex::decode("0014e330dca589a593b86b4ade6631899fb81dd6e66b").unwrap(),
+      ),
+      payout_serial_id: BigInt::from(10552966 as u64),
+      inputs: vec![TxInputInfo {
+        txid: "3a0cc8f8eb942a35713ed08220e68168548a7acd88c8154de7c6c154997af06a".to_string(),
+        vout: 1,
+        script_sig: Buffer::from(vec![]),
+        max_witness_length: 108,
+        serial_id: BigInt::from(16613448 as u64),
+      }],
+      input_amount: BigInt::from(200000000 as u64),
+      collateral: BigInt::from(998000 as u64),
+      dlc_inputs: vec![],
+    };
+
+    let remote_params = PartyParams {
+      fund_pubkey: Buffer::from(
+        hex::decode("03ffe16ce03bf2c3171cf6fb96bf3c1f39fc86e6df6d88f8d2725612f33eef83d1").unwrap(),
+      ),
+      change_script_pubkey: Buffer::from(
+        hex::decode("0014a21f425beec96857b25b02cb65cd3e236b9e3a79").unwrap(),
+      ),
+      change_serial_id: BigInt::from(5583 as u64),
+      payout_script_pubkey: Buffer::from(
+        hex::decode("0014eb93d76b8b19fc3f89a7a89e49b5bcc73d1c6212").unwrap(),
+      ),
+      payout_serial_id: BigInt::from(535622 as u64),
+      inputs: vec![TxInputInfo {
+        txid: "ad4d051fa11dfcb35f8764c0a878fb245bd4845cda3ca5f214a3746b0047e29b".to_string(),
+        vout: 0,
+        script_sig: Buffer::from(vec![]),
+        max_witness_length: 108,
+        serial_id: BigInt::from(5601888 as u64),
+      }],
+      input_amount: BigInt::from(200000000 as u64),
+      collateral: BigInt::from(2000 as u64),
+      dlc_inputs: vec![],
+    };
+
+    let refund_lock_time = 1617170573;
+    let feerate = BigInt::from(10 as u64);
+    let fund_lock_time = 0;
+    let cet_lock_time = 1617170572;
+    let fund_output_serial_id = BigInt::from(141263 as u64);
+
+    DlcTransactionsInput {
+      outcomes,
+      local_params,
+      remote_params,
+      refund_lock_time,
+      feerate,
+      fund_lock_time,
+      cet_lock_time,
+      fund_output_serial_id,
+    }
+  }
+
+  #[test]
+  fn test_create_dlc_transactions() {
+    let input = convert_test_input();
+    let result = create_dlc_transactions(
+      input.outcomes,
+      input.local_params,
+      input.remote_params,
+      input.refund_lock_time,
+      input.feerate,
+      input.fund_lock_time,
+      input.cet_lock_time,
+      input.fund_output_serial_id,
+    );
+
+    assert!(result.is_ok());
+  }
 }

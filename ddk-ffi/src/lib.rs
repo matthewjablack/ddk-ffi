@@ -131,12 +131,6 @@ pub struct TxInputInfo {
 }
 
 #[derive(Clone)]
-pub struct DlcOutcome {
-    pub local_payout: u64,
-    pub remote_payout: u64,
-}
-
-#[derive(Clone)]
 pub struct Payout {
     pub offer: u64,
     pub accept: u64,
@@ -325,7 +319,7 @@ pub fn create_fund_tx_locking_script(
 
 /// Create complete DLC transactions
 pub fn create_dlc_transactions(
-    outcomes: Vec<DlcOutcome>,
+    outcomes: Vec<Payout>,
     local_params: PartyParams,
     remote_params: PartyParams,
     refund_locktime: u32,
@@ -342,8 +336,8 @@ pub fn create_dlc_transactions(
     let payouts: Vec<DlcPayout> = outcomes
         .iter()
         .map(|outcome| DlcPayout {
-            offer: Amount::from_sat(outcome.local_payout),
-            accept: Amount::from_sat(outcome.remote_payout),
+            offer: Amount::from_sat(outcome.offer),
+            accept: Amount::from_sat(outcome.accept),
         })
         .collect();
 
@@ -366,7 +360,7 @@ pub fn create_dlc_transactions(
 
 /// Create spliced DLC transactions
 pub fn create_spliced_dlc_transactions(
-    outcomes: Vec<DlcOutcome>,
+    outcomes: Vec<Payout>,
     local_params: PartyParams,
     remote_params: PartyParams,
     refund_locktime: u32,
@@ -383,8 +377,8 @@ pub fn create_spliced_dlc_transactions(
     let payouts: Vec<DlcPayout> = outcomes
         .iter()
         .map(|outcome| DlcPayout {
-            offer: Amount::from_sat(outcome.local_payout),
-            accept: Amount::from_sat(outcome.remote_payout),
+            offer: Amount::from_sat(outcome.offer),
+            accept: Amount::from_sat(outcome.accept),
         })
         .collect();
 
@@ -455,7 +449,7 @@ pub fn create_cets(
     fund_vout: u32,
     local_final_script_pubkey: Vec<u8>,
     remote_final_script_pubkey: Vec<u8>,
-    outcomes: Vec<DlcOutcome>,
+    outcomes: Vec<Payout>,
     lock_time: u32,
     local_serial_id: u64,
     remote_serial_id: u64,
@@ -478,8 +472,8 @@ pub fn create_cets(
     let payouts: Vec<DlcPayout> = outcomes
         .iter()
         .map(|outcome| DlcPayout {
-            offer: Amount::from_sat(outcome.local_payout),
-            accept: Amount::from_sat(outcome.remote_payout),
+            offer: Amount::from_sat(outcome.offer),
+            accept: Amount::from_sat(outcome.accept),
         })
         .collect();
 
@@ -1178,13 +1172,13 @@ mod tests {
         );
 
         let outcomes = vec![
-            DlcOutcome {
-                local_payout: 200_000_000, // 2 BTC to offer
-                remote_payout: 0,          // 0 BTC to accept
+            Payout {
+                offer: 200_000_000, // 2 BTC to offer
+                accept: 0,          // 0 BTC to accept
             },
-            DlcOutcome {
-                local_payout: 0,            // 0 BTC to offer
-                remote_payout: 200_000_000, // 2 BTC to accept
+            Payout {
+                offer: 0,            // 0 BTC to offer
+                accept: 200_000_000, // 2 BTC to accept
             },
         ];
 

@@ -22,7 +22,7 @@ namespace ddk_ffi {
     
     [Throws=DLCError]
     DlcTransactions create_dlc_transactions(
-        sequence<DlcOutcome> outcomes,
+        sequence<Payout> outcomes,
         PartyParams local_params,
         PartyParams remote_params,
         u32 refund_locktime,
@@ -34,7 +34,7 @@ namespace ddk_ffi {
     
     [Throws=DLCError]
     DlcTransactions create_spliced_dlc_transactions(
-        sequence<DlcOutcome> outcomes,
+        sequence<Payout> outcomes,
         PartyParams local_params,
         PartyParams remote_params,
         u32 refund_locktime,
@@ -61,7 +61,7 @@ namespace ddk_ffi {
         u32 fund_vout,
         sequence<u8> local_final_script_pubkey,
         sequence<u8> remote_final_script_pubkey,
-        sequence<DlcOutcome> outcomes,
+        sequence<Payout> outcomes,
         u32 lock_time,
         u64 local_serial_id,
         u64 remote_serial_id
@@ -202,12 +202,6 @@ dictionary TxInputInfo {
     sequence<u8> script_sig;
     u32 max_witness_length;
     u64 serial_id;
-};
-
-// DLC outcome with payouts
-dictionary DlcOutcome {
-    u64 local_payout;
-    u64 remote_payout;
 };
 
 // Payout for offer and accept parties

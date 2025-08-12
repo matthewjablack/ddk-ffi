@@ -125,28 +125,24 @@ impl From<ddk_ffi::TxInputInfo> for TxInputInfo {
   }
 }
 
-// Convert NAPI DlcOutcome to ddk_ffi DlcOutcome
-impl TryFrom<DlcOutcome> for ddk_ffi::DlcOutcome {
+impl TryFrom<Payout> for ddk_ffi::Payout {
   type Error = napi::Error;
 
-  fn try_from(outcome: DlcOutcome) -> Result<Self> {
-    Ok(ddk_ffi::DlcOutcome {
-      local_payout: bigint_to_u64(&outcome.local_payout)?,
-      remote_payout: bigint_to_u64(&outcome.remote_payout)?,
+  fn try_from(outcome: Payout) -> Result<Self> {
+    Ok(ddk_ffi::Payout {
+      offer: bigint_to_u64(&outcome.offer)?,
+      accept: bigint_to_u64(&outcome.accept)?,
     })
   }
 }
-
-// Convert ddk_ffi DlcOutcome to NAPI DlcOutcome
-impl From<ddk_ffi::DlcOutcome> for DlcOutcome {
-  fn from(outcome: ddk_ffi::DlcOutcome) -> Self {
-    DlcOutcome {
-      local_payout: BigInt::from(outcome.local_payout),
-      remote_payout: BigInt::from(outcome.remote_payout),
+impl From<ddk_ffi::Payout> for Payout {
+  fn from(outcome: ddk_ffi::Payout) -> Self {
+    Payout {
+      offer: BigInt::from(outcome.offer),
+      accept: BigInt::from(outcome.accept),
     }
   }
 }
-
 // Convert NAPI DlcInputInfo to ddk_ffi DlcInputInfo
 impl TryFrom<DlcInputInfo> for ddk_ffi::DlcInputInfo {
   type Error = napi::Error;

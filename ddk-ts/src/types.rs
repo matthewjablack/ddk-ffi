@@ -38,13 +38,6 @@ pub struct TxInputInfo {
   pub serial_id: BigInt,
 }
 
-// DLC outcome with payouts - matches UDL exactly
-#[napi(object)]
-pub struct DlcOutcome {
-  pub local_payout: BigInt,
-  pub remote_payout: BigInt,
-}
-
 // Payout for offer and accept parties - matches UDL exactly
 #[napi(object)]
 pub struct Payout {
