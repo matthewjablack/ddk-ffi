@@ -743,6 +743,71 @@ fn vec_to_ecdsa_adaptor_signature(signature: Vec<u8>) -> Result<EcdsaAdaptorSign
     EcdsaAdaptorSignature::from_slice(&signature).map_err(|_| DLCError::InvalidSignature)
 }
 
+pub fn create_cet_adaptor_sigs_from_oracle_info(
+    cets: Vec<Transaction>,
+    oracle_info: Vec<OracleInfo>,
+    funding_secret_key: Vec<u8>,
+    funding_script_pubkey: Vec<u8>,
+    fund_output_value: u64,
+    msgs: Vec<Vec<Vec<u8>>>,
+) -> Result<Vec<AdaptorSignature>, DLCError> {
+    if msgs.len() != cets.len() {
+        return Err(DLCError::InvalidArgument);
+    }
+
+    let cets = cets
+        .iter()
+        .map(|cet| transaction_to_btc_tx(cet))
+        .collect::<Result<Vec<_>, _>>()?;
+    let oracle_infos = oracle_info
+        .iter()
+        .map(|info| {
+            let public_key = XOnlyPublicKey::from_slice(&info.public_key)?;
+            let nonces = info
+                .nonces
+                .iter()
+                .map(|nonce| XOnlyPublicKey::from_slice(nonce))
+                .collect::<Result<Vec<_>, _>>()?;
+            Ok(DlcOracleInfo { public_key, nonces })
+        })
+        .collect::<Result<Vec<_>, dlc::Error>>()
+        .map_err(|_| DLCError::InvalidArgument)?;
+
+    let funding_sk =
+        SecretKey::from_slice(&funding_secret_key).map_err(|_| DLCError::InvalidArgument)?;
+    let funding_script = Script::from_bytes(&funding_script_pubkey);
+    let msgs = msgs
+        .iter()
+        .map(|msg| {
+            msg.iter()
+                .map(|m| Message::from_digest_slice(m).map_err(|_| DLCError::InvalidArgument))
+                .collect::<Result<Vec<_>, _>>()
+        })
+        .collect::<Result<Vec<_>, _>>()?;
+    let secp = get_secp_context();
+
+    let adaptor_sigs = dlc::create_cet_adaptor_sigs_from_oracle_info(
+        secp,
+        &cets,
+        &oracle_infos,
+        &funding_sk,
+        &funding_script,
+        Amount::from_sat(fund_output_value),
+        &[msgs],
+    )
+    .map_err(|_| DLCError::InvalidSignature)?;
+
+    let adaptor_sigs = adaptor_sigs
+        .iter()
+        .map(|sig| AdaptorSignature {
+            signature: sig.as_ref().to_vec(),
+            proof: Vec::new(),
+        })
+        .collect::<Vec<_>>();
+
+    Ok(adaptor_sigs)
+}
+
 /// Create CET adaptor signature from oracle info
 pub fn create_cet_adaptor_signature_from_oracle_info(
     cet: Transaction,
