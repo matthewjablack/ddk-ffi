@@ -51,7 +51,7 @@ pub fn create_dlc_transactions(
   cet_lock_time: u32,
   fund_output_serial_id: BigInt,
 ) -> Result<DlcTransactions> {
-  log_to_console(env, "create_dlc_transactions")
+  log_to_console(env, "create_dlc_transactions: parsing inputs")
     .map_err(|e| Error::from_reason(format!("{:?}", e)))?;
 
   let ffi_outcomes: Result<Vec<ddk_ffi::Payout>> =
@@ -59,6 +59,15 @@ pub fn create_dlc_transactions(
 
   let ffi_local_params = local_params.try_into()?;
   let ffi_remote_params = remote_params.try_into()?;
+  log_to_console(env, "create_dlc_transactions: inputs parsed correctly")
+    .map_err(|e| Error::from_reason(format!("{:?}", e)))?;
+
+  log_to_console(
+    env,
+    "create_dlc_transactions: calling ddk_ffi::create_dlc_transactions with inputs",
+  )
+  .map_err(|e| Error::from_reason(format!("{:?}", e)))?;
+
   let result = ddk_ffi::create_dlc_transactions(
     ffi_outcomes?,
     ffi_local_params,
@@ -69,7 +78,13 @@ pub fn create_dlc_transactions(
     cet_lock_time,
     bigint_to_u64(&fund_output_serial_id)?,
   )
-  .map_err(|e| Error::from_reason(format!("{:?}", e)))?;
+  .map_err(|e| {
+    let _ = log_to_console(
+      env,
+      &format!("ddk_ffi::create_dlc_transactions: error: {:?}", e),
+    );
+    Error::from_reason(format!("{:?}", e))
+  })?;
 
   Ok(result.into())
 }
