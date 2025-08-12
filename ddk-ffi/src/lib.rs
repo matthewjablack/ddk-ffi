@@ -765,12 +765,6 @@ pub fn create_cet_adaptor_sigs_from_oracle_info(
     fund_output_value: u64,
     msgs: Vec<Vec<Vec<u8>>>,
 ) -> Result<Vec<AdaptorSignature>, DLCError> {
-    if msgs.len() != cets.len() {
-        return Err(DLCError::InvalidArgument(
-            "Messages length must be equal to cets length".to_string(),
-        ));
-    }
-
     let cets = cets
         .iter()
         .map(|cet| transaction_to_btc_tx(cet))
