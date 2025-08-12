@@ -165,6 +165,16 @@ interface NativeModuleInterface {
     msgs: Uint8Array,
     uniffi_out_err: UniffiRustCallStatus
   ): number;
+  ubrn_uniffi_ddk_ffi_fn_func_verify_cet_adaptor_sigs_from_oracle_info(
+    adaptorSigs: Uint8Array,
+    cets: Uint8Array,
+    oracleInfo: Uint8Array,
+    pubkey: Uint8Array,
+    fundingScriptPubkey: Uint8Array,
+    totalCollateral: bigint,
+    msgs: Uint8Array,
+    uniffi_out_err: UniffiRustCallStatus
+  ): number;
   ubrn_uniffi_ddk_ffi_fn_func_verify_fund_tx_signature(
     fundTx: Uint8Array,
     signature: Uint8Array,
@@ -195,6 +205,7 @@ interface NativeModuleInterface {
   ubrn_uniffi_ddk_ffi_checksum_func_sign_cet(): number;
   ubrn_uniffi_ddk_ffi_checksum_func_sign_fund_transaction_input(): number;
   ubrn_uniffi_ddk_ffi_checksum_func_verify_cet_adaptor_sig_from_oracle_info(): number;
+  ubrn_uniffi_ddk_ffi_checksum_func_verify_cet_adaptor_sigs_from_oracle_info(): number;
   ubrn_uniffi_ddk_ffi_checksum_func_verify_fund_tx_signature(): number;
   ubrn_uniffi_ddk_ffi_checksum_func_version(): number;
   ubrn_ffi_ddk_ffi_uniffi_contract_version(): number;

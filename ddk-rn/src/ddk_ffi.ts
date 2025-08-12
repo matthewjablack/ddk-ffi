@@ -589,6 +589,39 @@ export function verifyCetAdaptorSigFromOracleInfo(
     )
   );
 }
+export function verifyCetAdaptorSigsFromOracleInfo(
+  adaptorSigs: Array<AdaptorSignature>,
+  cets: Array<Transaction>,
+  oracleInfo: Array<OracleInfo>,
+  pubkey: Array</*u8*/ number>,
+  fundingScriptPubkey: Array</*u8*/ number>,
+  totalCollateral: /*u64*/ bigint,
+  msgs: Array<Array<Array</*u8*/ number>>>
+): boolean {
+  return FfiConverterBool.lift(
+    uniffiCaller.rustCall(
+      /*caller:*/ (callStatus) => {
+        return (() => {
+          console.debug(
+            `-- uniffi_ddk_ffi_fn_func_verify_cet_adaptor_sigs_from_oracle_info`
+          );
+          return nativeModule()
+            .ubrn_uniffi_ddk_ffi_fn_func_verify_cet_adaptor_sigs_from_oracle_info;
+        })()(
+          FfiConverterArrayTypeAdaptorSignature.lower(adaptorSigs),
+          FfiConverterArrayTypeTransaction.lower(cets),
+          FfiConverterArrayTypeOracleInfo.lower(oracleInfo),
+          FfiConverterArrayUInt8.lower(pubkey),
+          FfiConverterArrayUInt8.lower(fundingScriptPubkey),
+          FfiConverterUInt64.lower(totalCollateral),
+          FfiConverterArrayArrayArrayUInt8.lower(msgs),
+          callStatus
+        );
+      },
+      /*liftString:*/ FfiConverterString.lift
+    )
+  );
+}
 export function verifyFundTxSignature(
   fundTx: Transaction,
   signature: Array</*u8*/ number>,
@@ -2126,6 +2159,14 @@ function uniffiEnsureInitialized() {
   ) {
     throw new UniffiInternalError.ApiChecksumMismatch(
       'uniffi_ddk_ffi_checksum_func_verify_cet_adaptor_sig_from_oracle_info'
+    );
+  }
+  if (
+    nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_verify_cet_adaptor_sigs_from_oracle_info() !==
+    37581
+  ) {
+    throw new UniffiInternalError.ApiChecksumMismatch(
+      'uniffi_ddk_ffi_checksum_func_verify_cet_adaptor_sigs_from_oracle_info'
     );
   }
   if (
