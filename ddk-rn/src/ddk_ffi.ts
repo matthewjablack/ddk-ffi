@@ -457,6 +457,39 @@ export function isDustOutput(output: TxOutput): boolean {
     )
   );
 }
+export function signCet(
+  cet: Transaction,
+  adaptorSignature: Array</*u8*/ number>,
+  oracleSignatures: Array<Array</*u8*/ number>>,
+  fundingSecretKey: Array</*u8*/ number>,
+  otherPubkey: Array</*u8*/ number>,
+  fundingScriptPubkey: Array</*u8*/ number>,
+  fundOutputValue: /*u64*/ bigint
+): Transaction /*throws*/ {
+  return FfiConverterTypeTransaction.lift(
+    uniffiCaller.rustCallWithError(
+      /*liftError:*/ FfiConverterTypeDLCError.lift.bind(
+        FfiConverterTypeDLCError
+      ),
+      /*caller:*/ (callStatus) => {
+        return (() => {
+          console.debug(`-- uniffi_ddk_ffi_fn_func_sign_cet`);
+          return nativeModule().ubrn_uniffi_ddk_ffi_fn_func_sign_cet;
+        })()(
+          FfiConverterTypeTransaction.lower(cet),
+          FfiConverterArrayUInt8.lower(adaptorSignature),
+          FfiConverterArrayArrayUInt8.lower(oracleSignatures),
+          FfiConverterArrayUInt8.lower(fundingSecretKey),
+          FfiConverterArrayUInt8.lower(otherPubkey),
+          FfiConverterArrayUInt8.lower(fundingScriptPubkey),
+          FfiConverterUInt64.lower(fundOutputValue),
+          callStatus
+        );
+      },
+      /*liftString:*/ FfiConverterString.lift
+    )
+  );
+}
 export function signFundTransactionInput(
   fundTransaction: Transaction,
   privkey: Array</*u8*/ number>,
@@ -1982,6 +2015,11 @@ function uniffiEnsureInitialized() {
   ) {
     throw new UniffiInternalError.ApiChecksumMismatch(
       'uniffi_ddk_ffi_checksum_func_is_dust_output'
+    );
+  }
+  if (nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_sign_cet() !== 43957) {
+    throw new UniffiInternalError.ApiChecksumMismatch(
+      'uniffi_ddk_ffi_checksum_func_sign_cet'
     );
   }
   if (

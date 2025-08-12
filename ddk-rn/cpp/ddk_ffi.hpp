@@ -35,6 +35,7 @@ class NativeDdkFfi : public jsi::HostObject {
     jsi::Value cpp_uniffi_ddk_ffi_fn_func_get_total_input_vsize(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_ddk_ffi_fn_func_get_xpub_from_xpriv(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_ddk_ffi_fn_func_is_dust_output(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
+    jsi::Value cpp_uniffi_ddk_ffi_fn_func_sign_cet(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_ddk_ffi_fn_func_sign_fund_transaction_input(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_ddk_ffi_fn_func_verify_fund_tx_signature(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_ddk_ffi_fn_func_version(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
@@ -52,6 +53,7 @@ class NativeDdkFfi : public jsi::HostObject {
     jsi::Value cpp_uniffi_ddk_ffi_checksum_func_get_total_input_vsize(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_ddk_ffi_checksum_func_get_xpub_from_xpriv(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_ddk_ffi_checksum_func_is_dust_output(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
+    jsi::Value cpp_uniffi_ddk_ffi_checksum_func_sign_cet(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_ddk_ffi_checksum_func_sign_fund_transaction_input(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_ddk_ffi_checksum_func_verify_fund_tx_signature(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_ddk_ffi_checksum_func_version(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);

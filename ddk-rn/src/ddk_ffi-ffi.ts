@@ -128,6 +128,16 @@ interface NativeModuleInterface {
     output: Uint8Array,
     uniffi_out_err: UniffiRustCallStatus
   ): number;
+  ubrn_uniffi_ddk_ffi_fn_func_sign_cet(
+    cet: Uint8Array,
+    adaptorSignature: Uint8Array,
+    oracleSignatures: Uint8Array,
+    fundingSecretKey: Uint8Array,
+    otherPubkey: Uint8Array,
+    fundingScriptPubkey: Uint8Array,
+    fundOutputValue: bigint,
+    uniffi_out_err: UniffiRustCallStatus
+  ): Uint8Array;
   ubrn_uniffi_ddk_ffi_fn_func_sign_fund_transaction_input(
     fundTransaction: Uint8Array,
     privkey: Uint8Array,
@@ -162,6 +172,7 @@ interface NativeModuleInterface {
   ubrn_uniffi_ddk_ffi_checksum_func_get_total_input_vsize(): number;
   ubrn_uniffi_ddk_ffi_checksum_func_get_xpub_from_xpriv(): number;
   ubrn_uniffi_ddk_ffi_checksum_func_is_dust_output(): number;
+  ubrn_uniffi_ddk_ffi_checksum_func_sign_cet(): number;
   ubrn_uniffi_ddk_ffi_checksum_func_sign_fund_transaction_input(): number;
   ubrn_uniffi_ddk_ffi_checksum_func_verify_fund_tx_signature(): number;
   ubrn_uniffi_ddk_ffi_checksum_func_version(): number;
