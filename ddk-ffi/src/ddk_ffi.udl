@@ -117,7 +117,7 @@ namespace ddk_ffi {
         sequence<u8> funding_secret_key,
         sequence<u8> funding_script_pubkey,
         u64 fund_output_value,
-        sequence<sequence<sequence<u8>>> msgs
+        sequence<sequence<sequence<sequence<u8>>>> msgs
     );
 
     boolean verify_cet_adaptor_sigs_from_oracle_info(

@@ -390,8 +390,22 @@ pub fn create_cet_adaptor_sigs_from_oracle_info(
   funding_secret_key: Buffer,
   funding_script_pubkey: Buffer,
   fund_output_value: BigInt,
-  msgs: Vec<Vec<Buffer>>,
+  msgs: Vec<Vec<Vec<Buffer>>>,
 ) -> Result<Vec<AdaptorSignature>> {
+  let ffi_msgs = msgs
+    .into_iter()
+    .map(|cet_msgs| {
+      // For each CET
+      cet_msgs
+        .into_iter()
+        .map(|outcome_msgs| {
+          // For each outcome
+          outcome_msgs.iter().map(buffer_to_vec).collect::<Vec<_>>()
+        })
+        .collect::<Vec<_>>()
+    })
+    .collect::<Vec<_>>();
+
   let sigs = ddk_ffi::create_cet_adaptor_sigs_from_oracle_info(
     cets
       .into_iter()
@@ -401,10 +415,7 @@ pub fn create_cet_adaptor_sigs_from_oracle_info(
     buffer_to_vec(&funding_secret_key),
     buffer_to_vec(&funding_script_pubkey),
     bigint_to_u64(&fund_output_value)?,
-    msgs
-      .into_iter()
-      .map(|msg| msg.iter().map(buffer_to_vec).collect())
-      .collect(),
+    ffi_msgs,
   )
   .map_err(|e| Error::from_reason(format!("{:?}", e)))?;
 

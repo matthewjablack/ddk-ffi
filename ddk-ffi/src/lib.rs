@@ -763,7 +763,7 @@ pub fn create_cet_adaptor_sigs_from_oracle_info(
     funding_secret_key: Vec<u8>,
     funding_script_pubkey: Vec<u8>,
     fund_output_value: u64,
-    msgs: Vec<Vec<Vec<u8>>>,
+    msgs: Vec<Vec<Vec<Vec<u8>>>>,
 ) -> Result<Vec<AdaptorSignature>, DLCError> {
     let cets = cets
         .iter()
@@ -788,19 +788,28 @@ pub fn create_cet_adaptor_sigs_from_oracle_info(
     let funding_sk = SecretKey::from_slice(&funding_secret_key)
         .map_err(|_| DLCError::InvalidArgument("Invalid funding secret key".to_string()))?;
     let funding_script = Script::from_bytes(&funding_script_pubkey);
-    let msgs = msgs
+    let msgs: Vec<Vec<Vec<Message>>> = msgs
         .iter()
-        .map(|msg| {
-            msg.iter()
-                .map(|m| {
-                    Message::from_digest_slice(m)
-                        .map_err(|_| DLCError::InvalidArgument("Invalid message".to_string()))
+        .map(|cet_msgs| {
+            // For each CET
+            cet_msgs
+                .iter()
+                .map(|outcome_msgs| {
+                    // For each outcome
+                    outcome_msgs
+                        .iter()
+                        .map(|msg_bytes| {
+                            // For each message (Vec<u8>)
+                            Message::from_digest_slice(msg_bytes).map_err(|_| {
+                                DLCError::InvalidArgument("Invalid message".to_string())
+                            })
+                        })
+                        .collect::<Result<Vec<_>, _>>()
                 })
                 .collect::<Result<Vec<_>, _>>()
         })
         .collect::<Result<Vec<_>, _>>()?;
     let secp = get_secp_context();
-
     let adaptor_sigs = dlc::create_cet_adaptor_sigs_from_oracle_info(
         secp,
         &cets,
@@ -808,7 +817,7 @@ pub fn create_cet_adaptor_sigs_from_oracle_info(
         &funding_sk,
         &funding_script,
         Amount::from_sat(fund_output_value),
-        &[msgs],
+        &msgs,
     )
     .map_err(|e| DLCError::InvalidArgument(format!("Error from rust-dlc: {:?}", e)))?;
 
