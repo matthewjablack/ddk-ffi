@@ -596,7 +596,7 @@ export function verifyCetAdaptorSigsFromOracleInfo(
   pubkey: Array</*u8*/ number>,
   fundingScriptPubkey: Array</*u8*/ number>,
   totalCollateral: /*u64*/ bigint,
-  msgs: Array<Array<Array</*u8*/ number>>>
+  msgs: Array<Array<Array<Array</*u8*/ number>>>>
 ): boolean {
   return FfiConverterBool.lift(
     uniffiCaller.rustCall(
@@ -614,7 +614,7 @@ export function verifyCetAdaptorSigsFromOracleInfo(
           FfiConverterArrayUInt8.lower(pubkey),
           FfiConverterArrayUInt8.lower(fundingScriptPubkey),
           FfiConverterUInt64.lower(totalCollateral),
-          FfiConverterArrayArrayArrayUInt8.lower(msgs),
+          FfiConverterArrayArrayArrayArrayUInt8.lower(msgs),
           callStatus
         );
       },
@@ -2110,7 +2110,7 @@ function uniffiEnsureInitialized() {
   }
   if (
     nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_verify_cet_adaptor_sigs_from_oracle_info() !==
-    37581
+    14181
   ) {
     throw new UniffiInternalError.ApiChecksumMismatch(
       'uniffi_ddk_ffi_checksum_func_verify_cet_adaptor_sigs_from_oracle_info'
