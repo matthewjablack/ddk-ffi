@@ -873,6 +873,30 @@ pub fn verify_cet_adaptor_sig_from_oracle_info(
     true
 }
 
+pub fn verify_cet_adaptor_sigs_from_oracle_info(
+    adaptor_sigs: Vec<AdaptorSignature>,
+    cets: Vec<Transaction>,
+    oracle_infos: Vec<OracleInfo>,
+    pubkey: Vec<u8>,
+    funding_script_pubkey: Vec<u8>,
+    total_collateral: u64,
+    msgs: Vec<Vec<Vec<u8>>>,
+) -> bool {
+    cets.into_iter()
+        .zip(adaptor_sigs.into_iter())
+        .all(|(cet, adaptor_sig)| {
+            verify_cet_adaptor_sig_from_oracle_info(
+                adaptor_sig,
+                cet,
+                oracle_infos.clone(),
+                pubkey.clone(),
+                funding_script_pubkey.clone(),
+                total_collateral,
+                msgs.clone(),
+            )
+        })
+}
+
 /// Create CET adaptor signature from oracle info
 pub fn create_cet_adaptor_signature_from_oracle_info(
     cet: Transaction,
