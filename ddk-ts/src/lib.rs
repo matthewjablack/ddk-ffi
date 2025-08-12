@@ -259,6 +259,30 @@ pub fn sign_fund_transaction_input(
 }
 
 #[napi]
+pub fn sign_cet(
+  cet: Transaction,
+  adaptor_signature: Buffer,
+  oracle_signatures: Vec<Buffer>,
+  funding_secret_key: Buffer,
+  other_pubkey: Buffer,
+  funding_script_pubkey: Buffer,
+  fund_output_value: BigInt,
+) -> Result<Transaction> {
+  let result = ddk_ffi::sign_cet(
+    cet.try_into()?,
+    buffer_to_vec(&adaptor_signature),
+    oracle_signatures.iter().map(buffer_to_vec).collect(),
+    buffer_to_vec(&funding_secret_key),
+    buffer_to_vec(&other_pubkey),
+    buffer_to_vec(&funding_script_pubkey),
+    bigint_to_u64(&fund_output_value)?,
+  )
+  .map_err(|e| Error::from_reason(format!("{:?}", e)))?;
+
+  Ok(result.into())
+}
+
+#[napi]
 pub fn create_cet_adaptor_signature_from_oracle_info(
   cet: Transaction,
   oracle_info: OracleInfo,

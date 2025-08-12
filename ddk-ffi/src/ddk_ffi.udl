@@ -98,6 +98,17 @@ namespace ddk_ffi {
         u32 vout,
         u64 input_amount
     );
+
+    [Throws=DLCError]
+    Transaction sign_cet(
+        Transaction cet,
+        sequence<u8> adaptor_signature,
+        sequence<sequence<u8>> oracle_signatures,
+        sequence<u8> funding_secret_key,
+        sequence<u8> other_pubkey,
+        sequence<u8> funding_script_pubkey,
+        u64 fund_output_value
+    );
     
     // Signing Functions
     [Throws=DLCError]

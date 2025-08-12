@@ -3,20 +3,20 @@ use bip39::{Language, Mnemonic};
 use bitcoin::bip32::{DerivationPath, IntoDerivationPath, Xpriv, Xpub};
 use bitcoin::hashes::Hash;
 use bitcoin::sighash::EcdsaSighashType;
-use bitcoin::WPubkeyHash;
 use bitcoin::{
     Amount, Network, OutPoint, ScriptBuf, Sequence, Transaction as BtcTransaction, TxIn,
     TxOut as BtcTxOut, Txid, Witness,
 };
+use bitcoin::{Script, WPubkeyHash};
 use dlc::{
     self, dlc_input::DlcInputInfo as RustDlcInputInfo, DlcTransactions as RustDlcTransactions,
     OracleInfo as DlcOracleInfo, PartyParams as DlcPartyParams, Payout as DlcPayout,
     TxInputInfo as DlcTxInputInfo,
 };
-use secp256k1_zkp::All;
 use secp256k1_zkp::{
     ecdsa::Signature as EcdsaSignature, Message, PublicKey, Secp256k1, SecretKey, XOnlyPublicKey,
 };
+use secp256k1_zkp::{schnorr::Signature as SchnorrSignature, All, EcdsaAdaptorSignature};
 use std::str::FromStr;
 use std::sync::OnceLock;
 
@@ -472,8 +472,8 @@ pub fn create_cets(
         witness: Witness::new(),
     };
 
-    let local_script = bitcoin::Script::from_bytes(&local_final_script_pubkey);
-    let remote_script = bitcoin::Script::from_bytes(&remote_final_script_pubkey);
+    let local_script = Script::from_bytes(&local_final_script_pubkey);
+    let remote_script = Script::from_bytes(&remote_final_script_pubkey);
 
     let payouts: Vec<DlcPayout> = outcomes
         .iter()
@@ -698,6 +698,51 @@ pub fn sign_fund_transaction_input(
     Ok(btc_tx_to_transaction(&btc_tx))
 }
 
+pub fn sign_cet(
+    cet: Transaction,
+    adaptor_signature: Vec<u8>,
+    oracle_signatures: Vec<Vec<u8>>,
+    funding_secret_key: Vec<u8>,
+    other_pubkey: Vec<u8>,
+    funding_script_pubkey: Vec<u8>,
+    fund_output_value: u64,
+) -> Result<Transaction, DLCError> {
+    let mut btc_tx = transaction_to_btc_tx(&cet)?;
+    let adaptor_sig = vec_to_ecdsa_adaptor_signature(adaptor_signature)?;
+    let oracle_sigs = oracle_signatures
+        .iter()
+        .map(|sig| vec_to_schnorr_signature(sig))
+        .collect::<Result<Vec<_>, _>>()?;
+    let funding_sk =
+        SecretKey::from_slice(&funding_secret_key).map_err(|_| DLCError::InvalidArgument)?;
+    let other_pk = PublicKey::from_slice(&other_pubkey).map_err(|_| DLCError::InvalidPublicKey)?;
+    let funding_script = Script::from_bytes(&funding_script_pubkey);
+    let secp = get_secp_context();
+
+    dlc::sign_cet(
+        secp,
+        &mut btc_tx,
+        &adaptor_sig,
+        &[oracle_sigs],
+        &funding_sk,
+        &other_pk,
+        &funding_script,
+        Amount::from_sat(fund_output_value),
+    )
+    .map_err(|e| DLCError::Secp256k1Error(e.to_string()))?;
+
+    Ok(btc_tx_to_transaction(&btc_tx))
+}
+
+fn vec_to_schnorr_signature(signature: &Vec<u8>) -> Result<SchnorrSignature, DLCError> {
+    let sig = SchnorrSignature::from_slice(signature).map_err(|_| DLCError::InvalidSignature)?;
+    Ok(sig)
+}
+
+fn vec_to_ecdsa_adaptor_signature(signature: Vec<u8>) -> Result<EcdsaAdaptorSignature, DLCError> {
+    EcdsaAdaptorSignature::from_slice(&signature).map_err(|_| DLCError::InvalidSignature)
+}
+
 /// Create CET adaptor signature from oracle info
 pub fn create_cet_adaptor_signature_from_oracle_info(
     cet: Transaction,
@@ -709,7 +754,7 @@ pub fn create_cet_adaptor_signature_from_oracle_info(
 ) -> Result<AdaptorSignature, DLCError> {
     let btc_tx = transaction_to_btc_tx(&cet)?;
     let sk = SecretKey::from_slice(&funding_sk).map_err(|_| DLCError::InvalidArgument)?;
-    let funding_script = bitcoin::Script::from_bytes(&funding_script_pubkey);
+    let funding_script = Script::from_bytes(&funding_script_pubkey);
 
     // Convert oracle info
     let oracle_pk = XOnlyPublicKey::from_slice(&oracle_info.public_key)
