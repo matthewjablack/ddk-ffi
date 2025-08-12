@@ -191,7 +191,7 @@ export function createCets(
   fundVout: /*u32*/ number,
   localFinalScriptPubkey: Array</*u8*/ number>,
   remoteFinalScriptPubkey: Array</*u8*/ number>,
-  outcomes: Array<DlcOutcome>,
+  outcomes: Array<Payout>,
   lockTime: /*u32*/ number,
   localSerialId: /*u64*/ bigint,
   remoteSerialId: /*u64*/ bigint
@@ -210,7 +210,7 @@ export function createCets(
           FfiConverterUInt32.lower(fundVout),
           FfiConverterArrayUInt8.lower(localFinalScriptPubkey),
           FfiConverterArrayUInt8.lower(remoteFinalScriptPubkey),
-          FfiConverterArrayTypeDlcOutcome.lower(outcomes),
+          FfiConverterArrayTypePayout.lower(outcomes),
           FfiConverterUInt32.lower(lockTime),
           FfiConverterUInt64.lower(localSerialId),
           FfiConverterUInt64.lower(remoteSerialId),
@@ -222,7 +222,7 @@ export function createCets(
   );
 }
 export function createDlcTransactions(
-  outcomes: Array<DlcOutcome>,
+  outcomes: Array<Payout>,
   localParams: PartyParams,
   remoteParams: PartyParams,
   refundLocktime: /*u32*/ number,
@@ -242,7 +242,7 @@ export function createDlcTransactions(
           return nativeModule()
             .ubrn_uniffi_ddk_ffi_fn_func_create_dlc_transactions;
         })()(
-          FfiConverterArrayTypeDlcOutcome.lower(outcomes),
+          FfiConverterArrayTypePayout.lower(outcomes),
           FfiConverterTypePartyParams.lower(localParams),
           FfiConverterTypePartyParams.lower(remoteParams),
           FfiConverterUInt32.lower(refundLocktime),
@@ -318,7 +318,7 @@ export function createRefundTransaction(
   );
 }
 export function createSplicedDlcTransactions(
-  outcomes: Array<DlcOutcome>,
+  outcomes: Array<Payout>,
   localParams: PartyParams,
   remoteParams: PartyParams,
   refundLocktime: /*u32*/ number,
@@ -340,7 +340,7 @@ export function createSplicedDlcTransactions(
           return nativeModule()
             .ubrn_uniffi_ddk_ffi_fn_func_create_spliced_dlc_transactions;
         })()(
-          FfiConverterArrayTypeDlcOutcome.lower(outcomes),
+          FfiConverterArrayTypePayout.lower(outcomes),
           FfiConverterTypePartyParams.lower(localParams),
           FfiConverterTypePartyParams.lower(remoteParams),
           FfiConverterUInt32.lower(refundLocktime),
@@ -864,64 +864,6 @@ const FfiConverterTypeDlcInputInfo = (() => {
         FfiConverterUInt32.allocationSize(value.maxWitnessLen) +
         FfiConverterUInt64.allocationSize(value.inputSerialId) +
         FfiConverterArrayUInt8.allocationSize(value.contractId)
-      );
-    }
-  }
-  return new FFIConverter();
-})();
-
-export type DlcOutcome = {
-  localPayout: /*u64*/ bigint;
-  remotePayout: /*u64*/ bigint;
-};
-
-/**
- * Generated factory for {@link DlcOutcome} record objects.
- */
-export const DlcOutcome = (() => {
-  const defaults = () => ({});
-  const create = (() => {
-    return uniffiCreateRecord<DlcOutcome, ReturnType<typeof defaults>>(
-      defaults
-    );
-  })();
-  return Object.freeze({
-    /**
-     * Create a frozen instance of {@link DlcOutcome}, with defaults specified
-     * in Rust, in the {@link ddk_ffi} crate.
-     */
-    create,
-
-    /**
-     * Create a frozen instance of {@link DlcOutcome}, with defaults specified
-     * in Rust, in the {@link ddk_ffi} crate.
-     */
-    new: create,
-
-    /**
-     * Defaults specified in the {@link ddk_ffi} crate.
-     */
-    defaults: () => Object.freeze(defaults()) as Partial<DlcOutcome>,
-  });
-})();
-
-const FfiConverterTypeDlcOutcome = (() => {
-  type TypeName = DlcOutcome;
-  class FFIConverter extends AbstractFfiConverterByteArray<TypeName> {
-    read(from: RustBuffer): TypeName {
-      return {
-        localPayout: FfiConverterUInt64.read(from),
-        remotePayout: FfiConverterUInt64.read(from),
-      };
-    }
-    write(value: TypeName, into: RustBuffer): void {
-      FfiConverterUInt64.write(value.localPayout, into);
-      FfiConverterUInt64.write(value.remotePayout, into);
-    }
-    allocationSize(value: TypeName): number {
-      return (
-        FfiConverterUInt64.allocationSize(value.localPayout) +
-        FfiConverterUInt64.allocationSize(value.remotePayout)
       );
     }
   }
@@ -1960,14 +1902,14 @@ const FfiConverterArrayTypeDlcInputInfo = new FfiConverterArray(
   FfiConverterTypeDlcInputInfo
 );
 
-// FfiConverter for Array<DlcOutcome>
-const FfiConverterArrayTypeDlcOutcome = new FfiConverterArray(
-  FfiConverterTypeDlcOutcome
-);
-
 // FfiConverter for Array<OracleInfo>
 const FfiConverterArrayTypeOracleInfo = new FfiConverterArray(
   FfiConverterTypeOracleInfo
+);
+
+// FfiConverter for Array<Payout>
+const FfiConverterArrayTypePayout = new FfiConverterArray(
+  FfiConverterTypePayout
 );
 
 // FfiConverter for Array<Transaction>
@@ -2055,7 +1997,7 @@ function uniffiEnsureInitialized() {
     );
   }
   if (
-    nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_create_cets() !== 45293
+    nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_create_cets() !== 50529
   ) {
     throw new UniffiInternalError.ApiChecksumMismatch(
       'uniffi_ddk_ffi_checksum_func_create_cets'
@@ -2063,7 +2005,7 @@ function uniffiEnsureInitialized() {
   }
   if (
     nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_create_dlc_transactions() !==
-    9500
+    29518
   ) {
     throw new UniffiInternalError.ApiChecksumMismatch(
       'uniffi_ddk_ffi_checksum_func_create_dlc_transactions'
@@ -2087,7 +2029,7 @@ function uniffiEnsureInitialized() {
   }
   if (
     nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_create_spliced_dlc_transactions() !==
-    51059
+    19497
   ) {
     throw new UniffiInternalError.ApiChecksumMismatch(
       'uniffi_ddk_ffi_checksum_func_create_spliced_dlc_transactions'
@@ -2191,7 +2133,6 @@ export default Object.freeze({
     FfiConverterTypeChangeOutputAndFees,
     FfiConverterTypeDLCError,
     FfiConverterTypeDlcInputInfo,
-    FfiConverterTypeDlcOutcome,
     FfiConverterTypeDlcTransactions,
     FfiConverterTypeExtendedKey,
     FfiConverterTypeOracleInfo,
