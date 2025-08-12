@@ -308,7 +308,7 @@ pub fn verify_cet_adaptor_sigs_from_oracle_info(
   pubkey: Buffer,
   funding_script_pubkey: Buffer,
   total_collateral: BigInt,
-  msgs: Vec<Vec<Buffer>>,
+  msgs: Vec<Vec<Vec<Buffer>>>,
 ) -> bool {
   let ffi_adaptor_sigs = adaptor_sigs.into_iter().map(|sig| sig.into()).collect();
   let Ok(ffi_cets) = cets
@@ -321,7 +321,12 @@ pub fn verify_cet_adaptor_sigs_from_oracle_info(
   let ffi_oracle_info = oracle_info.into_iter().map(|info| info.into()).collect();
   let ffi_msgs = msgs
     .into_iter()
-    .map(|msg| msg.iter().map(buffer_to_vec).collect())
+    .map(|msg| {
+      msg
+        .iter()
+        .map(|msg| msg.iter().map(buffer_to_vec).collect())
+        .collect()
+    })
     .collect();
 
   let Ok(ffi_amount) = bigint_to_u64(&total_collateral) else {

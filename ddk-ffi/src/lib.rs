@@ -904,11 +904,12 @@ pub fn verify_cet_adaptor_sigs_from_oracle_info(
     pubkey: Vec<u8>,
     funding_script_pubkey: Vec<u8>,
     total_collateral: u64,
-    msgs: Vec<Vec<Vec<u8>>>,
+    msgs: Vec<Vec<Vec<Vec<u8>>>>,
 ) -> bool {
     cets.into_iter()
         .zip(adaptor_sigs.into_iter())
-        .all(|(cet, adaptor_sig)| {
+        .enumerate()
+        .all(|(i, (cet, adaptor_sig))| {
             verify_cet_adaptor_sig_from_oracle_info(
                 adaptor_sig,
                 cet,
@@ -916,7 +917,7 @@ pub fn verify_cet_adaptor_sigs_from_oracle_info(
                 pubkey.clone(),
                 funding_script_pubkey.clone(),
                 total_collateral,
-                msgs.clone(),
+                msgs[i].clone(),
             )
         })
 }
@@ -1030,8 +1031,12 @@ pub fn get_xpub_from_xpriv(xpriv: Vec<u8>, network: String) -> Result<Vec<u8>, D
 #[cfg(test)]
 mod tests {
     use super::*;
-    use bitcoin::locktime::absolute::LockTime;
-    use secp256k1_zkp::rand::{thread_rng, RngCore};
+    use bitcoin::{hashes::sha256, locktime::absolute::LockTime, Address, CompressedPublicKey};
+    use dlc::secp_utils;
+    use secp256k1_zkp::{
+        rand::{thread_rng, RngCore},
+        Keypair, Scalar,
+    };
     use std::str::FromStr;
 
     /// Create test keys similar to rust-dlc tests
@@ -1427,5 +1432,265 @@ mod tests {
             0,
         );
         assert!(matches!(result, Err(DLCError::InvalidArgument(_))));
+    }
+
+    fn get_p2wpkh_script_pubkey(secp: &Secp256k1<All>) -> ScriptBuf {
+        let mut rng = secp256k1_zkp::rand::thread_rng();
+        let sk = bitcoin::PrivateKey {
+            inner: SecretKey::new(&mut rng),
+            network: Network::Testnet.into(),
+            compressed: true,
+        };
+        let pk = CompressedPublicKey::from_private_key(secp, &sk).unwrap();
+        Address::p2wpkh(&pk, Network::Testnet).script_pubkey()
+    }
+
+    fn get_party_params(
+        input_amount: u64,
+        collateral: u64,
+        serial_id: Option<u64>,
+    ) -> (PartyParams, SecretKey) {
+        let secp = Secp256k1::new();
+        let mut rng = secp256k1_zkp::rand::thread_rng();
+        let fund_privkey = SecretKey::new(&mut rng);
+        let serial_id = serial_id.unwrap_or(1);
+        (
+            PartyParams {
+                fund_pubkey: PublicKey::from_secret_key(&secp, &fund_privkey)
+                    .serialize()
+                    .to_vec(),
+                change_script_pubkey: get_p2wpkh_script_pubkey(&secp).into_bytes(),
+                change_serial_id: serial_id,
+                payout_script_pubkey: get_p2wpkh_script_pubkey(&secp).into_bytes(),
+                payout_serial_id: serial_id,
+                input_amount,
+                collateral,
+                inputs: vec![TxInputInfo {
+                    txid: "5df6e0e2761359d30a8275058e299fcc0381534545f55cf43e41983f5d4c9456"
+                        .to_string(),
+                    vout: 0,
+                    max_witness_length: 108,
+                    script_sig: vec![],
+                    serial_id,
+                }],
+                dlc_inputs: vec![],
+            },
+            fund_privkey,
+        )
+    }
+
+    fn payouts_test() -> Vec<Payout> {
+        vec![
+            Payout {
+                offer: 100000000,
+                accept: 100000000,
+            },
+            Payout {
+                offer: 100000000,
+                accept: 100000000,
+            },
+            Payout {
+                offer: 100000000,
+                accept: 100000000,
+            },
+        ]
+    }
+
+    fn signatures_to_secret(signatures: &[Vec<SchnorrSignature>]) -> SecretKey {
+        let s_values = signatures
+            .iter()
+            .flatten()
+            .map(|x| secp_utils::schnorrsig_decompose(x).unwrap().1)
+            .collect::<Vec<_>>();
+        let secret = SecretKey::from_slice(s_values[0]).unwrap();
+
+        s_values.iter().skip(1).fold(secret, |accum, s| {
+            let sec = SecretKey::from_slice(s).unwrap();
+            accum.add_tweak(&Scalar::from(sec)).unwrap()
+        })
+    }
+
+    /// Verify a signature for a given transaction input.
+    fn verify_tx_input_sig(
+        signature: Vec<u8>,
+        tx: Transaction,
+        input_index: usize,
+        script_pubkey: Vec<u8>,
+        value: u64,
+        pk: Vec<u8>,
+    ) -> Result<(), DLCError> {
+        let secp = get_secp_context();
+        let btc_txn = transaction_to_btc_tx(&tx)?;
+        let script = ScriptBuf::from_bytes(script_pubkey);
+        let sig_hash_msg =
+            dlc::util::get_sig_hash_msg(&btc_txn, input_index, &script, Amount::from_sat(value))?;
+        let sig = if signature.len() == 64 {
+            EcdsaSignature::from_compact(&signature).map_err(|_| DLCError::InvalidSignature)
+        } else {
+            EcdsaSignature::from_der(&signature).map_err(|_| DLCError::InvalidSignature)
+        }?;
+        let pk = PublicKey::from_slice(&pk).map_err(|_| DLCError::InvalidPublicKey)?;
+        secp.verify_ecdsa(&sig_hash_msg, &sig, &pk)
+            .map_err(|_| DLCError::InvalidSignature)?;
+        Ok(())
+    }
+
+    #[test]
+    fn create_cet_adaptor_sig_single_oracle_three_outcomes() {
+        // Arrange
+        let secp = Secp256k1::new();
+        let mut rng = secp256k1_zkp::rand::thread_rng();
+        let (offer_party_params, offer_fund_sk) =
+            get_party_params(1_000_000_000, 100_000_000, None);
+        let (accept_party_params, accept_fund_sk) =
+            get_party_params(1_000_000_000, 100_000_000, None);
+
+        let dlc_txs = create_dlc_transactions(
+            payouts_test(),
+            offer_party_params.clone(),
+            accept_party_params.clone(),
+            100,
+            4,
+            10,
+            10,
+            0,
+        )
+        .unwrap();
+
+        let cets = dlc_txs.cets;
+        const NB_ORACLES: usize = 1; // 1 oracle
+        const NB_OUTCOMES: usize = 3; // 3 outcomes (enumeration)
+        const NB_DIGITS: usize = 1; // 1 nonce for enumeration contract
+
+        let mut oracle_infos: Vec<OracleInfo> = Vec::with_capacity(NB_ORACLES);
+        let mut oracle_sks: Vec<Keypair> = Vec::with_capacity(NB_ORACLES);
+        let mut oracle_sk_nonce: Vec<Vec<[u8; 32]>> = Vec::with_capacity(NB_ORACLES);
+        let mut oracle_sigs: Vec<Vec<SchnorrSignature>> = Vec::with_capacity(NB_ORACLES);
+
+        // Messages: 3 outcomes × 1 oracle × 1 message per outcome
+        let messages: Vec<Vec<Vec<_>>> = (0..NB_OUTCOMES)
+            .map(|outcome_idx| {
+                vec![
+                    // Single oracle
+                    vec![
+                        // Single message for this outcome
+                        {
+                            let message = &[outcome_idx as u8]; // Different message per outcome
+                            let hash = sha256::Hash::hash(message).to_byte_array();
+                            hash.to_vec()
+                        },
+                    ],
+                ]
+            })
+            .collect();
+
+        // Setup single oracle with single nonce
+        for i in 0..NB_ORACLES {
+            // Runs once
+            let oracle_kp = Keypair::new(&secp, &mut rng);
+            let oracle_pubkey = oracle_kp.x_only_public_key().0;
+            let mut nonces: Vec<XOnlyPublicKey> = Vec::with_capacity(NB_DIGITS);
+            let mut sk_nonces: Vec<[u8; 32]> = Vec::with_capacity(NB_DIGITS);
+            oracle_sigs.push(Vec::with_capacity(NB_DIGITS));
+
+            // Single nonce for enumeration
+            let mut sk_nonce = [0u8; 32];
+            rng.fill_bytes(&mut sk_nonce);
+            let oracle_r_kp = Keypair::from_seckey_slice(&secp, &sk_nonce).unwrap();
+            let nonce = XOnlyPublicKey::from_keypair(&oracle_r_kp).0;
+
+            // Sign the first outcome's message with the single nonce
+            let sig = secp_utils::schnorrsig_sign_with_nonce(
+                &secp,
+                &Message::from_digest_slice(&messages[0][0][0]).unwrap(), // First outcome, first oracle, first message
+                &oracle_kp,
+                &sk_nonce,
+            );
+
+            oracle_sigs[i].push(sig);
+            nonces.push(nonce);
+            sk_nonces.push(sk_nonce);
+
+            oracle_infos.push(OracleInfo {
+                public_key: oracle_pubkey.serialize().to_vec(),
+                nonces: nonces.iter().map(|n| n.serialize().to_vec()).collect(), // Just 1 nonce
+            });
+            oracle_sk_nonce.push(sk_nonces);
+            oracle_sks.push(oracle_kp);
+        }
+        let funding_script_pubkey = dlc::make_funding_redeemscript(
+            &PublicKey::from_slice(&offer_party_params.fund_pubkey.clone()).unwrap(),
+            &PublicKey::from_slice(&accept_party_params.fund_pubkey.clone()).unwrap(),
+        );
+        let fund_output_value = dlc_txs.fund.outputs[0].value;
+
+        // Act
+        let cet_sigs = create_cet_adaptor_sigs_from_oracle_info(
+            cets.clone(), // Use only first 3 CETs
+            oracle_infos.clone(),
+            offer_fund_sk.secret_bytes().to_vec(),
+            funding_script_pubkey.clone().into_bytes(),
+            fund_output_value,
+            messages.clone(),
+        )
+        .unwrap();
+
+        let oracle_signatures = oracle_sigs
+            .iter()
+            .map(|s| s.iter().map(|s| s.serialize().to_vec()).collect::<Vec<_>>())
+            .collect::<Vec<_>>();
+
+        let sign_res = sign_cet(
+            cets[0].clone(),
+            cet_sigs[0].signature.clone(),
+            oracle_signatures[0].clone(),
+            accept_fund_sk.secret_bytes().to_vec(),
+            offer_party_params.fund_pubkey.clone(),
+            funding_script_pubkey.clone().into_bytes(),
+            fund_output_value,
+        );
+
+        assert!(sign_res.is_ok());
+
+        let adaptor_secret = signatures_to_secret(&oracle_sigs);
+        let signature = vec_to_ecdsa_adaptor_signature(cet_sigs[0].signature.clone()).unwrap();
+        let adapted_sig = signature.decrypt(&adaptor_secret).unwrap();
+
+        let batch_verify = verify_cet_adaptor_sigs_from_oracle_info(
+            cet_sigs.clone(),
+            cets.clone(),
+            oracle_infos.clone(),
+            offer_party_params.fund_pubkey.clone(),
+            funding_script_pubkey.clone().into_bytes(),
+            fund_output_value,
+            messages.clone(),
+        );
+
+        assert!(batch_verify);
+
+        // Assert
+        assert_eq!(cet_sigs.len(), 3, "Should have 3 CET signatures");
+        assert!(cet_sigs
+            .iter()
+            .enumerate()
+            .all(|(i, x)| verify_cet_adaptor_sig_from_oracle_info(
+                x.clone(),
+                cets[i].clone(),
+                oracle_infos.clone(),
+                offer_party_params.fund_pubkey.clone(),
+                funding_script_pubkey.clone().into_bytes(),
+                fund_output_value,
+                messages[i].clone(),
+            )));
+        sign_res.expect("Error signing CET");
+        verify_tx_input_sig(
+            adapted_sig.serialize_compact().to_vec(),
+            cets[0].clone(),
+            0,
+            funding_script_pubkey.clone().into_bytes(),
+            fund_output_value,
+            offer_party_params.fund_pubkey.clone(),
+        )
+        .expect("Invalid decrypted adaptor signature");
     }
 }

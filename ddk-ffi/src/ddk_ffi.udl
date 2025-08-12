@@ -127,7 +127,7 @@ namespace ddk_ffi {
         sequence<u8> pubkey,
         sequence<u8> funding_script_pubkey,
         u64 total_collateral,
-        sequence<sequence<sequence<u8>>> msgs
+        sequence<sequence<sequence<sequence<u8>>>> msgs
     );
 
     boolean verify_cet_adaptor_sig_from_oracle_info(
