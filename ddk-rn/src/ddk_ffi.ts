@@ -158,7 +158,7 @@ export function createCetAdaptorSigsFromOracleInfo(
   fundingSecretKey: Array</*u8*/ number>,
   fundingScriptPubkey: Array</*u8*/ number>,
   fundOutputValue: /*u64*/ bigint,
-  msgs: Array<Array<Array</*u8*/ number>>>
+  msgs: Array<Array<Array<Array</*u8*/ number>>>>
 ): Array<AdaptorSignature> /*throws*/ {
   return FfiConverterArrayTypeAdaptorSignature.lift(
     uniffiCaller.rustCallWithError(
@@ -178,7 +178,7 @@ export function createCetAdaptorSigsFromOracleInfo(
           FfiConverterArrayUInt8.lower(fundingSecretKey),
           FfiConverterArrayUInt8.lower(fundingScriptPubkey),
           FfiConverterUInt64.lower(fundOutputValue),
-          FfiConverterArrayArrayArrayUInt8.lower(msgs),
+          FfiConverterArrayArrayArrayArrayUInt8.lower(msgs),
           callStatus
         );
       },
@@ -1945,6 +1945,11 @@ const FfiConverterArrayArrayArrayUInt8 = new FfiConverterArray(
   FfiConverterArrayArrayUInt8
 );
 
+// FfiConverter for Array<Array<Array<Array</*u8*/number>>>>
+const FfiConverterArrayArrayArrayArrayUInt8 = new FfiConverterArray(
+  FfiConverterArrayArrayArrayUInt8
+);
+
 /**
  * This should be called before anything else.
  *
@@ -1990,7 +1995,7 @@ function uniffiEnsureInitialized() {
   }
   if (
     nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_create_cet_adaptor_sigs_from_oracle_info() !==
-    59405
+    15699
   ) {
     throw new UniffiInternalError.ApiChecksumMismatch(
       'uniffi_ddk_ffi_checksum_func_create_cet_adaptor_sigs_from_oracle_info'
