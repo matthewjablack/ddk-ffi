@@ -152,6 +152,40 @@ export function createCetAdaptorSignatureFromOracleInfo(
     )
   );
 }
+export function createCetAdaptorSigsFromOracleInfo(
+  cets: Array<Transaction>,
+  oracleInfo: Array<OracleInfo>,
+  fundingSecretKey: Array</*u8*/ number>,
+  fundingScriptPubkey: Array</*u8*/ number>,
+  fundOutputValue: /*u64*/ bigint,
+  msgs: Array<Array<Array</*u8*/ number>>>
+): Array<AdaptorSignature> /*throws*/ {
+  return FfiConverterArrayTypeAdaptorSignature.lift(
+    uniffiCaller.rustCallWithError(
+      /*liftError:*/ FfiConverterTypeDLCError.lift.bind(
+        FfiConverterTypeDLCError
+      ),
+      /*caller:*/ (callStatus) => {
+        return (() => {
+          console.debug(
+            `-- uniffi_ddk_ffi_fn_func_create_cet_adaptor_sigs_from_oracle_info`
+          );
+          return nativeModule()
+            .ubrn_uniffi_ddk_ffi_fn_func_create_cet_adaptor_sigs_from_oracle_info;
+        })()(
+          FfiConverterArrayTypeTransaction.lower(cets),
+          FfiConverterArrayTypeOracleInfo.lower(oracleInfo),
+          FfiConverterArrayUInt8.lower(fundingSecretKey),
+          FfiConverterArrayUInt8.lower(fundingScriptPubkey),
+          FfiConverterUInt64.lower(fundOutputValue),
+          FfiConverterArrayArrayArrayUInt8.lower(msgs),
+          callStatus
+        );
+      },
+      /*liftString:*/ FfiConverterString.lift
+    )
+  );
+}
 export function createCets(
   fundTxId: string,
   fundVout: /*u32*/ number,
@@ -1850,6 +1884,11 @@ const FfiConverterTypeExtendedKey = (() => {
 // FfiConverter for string | undefined
 const FfiConverterOptionalString = new FfiConverterOptional(FfiConverterString);
 
+// FfiConverter for Array<AdaptorSignature>
+const FfiConverterArrayTypeAdaptorSignature = new FfiConverterArray(
+  FfiConverterTypeAdaptorSignature
+);
+
 // FfiConverter for Array<DlcInputInfo>
 const FfiConverterArrayTypeDlcInputInfo = new FfiConverterArray(
   FfiConverterTypeDlcInputInfo
@@ -1858,6 +1897,11 @@ const FfiConverterArrayTypeDlcInputInfo = new FfiConverterArray(
 // FfiConverter for Array<DlcOutcome>
 const FfiConverterArrayTypeDlcOutcome = new FfiConverterArray(
   FfiConverterTypeDlcOutcome
+);
+
+// FfiConverter for Array<OracleInfo>
+const FfiConverterArrayTypeOracleInfo = new FfiConverterArray(
+  FfiConverterTypeOracleInfo
 );
 
 // FfiConverter for Array<Transaction>
@@ -1886,6 +1930,11 @@ const FfiConverterArrayUInt8 = new FfiConverterArray(FfiConverterUInt8);
 // FfiConverter for Array<Array</*u8*/number>>
 const FfiConverterArrayArrayUInt8 = new FfiConverterArray(
   FfiConverterArrayUInt8
+);
+
+// FfiConverter for Array<Array<Array</*u8*/number>>>
+const FfiConverterArrayArrayArrayUInt8 = new FfiConverterArray(
+  FfiConverterArrayArrayUInt8
 );
 
 /**
@@ -1929,6 +1978,14 @@ function uniffiEnsureInitialized() {
   ) {
     throw new UniffiInternalError.ApiChecksumMismatch(
       'uniffi_ddk_ffi_checksum_func_create_cet_adaptor_signature_from_oracle_info'
+    );
+  }
+  if (
+    nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_create_cet_adaptor_sigs_from_oracle_info() !==
+    59405
+  ) {
+    throw new UniffiInternalError.ApiChecksumMismatch(
+      'uniffi_ddk_ffi_checksum_func_create_cet_adaptor_sigs_from_oracle_info'
     );
   }
   if (

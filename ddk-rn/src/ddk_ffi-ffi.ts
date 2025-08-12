@@ -47,6 +47,15 @@ interface NativeModuleInterface {
     msgs: Uint8Array,
     uniffi_out_err: UniffiRustCallStatus
   ): Uint8Array;
+  ubrn_uniffi_ddk_ffi_fn_func_create_cet_adaptor_sigs_from_oracle_info(
+    cets: Uint8Array,
+    oracleInfo: Uint8Array,
+    fundingSecretKey: Uint8Array,
+    fundingScriptPubkey: Uint8Array,
+    fundOutputValue: bigint,
+    msgs: Uint8Array,
+    uniffi_out_err: UniffiRustCallStatus
+  ): Uint8Array;
   ubrn_uniffi_ddk_ffi_fn_func_create_cets(
     fundTxId: Uint8Array,
     fundVout: number,
@@ -161,6 +170,7 @@ interface NativeModuleInterface {
   ubrn_uniffi_ddk_ffi_checksum_func_convert_mnemonic_to_seed(): number;
   ubrn_uniffi_ddk_ffi_checksum_func_create_cet(): number;
   ubrn_uniffi_ddk_ffi_checksum_func_create_cet_adaptor_signature_from_oracle_info(): number;
+  ubrn_uniffi_ddk_ffi_checksum_func_create_cet_adaptor_sigs_from_oracle_info(): number;
   ubrn_uniffi_ddk_ffi_checksum_func_create_cets(): number;
   ubrn_uniffi_ddk_ffi_checksum_func_create_dlc_transactions(): number;
   ubrn_uniffi_ddk_ffi_checksum_func_create_fund_tx_locking_script(): number;

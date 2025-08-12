@@ -157,6 +157,15 @@ extern "C" {
         RustBuffer msgs, 
         RustCallStatus *uniffi_out_err
     );
+    RustBuffer uniffi_ddk_ffi_fn_func_create_cet_adaptor_sigs_from_oracle_info(
+        RustBuffer cets, 
+        RustBuffer oracle_info, 
+        RustBuffer funding_secret_key, 
+        RustBuffer funding_script_pubkey, 
+        uint64_t fund_output_value, 
+        RustBuffer msgs, 
+        RustCallStatus *uniffi_out_err
+    );
     RustBuffer uniffi_ddk_ffi_fn_func_create_cets(
         RustBuffer fund_tx_id, 
         uint32_t fund_vout, 
@@ -484,6 +493,8 @@ extern "C" {
     uint16_t uniffi_ddk_ffi_checksum_func_create_cet(
     );
     uint16_t uniffi_ddk_ffi_checksum_func_create_cet_adaptor_signature_from_oracle_info(
+    );
+    uint16_t uniffi_ddk_ffi_checksum_func_create_cet_adaptor_sigs_from_oracle_info(
     );
     uint16_t uniffi_ddk_ffi_checksum_func_create_cets(
     );
@@ -2083,6 +2094,14 @@ NativeDdkFfi::NativeDdkFfi(
             return this->cpp_uniffi_ddk_ffi_fn_func_create_cet_adaptor_signature_from_oracle_info(rt, thisVal, args, count);
         }
     );
+    props["ubrn_uniffi_ddk_ffi_fn_func_create_cet_adaptor_sigs_from_oracle_info"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_ddk_ffi_fn_func_create_cet_adaptor_sigs_from_oracle_info"),
+        6,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_ddk_ffi_fn_func_create_cet_adaptor_sigs_from_oracle_info(rt, thisVal, args, count);
+        }
+    );
     props["ubrn_uniffi_ddk_ffi_fn_func_create_cets"] = jsi::Function::createFromHostFunction(
         rt,
         jsi::PropNameID::forAscii(rt, "ubrn_uniffi_ddk_ffi_fn_func_create_cets"),
@@ -2225,6 +2244,14 @@ NativeDdkFfi::NativeDdkFfi(
         0,
         [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
             return this->cpp_uniffi_ddk_ffi_checksum_func_create_cet_adaptor_signature_from_oracle_info(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_ddk_ffi_checksum_func_create_cet_adaptor_sigs_from_oracle_info"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_ddk_ffi_checksum_func_create_cet_adaptor_sigs_from_oracle_info"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_ddk_ffi_checksum_func_create_cet_adaptor_sigs_from_oracle_info(rt, thisVal, args, count);
         }
     );
     props["ubrn_uniffi_ddk_ffi_checksum_func_create_cets"] = jsi::Function::createFromHostFunction(
@@ -2440,6 +2467,16 @@ jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_fn_func_create_cet_adaptor_signature
         
         return uniffi::ddk_ffi::Bridging<RustBuffer>::toJs(rt, callInvoker, value);
 }
+jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_fn_func_create_cet_adaptor_sigs_from_oracle_info(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::ddk_ffi::Bridging<RustCallStatus>::rustSuccess(rt);
+        auto value = uniffi_ddk_ffi_fn_func_create_cet_adaptor_sigs_from_oracle_info(uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[0]), uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1]), uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[2]), uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[3]), uniffi_jsi::Bridging<uint64_t>::fromJs(rt, callInvoker, args[4]), uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[5]), 
+            &status
+        );
+        uniffi::ddk_ffi::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return uniffi::ddk_ffi::Bridging<RustBuffer>::toJs(rt, callInvoker, value);
+}
 jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_fn_func_create_cets(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
         RustCallStatus status = uniffi::ddk_ffi::Bridging<RustCallStatus>::rustSuccess(rt);
         auto value = uniffi_ddk_ffi_fn_func_create_cets(uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[0]), uniffi_jsi::Bridging<uint32_t>::fromJs(rt, callInvoker, args[1]), uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[2]), uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[3]), uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[4]), uniffi_jsi::Bridging<uint32_t>::fromJs(rt, callInvoker, args[5]), uniffi_jsi::Bridging<uint64_t>::fromJs(rt, callInvoker, args[6]), uniffi_jsi::Bridging<uint64_t>::fromJs(rt, callInvoker, args[7]), 
@@ -2605,6 +2642,13 @@ jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_checksum_func_create_cet(jsi::Runtim
 }
 jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_checksum_func_create_cet_adaptor_signature_from_oracle_info(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
         auto value = uniffi_ddk_ffi_checksum_func_create_cet_adaptor_signature_from_oracle_info(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_checksum_func_create_cet_adaptor_sigs_from_oracle_info(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_ddk_ffi_checksum_func_create_cet_adaptor_sigs_from_oracle_info(
         );
 
         
