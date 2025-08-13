@@ -301,6 +301,24 @@ pub fn verify_cet_adaptor_sig_from_oracle_info(
 }
 
 #[napi]
+pub fn sign_multi_sig_input(
+  tx: Transaction,
+  dlc_input: DlcInputInfo,
+  local_privkey: Buffer,
+  remote_signature: Buffer,
+) -> Result<Transaction> {
+  let result = ddk_ffi::sign_multi_sig_input(
+    tx.try_into()?,
+    dlc_input.try_into()?,
+    buffer_to_vec(&local_privkey),
+    buffer_to_vec(&remote_signature),
+  )
+  .map_err(|e| Error::from_reason(format!("{:?}", e)))?;
+
+  Ok(result.into())
+}
+
+#[napi]
 pub fn add_signature_to_transaction(
   tx: Transaction,
   signature: Buffer,

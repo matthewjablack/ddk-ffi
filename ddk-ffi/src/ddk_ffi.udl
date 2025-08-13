@@ -108,6 +108,14 @@ namespace ddk_ffi {
     );
 
     [Throws=DLCError]
+    Transaction sign_multi_sig_input(
+        Transaction tx,
+        DlcInputInfo dlc_input,
+        sequence<u8> local_privkey,
+        sequence<u8> remote_signature
+    );
+
+    [Throws=DLCError]
     Transaction sign_cet(
         Transaction cet,
         sequence<u8> adaptor_signature,

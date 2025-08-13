@@ -4,7 +4,7 @@ use bitcoin::bip32::{DerivationPath, IntoDerivationPath, Xpriv, Xpub};
 use bitcoin::hashes::Hash;
 use bitcoin::sighash::EcdsaSighashType;
 use bitcoin::{
-    Amount, Network, OutPoint, ScriptBuf, Sequence, Transaction as BtcTransaction, TxIn,
+    Amount, Network, OutPoint, Psbt, ScriptBuf, Sequence, Transaction as BtcTransaction, TxIn,
     TxOut as BtcTxOut, Txid, Witness,
 };
 use bitcoin::{Script, WPubkeyHash};
@@ -268,6 +268,19 @@ pub fn dlc_input_info_to_rust(input: &DlcInputInfo) -> Result<RustDlcInputInfo, 
         max_witness_len: input.max_witness_len as usize,
         input_serial_id: input.input_serial_id,
         contract_id,
+    })
+}
+
+pub fn rust_to_dlc_input(input: &RustDlcInputInfo) -> Result<DlcInputInfo, DLCError> {
+    Ok(DlcInputInfo {
+        fund_tx: btc_tx_to_transaction(&input.fund_tx),
+        fund_vout: input.fund_vout,
+        local_fund_pubkey: input.local_fund_pubkey.serialize().to_vec(),
+        remote_fund_pubkey: input.remote_fund_pubkey.serialize().to_vec(),
+        fund_amount: input.fund_amount.to_sat(),
+        max_witness_len: input.max_witness_len as u32,
+        input_serial_id: input.input_serial_id,
+        contract_id: input.contract_id.to_vec(),
     })
 }
 
@@ -726,6 +739,55 @@ pub fn sign_fund_transaction_input(
     .map_err(DLCError::from)?;
 
     Ok(btc_tx_to_transaction(&btc_tx))
+}
+
+pub fn sign_multi_sig_input(
+    txn: Transaction,
+    dlc_input: DlcInputInfo,
+    local_privkey: Vec<u8>,
+    remote_signature: Vec<u8>,
+) -> Result<Transaction, DLCError> {
+    let secp = get_secp_context();
+    let btc_tx = transaction_to_btc_tx(&txn)?;
+    let sk = SecretKey::from_slice(&local_privkey)
+        .map_err(|_| DLCError::InvalidArgument("Invalid private key".to_string()))?;
+
+    let local_pk = PublicKey::from_slice(&dlc_input.local_fund_pubkey)
+        .map_err(|_| DLCError::InvalidPublicKey)?;
+    let remote_pk = PublicKey::from_slice(&dlc_input.remote_fund_pubkey)
+        .map_err(|_| DLCError::InvalidPublicKey)?;
+
+    let dlc_input = dlc_input_info_to_rust(&dlc_input)?;
+
+    let signature = dlc::dlc_input::create_dlc_funding_input_signature(
+        secp,
+        &btc_tx,
+        dlc_input.fund_vout as usize,
+        &dlc_input,
+        &sk,
+    )
+    .map_err(|_| DLCError::InvalidSignature)?;
+
+    let (first, second) = if local_pk < remote_pk {
+        (local_pk, remote_pk)
+    } else {
+        (remote_pk, local_pk)
+    };
+
+    let witness = dlc::dlc_input::combine_dlc_input_signatures(
+        &dlc_input,
+        &signature,
+        &remote_signature,
+        &first,
+        &second,
+    );
+
+    let mut fund_psbt = Psbt::from_unsigned_tx(btc_tx).map_err(|_| DLCError::InvalidTransaction)?;
+    fund_psbt.inputs[dlc_input.fund_vout as usize].final_script_witness = Some(witness);
+
+    Ok(btc_tx_to_transaction(
+        &fund_psbt.extract_tx_unchecked_fee_rate(),
+    ))
 }
 
 pub fn sign_cet(
