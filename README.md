@@ -292,7 +292,7 @@ The packages maintain 100% API compatibility through:
 3. **Type Safety**: Full TypeScript definitions generated from UDL
 4. **Testing**: Comprehensive test suites verify behavior consistency
 
-View the [compatibility verification script](./ddk-ts/scripts/verify-parity.js) that ensures both packages expose identical APIs.
+View the [compatibility verification script](./ddk-ts/scripts/verify-parity.cjs) that ensures both packages expose identical APIs.
 
 ## 🛠️ Development
 

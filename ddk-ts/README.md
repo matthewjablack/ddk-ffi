@@ -86,7 +86,7 @@ ddk-ts/
 ├── example/            # Example TypeScript application
 ├── __test__/           # Test files
 └── scripts/            # Build and verification scripts
-    └── verify-parity.js # Ensures API compatibility with UDL
+    └── verify-parity.cjs # Ensures API compatibility with UDL
 ```
 
 ### Testing
@@ -131,7 +131,7 @@ This will:
 
 ### API Compatibility
 
-The TypeScript bindings maintain 100% API compatibility with the UniFFI definitions. The [verify-parity.js](scripts/verify-parity.js) script ensures that all functions defined in the UDL file are properly exposed in the TypeScript bindings.
+The TypeScript bindings maintain 100% API compatibility with the UniFFI definitions. The [verify-parity.cjs](scripts/verify-parity.cjs) script ensures that all functions defined in the UDL file are properly exposed in the TypeScript bindings.
 
 ## Troubleshooting
 

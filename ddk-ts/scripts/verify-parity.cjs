@@ -50,7 +50,7 @@ function toSnakeCase(str) {
 function verifyParity() {
   const udlPath = path.join(__dirname, '../../ddk-ffi/src/ddk_ffi.udl')
   const libPath = path.join(__dirname, '../src/lib.rs')
-  const testPath = path.join(__dirname, '../__test__/index.spec.mjs')
+  const testPath = path.join(__dirname, '../__test__/index.spec.ts')
 
   console.log('🔍 Verifying NAPI-RS and UniFFI parity...\n')
 

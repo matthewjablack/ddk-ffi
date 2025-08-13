@@ -620,8 +620,7 @@ pub fn verify_fund_tx_signature(
             input.previous_output.txid == input_txid && input.previous_output.vout == vout
         })
         .ok_or(DLCError::InvalidArgument(format!(
-            "Input index not found in {}",
-            input_txid
+            "Input index not found in {input_txid}"
         )))?;
 
     // Create a simple P2WPKH script for verification
@@ -678,8 +677,7 @@ pub fn get_raw_funding_transaction_input_signature(
             input.previous_output.txid == prev_txid && input.previous_output.vout == prev_tx_vout
         })
         .ok_or(DLCError::InvalidArgument(format!(
-            "Input index not found in {}",
-            prev_txid
+            "Input index not found in {prev_txid}"
         )))?;
 
     let secp = get_secp_context();
@@ -723,8 +721,7 @@ pub fn sign_fund_transaction_input(
             input.previous_output.txid == prev_txid && input.previous_output.vout == prev_tx_vout
         })
         .ok_or(DLCError::InvalidArgument(format!(
-            "Input index not found in {}",
-            prev_txid
+            "Input index not found in {prev_txid}"
         )))?;
 
     let secp = Secp256k1::signing_only();
@@ -803,7 +800,7 @@ pub fn sign_cet(
     let adaptor_sig = vec_to_ecdsa_adaptor_signature(adaptor_signature)?;
     let oracle_sigs = oracle_signatures
         .iter()
-        .map(|sig| vec_to_schnorr_signature(sig))
+        .map(|sig| vec_to_schnorr_signature(sig.as_slice()))
         .collect::<Result<Vec<_>, _>>()?;
     let funding_sk = SecretKey::from_slice(&funding_secret_key)
         .map_err(|_| DLCError::InvalidArgument("Invalid funding secret key".to_string()))?;
@@ -818,7 +815,7 @@ pub fn sign_cet(
         &[oracle_sigs],
         &funding_sk,
         &other_pk,
-        &funding_script,
+        funding_script,
         Amount::from_sat(fund_output_value),
     )
     .map_err(|e| DLCError::Secp256k1Error(e.to_string()))?;
@@ -826,7 +823,7 @@ pub fn sign_cet(
     Ok(btc_tx_to_transaction(&btc_tx))
 }
 
-fn vec_to_schnorr_signature(signature: &Vec<u8>) -> Result<SchnorrSignature, DLCError> {
+fn vec_to_schnorr_signature(signature: &[u8]) -> Result<SchnorrSignature, DLCError> {
     let sig = SchnorrSignature::from_slice(signature).map_err(|_| DLCError::InvalidSignature)?;
     Ok(sig)
 }
@@ -845,7 +842,7 @@ pub fn create_cet_adaptor_sigs_from_oracle_info(
 ) -> Result<Vec<AdaptorSignature>, DLCError> {
     let cets = cets
         .iter()
-        .map(|cet| transaction_to_btc_tx(cet))
+        .map(transaction_to_btc_tx)
         .collect::<Result<Vec<_>, _>>()?;
     let oracle_infos = oracle_info
         .iter()
@@ -893,11 +890,11 @@ pub fn create_cet_adaptor_sigs_from_oracle_info(
         &cets,
         &oracle_infos,
         &funding_sk,
-        &funding_script,
+        funding_script,
         Amount::from_sat(fund_output_value),
         &msgs,
     )
-    .map_err(|e| DLCError::InvalidArgument(format!("Error from rust-dlc: {:?}", e)))?;
+    .map_err(|e| DLCError::Secp256k1Error(e.to_string()))?;
 
     let adaptor_sigs = adaptor_sigs
         .iter()
@@ -966,7 +963,7 @@ pub fn verify_cet_adaptor_sig_from_oracle_info(
         &btc_tx,
         &adaptor_point,
         &pubkey,
-        &funding_script,
+        funding_script,
         Amount::from_sat(total_collateral),
     ) else {
         return false;
@@ -985,7 +982,7 @@ pub fn verify_cet_adaptor_sigs_from_oracle_info(
     msgs: Vec<Vec<Vec<Vec<u8>>>>,
 ) -> bool {
     cets.into_iter()
-        .zip(adaptor_sigs.into_iter())
+        .zip(adaptor_sigs)
         .enumerate()
         .all(|(i, (cet, adaptor_sig))| {
             verify_cet_adaptor_sig_from_oracle_info(

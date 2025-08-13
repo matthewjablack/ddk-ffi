@@ -21,9 +21,9 @@ jobs:
       - name: Check Feature Parity
         run: |
           cd ddk-ts
-          node scripts/verify-parity.js
+          node scripts/verify-parity.cjs
 
       - name: Verify Types
         run: |
           cd ddk-ts
-          node scripts/verify-types.js
+          node scripts/verify-types.cjs
