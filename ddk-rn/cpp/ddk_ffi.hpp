@@ -21,6 +21,7 @@ class NativeDdkFfi : public jsi::HostObject {
     jsi::Value cpp_uniffi_internal_fn_func_ffi__string_to_byte_length(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_internal_fn_func_ffi__string_to_arraybuffer(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_internal_fn_func_ffi__arraybuffer_to_string(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
+    jsi::Value cpp_uniffi_ddk_ffi_fn_func_add_signature_to_transaction(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_ddk_ffi_fn_func_convert_mnemonic_to_seed(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_ddk_ffi_fn_func_create_cet(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_ddk_ffi_fn_func_create_cet_adaptor_signature_from_oracle_info(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
@@ -42,6 +43,7 @@ class NativeDdkFfi : public jsi::HostObject {
     jsi::Value cpp_uniffi_ddk_ffi_fn_func_verify_cet_adaptor_sigs_from_oracle_info(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_ddk_ffi_fn_func_verify_fund_tx_signature(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_ddk_ffi_fn_func_version(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
+    jsi::Value cpp_uniffi_ddk_ffi_checksum_func_add_signature_to_transaction(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_ddk_ffi_checksum_func_convert_mnemonic_to_seed(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_ddk_ffi_checksum_func_create_cet(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);
     jsi::Value cpp_uniffi_ddk_ffi_checksum_func_create_cet_adaptor_signature_from_oracle_info(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count);

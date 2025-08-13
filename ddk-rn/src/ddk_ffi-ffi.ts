@@ -23,6 +23,13 @@ interface NativeModuleInterface {
     buffer: Uint8Array,
     uniffi_out_err: UniffiRustCallStatus
   ): string;
+  ubrn_uniffi_ddk_ffi_fn_func_add_signature_to_transaction(
+    tx: Uint8Array,
+    signature: Uint8Array,
+    pubkey: Uint8Array,
+    inputIndex: number,
+    uniffi_out_err: UniffiRustCallStatus
+  ): Uint8Array;
   ubrn_uniffi_ddk_ffi_fn_func_convert_mnemonic_to_seed(
     mnemonic: Uint8Array,
     passphrase: Uint8Array,
@@ -187,6 +194,7 @@ interface NativeModuleInterface {
   ubrn_uniffi_ddk_ffi_fn_func_version(
     uniffi_out_err: UniffiRustCallStatus
   ): Uint8Array;
+  ubrn_uniffi_ddk_ffi_checksum_func_add_signature_to_transaction(): number;
   ubrn_uniffi_ddk_ffi_checksum_func_convert_mnemonic_to_seed(): number;
   ubrn_uniffi_ddk_ffi_checksum_func_create_cet(): number;
   ubrn_uniffi_ddk_ffi_checksum_func_create_cet_adaptor_signature_from_oracle_info(): number;

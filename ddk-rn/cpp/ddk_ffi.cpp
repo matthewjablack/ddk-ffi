@@ -133,6 +133,13 @@ extern "C" {
     uint64_t callback_data, 
     UniffiForeignFutureStructVoid result
     );
+    RustBuffer uniffi_ddk_ffi_fn_func_add_signature_to_transaction(
+        RustBuffer tx, 
+        RustBuffer signature, 
+        RustBuffer pubkey, 
+        uint32_t input_index, 
+        RustCallStatus *uniffi_out_err
+    );
     RustBuffer uniffi_ddk_ffi_fn_func_convert_mnemonic_to_seed(
         RustBuffer mnemonic, 
         RustBuffer passphrase, 
@@ -507,6 +514,8 @@ extern "C" {
     void ffi_ddk_ffi_rust_future_complete_void(
         /*handle*/ uint64_t handle, 
         RustCallStatus *uniffi_out_err
+    );
+    uint16_t uniffi_ddk_ffi_checksum_func_add_signature_to_transaction(
     );
     uint16_t uniffi_ddk_ffi_checksum_func_convert_mnemonic_to_seed(
     );
@@ -2094,6 +2103,14 @@ NativeDdkFfi::NativeDdkFfi(
             return this->cpp_uniffi_internal_fn_func_ffi__arraybuffer_to_string(rt, thisVal, args, count);
         }
     );
+    props["ubrn_uniffi_ddk_ffi_fn_func_add_signature_to_transaction"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_ddk_ffi_fn_func_add_signature_to_transaction"),
+        4,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_ddk_ffi_fn_func_add_signature_to_transaction(rt, thisVal, args, count);
+        }
+    );
     props["ubrn_uniffi_ddk_ffi_fn_func_convert_mnemonic_to_seed"] = jsi::Function::createFromHostFunction(
         rt,
         jsi::PropNameID::forAscii(rt, "ubrn_uniffi_ddk_ffi_fn_func_convert_mnemonic_to_seed"),
@@ -2260,6 +2277,14 @@ NativeDdkFfi::NativeDdkFfi(
         0,
         [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
             return this->cpp_uniffi_ddk_ffi_fn_func_version(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_ddk_ffi_checksum_func_add_signature_to_transaction"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_ddk_ffi_checksum_func_add_signature_to_transaction"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_ddk_ffi_checksum_func_add_signature_to_transaction(rt, thisVal, args, count);
         }
     );
     props["ubrn_uniffi_ddk_ffi_checksum_func_convert_mnemonic_to_seed"] = jsi::Function::createFromHostFunction(
@@ -2493,6 +2518,16 @@ jsi::Value NativeDdkFfi::cpp_uniffi_internal_fn_func_ffi__arraybuffer_to_string(
 }
 
 // Methods calling directly into the uniffi generated C API of the Rust crate.
+jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_fn_func_add_signature_to_transaction(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::ddk_ffi::Bridging<RustCallStatus>::rustSuccess(rt);
+        auto value = uniffi_ddk_ffi_fn_func_add_signature_to_transaction(uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[0]), uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1]), uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[2]), uniffi_jsi::Bridging<uint32_t>::fromJs(rt, callInvoker, args[3]), 
+            &status
+        );
+        uniffi::ddk_ffi::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return uniffi::ddk_ffi::Bridging<RustBuffer>::toJs(rt, callInvoker, value);
+}
 jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_fn_func_convert_mnemonic_to_seed(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
         RustCallStatus status = uniffi::ddk_ffi::Bridging<RustCallStatus>::rustSuccess(rt);
         auto value = uniffi_ddk_ffi_fn_func_convert_mnemonic_to_seed(uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[0]), uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1]), 
@@ -2701,6 +2736,13 @@ jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_fn_func_version(jsi::Runtime& rt, co
 
         
         return uniffi::ddk_ffi::Bridging<RustBuffer>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_checksum_func_add_signature_to_transaction(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_ddk_ffi_checksum_func_add_signature_to_transaction(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
 }
 jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_checksum_func_convert_mnemonic_to_seed(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
         auto value = uniffi_ddk_ffi_checksum_func_convert_mnemonic_to_seed(

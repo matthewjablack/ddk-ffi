@@ -61,6 +61,36 @@ const uniffiIsDebug =
   true;
 // Public interface members begin here.
 
+export function addSignatureToTransaction(
+  tx: Transaction,
+  signature: Array</*u8*/ number>,
+  pubkey: Array</*u8*/ number>,
+  inputIndex: /*u32*/ number
+): Transaction /*throws*/ {
+  return FfiConverterTypeTransaction.lift(
+    uniffiCaller.rustCallWithError(
+      /*liftError:*/ FfiConverterTypeDLCError.lift.bind(
+        FfiConverterTypeDLCError
+      ),
+      /*caller:*/ (callStatus) => {
+        return (() => {
+          console.debug(
+            `-- uniffi_ddk_ffi_fn_func_add_signature_to_transaction`
+          );
+          return nativeModule()
+            .ubrn_uniffi_ddk_ffi_fn_func_add_signature_to_transaction;
+        })()(
+          FfiConverterTypeTransaction.lower(tx),
+          FfiConverterArrayUInt8.lower(signature),
+          FfiConverterArrayUInt8.lower(pubkey),
+          FfiConverterUInt32.lower(inputIndex),
+          callStatus
+        );
+      },
+      /*liftString:*/ FfiConverterString.lift
+    )
+  );
+}
 export function convertMnemonicToSeed(
   mnemonic: string,
   passphrase: string | undefined
@@ -1970,6 +2000,14 @@ function uniffiEnsureInitialized() {
     throw new UniffiInternalError.ContractVersionMismatch(
       scaffoldingContractVersion,
       bindingsContractVersion
+    );
+  }
+  if (
+    nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_add_signature_to_transaction() !==
+    1337
+  ) {
+    throw new UniffiInternalError.ApiChecksumMismatch(
+      'uniffi_ddk_ffi_checksum_func_add_signature_to_transaction'
     );
   }
   if (
