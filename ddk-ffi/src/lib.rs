@@ -800,7 +800,9 @@ pub fn sign_cet(
     let funding_sk = SecretKey::from_slice(&funding_secret_key)
         .map_err(|_| DLCError::InvalidArgument("Invalid funding secret key".to_string()))?;
     let other_pk = PublicKey::from_slice(&other_pubkey).map_err(|_| DLCError::InvalidPublicKey)?;
-    let funding_script = Script::from_bytes(&funding_script_pubkey);
+    let funding_pubkey =
+        PublicKey::from_slice(&funding_script_pubkey).map_err(|_| DLCError::InvalidPublicKey)?;
+    let dlc_redeem_script = dlc::make_funding_redeemscript(&funding_pubkey, &other_pk);
     let secp = get_secp_context();
 
     dlc::sign_cet(
@@ -810,7 +812,7 @@ pub fn sign_cet(
         &[oracle_sigs],
         &funding_sk,
         &other_pk,
-        funding_script,
+        dlc_redeem_script.as_script(),
         Amount::from_sat(fund_output_value),
     )
     .map_err(|e| DLCError::Secp256k1Error(e.to_string()))?;
@@ -1717,7 +1719,7 @@ mod tests {
             oracle_signatures[0].clone(),
             accept_fund_sk.secret_bytes().to_vec(),
             offer_party_params.fund_pubkey.clone(),
-            funding_script_pubkey.clone().into_bytes(),
+            accept_party_params.fund_pubkey.clone(),
             fund_output_value,
         );
 
