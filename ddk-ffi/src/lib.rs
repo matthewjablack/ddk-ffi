@@ -628,13 +628,7 @@ pub fn verify_fund_tx_signature(
     let script = bitcoin::ScriptBuf::new_p2wpkh(&wpkh);
 
     // Parse signature
-    let sig = if signature.len() == 64 {
-        EcdsaSignature::from_compact(&signature).map_err(|_| DLCError::InvalidSignature)?
-    } else {
-        // Remove sighash type byte and parse DER
-        let sig_bytes = &signature[..signature.len() - 1];
-        EcdsaSignature::from_der(sig_bytes).map_err(|_| DLCError::InvalidSignature)?
-    };
+    let sig = EcdsaSignature::from_der(&signature).map_err(|_| DLCError::InvalidSignature)?;
 
     let secp = Secp256k1::verification_only();
     match dlc::verify_tx_input_sig(
@@ -696,7 +690,7 @@ pub fn get_raw_funding_transaction_input_signature(
     )
     .map_err(DLCError::from)?;
 
-    Ok(sig.serialize_compact().to_vec())
+    Ok(sig.serialize_der().to_vec())
 }
 
 /// Sign a funding transaction input
@@ -1599,11 +1593,7 @@ mod tests {
         let script = ScriptBuf::from_bytes(script_pubkey);
         let sig_hash_msg =
             dlc::util::get_sig_hash_msg(&btc_txn, input_index, &script, Amount::from_sat(value))?;
-        let sig = if signature.len() == 64 {
-            EcdsaSignature::from_compact(&signature).map_err(|_| DLCError::InvalidSignature)
-        } else {
-            EcdsaSignature::from_der(&signature).map_err(|_| DLCError::InvalidSignature)
-        }?;
+        let sig = EcdsaSignature::from_der(&signature).map_err(|_| DLCError::InvalidSignature)?;
         let pk = PublicKey::from_slice(&pk).map_err(|_| DLCError::InvalidPublicKey)?;
         secp.verify_ecdsa(&sig_hash_msg, &sig, &pk)
             .map_err(|_| DLCError::InvalidSignature)?;
@@ -1759,7 +1749,7 @@ mod tests {
             )));
         sign_res.expect("Error signing CET");
         verify_tx_input_sig(
-            adapted_sig.serialize_compact().to_vec(),
+            adapted_sig.serialize_der().to_vec(),
             cets[0].clone(),
             0,
             funding_script_pubkey.clone().into_bytes(),
