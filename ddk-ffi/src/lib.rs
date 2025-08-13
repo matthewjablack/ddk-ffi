@@ -224,6 +224,22 @@ pub fn btc_tx_to_transaction(tx: &BtcTransaction) -> Transaction {
     }
 }
 
+pub fn add_signature_to_transaction(
+    tx: Transaction,
+    signature: Vec<u8>,
+    pubkey: Vec<u8>,
+    input_index: u32,
+) -> Result<Transaction, DLCError> {
+    let mut tx = transaction_to_btc_tx(&tx).map_err(|_| DLCError::InvalidTransaction)?;
+    let mut witness = Witness::new();
+    witness.push(signature);
+    witness.push(pubkey);
+
+    tx.input[input_index as usize].witness = witness;
+
+    Ok(btc_tx_to_transaction(&tx))
+}
+
 pub fn plz_work() -> String {
     "heyhowareya".to_string()
 }
