@@ -301,6 +301,24 @@ pub fn verify_cet_adaptor_sig_from_oracle_info(
 }
 
 #[napi]
+pub fn add_signature_to_transaction(
+  tx: Transaction,
+  signature: Buffer,
+  pubkey: Buffer,
+  input_index: u32,
+) -> Result<Transaction> {
+  let result = ddk_ffi::add_signature_to_transaction(
+    tx.try_into()?,
+    buffer_to_vec(&signature),
+    buffer_to_vec(&pubkey),
+    input_index,
+  )
+  .map_err(|e| Error::from_reason(format!("{:?}", e)))?;
+
+  Ok(result.into())
+}
+
+#[napi]
 pub fn verify_cet_adaptor_sigs_from_oracle_info(
   adaptor_sigs: Vec<AdaptorSignature>,
   cets: Vec<Transaction>,
