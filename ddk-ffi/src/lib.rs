@@ -680,17 +680,18 @@ pub fn get_raw_funding_transaction_input_signature(
     let wpkh = WPubkeyHash::hash(&pk.serialize());
     let script = bitcoin::ScriptBuf::new_p2wpkh(&wpkh);
 
-    let sig = dlc::util::get_raw_sig_for_tx_input(
+    let sig = dlc::util::get_sig_for_tx_input(
         secp,
         &btc_tx,
         input_index,
         &script,
         Amount::from_sat(value),
+        EcdsaSighashType::All,
         &sk,
     )
     .map_err(DLCError::from)?;
 
-    Ok(sig.serialize_compact().to_vec())
+    Ok(sig)
 }
 
 /// Sign a funding transaction input
