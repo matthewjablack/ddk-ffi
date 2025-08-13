@@ -1592,12 +1592,17 @@ mod tests {
         let secp = get_secp_context();
         let btc_txn = transaction_to_btc_tx(&tx)?;
         let script = ScriptBuf::from_bytes(script_pubkey);
-        let sig_hash_msg =
-            dlc::util::get_sig_hash_msg(&btc_txn, input_index, &script, Amount::from_sat(value))?;
         let sig = EcdsaSignature::from_der(&signature).map_err(|_| DLCError::InvalidSignature)?;
         let pk = PublicKey::from_slice(&pk).map_err(|_| DLCError::InvalidPublicKey)?;
-        secp.verify_ecdsa(&sig_hash_msg, &sig, &pk)
-            .map_err(|_| DLCError::InvalidSignature)?;
+        dlc::verify_tx_input_sig(
+            secp,
+            &sig,
+            &btc_txn,
+            input_index,
+            &script,
+            Amount::from_sat(value),
+            &pk,
+        )?;
         Ok(())
     }
 
