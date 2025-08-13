@@ -1,6 +1,6 @@
 [package]
 name = "ddk_ffi"
-version = "0.3.19"
+version = "0.3.20"
 edition = "2021"
 license = "MIT"
 description = "rust-dlc language bindings"
