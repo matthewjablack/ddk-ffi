@@ -272,6 +272,13 @@ extern "C" {
         uint64_t value, 
         RustCallStatus *uniffi_out_err
     );
+    RustBuffer uniffi_ddk_ffi_fn_func_sign_multi_sig_input(
+        RustBuffer tx, 
+        RustBuffer dlc_input, 
+        RustBuffer local_privkey, 
+        RustBuffer remote_signature, 
+        RustCallStatus *uniffi_out_err
+    );
     int8_t uniffi_ddk_ffi_fn_func_verify_cet_adaptor_sig_from_oracle_info(
         RustBuffer adaptor_sig, 
         RustBuffer cet, 
@@ -550,6 +557,8 @@ extern "C" {
     uint16_t uniffi_ddk_ffi_checksum_func_sign_cet(
     );
     uint16_t uniffi_ddk_ffi_checksum_func_sign_fund_transaction_input(
+    );
+    uint16_t uniffi_ddk_ffi_checksum_func_sign_multi_sig_input(
     );
     uint16_t uniffi_ddk_ffi_checksum_func_verify_cet_adaptor_sig_from_oracle_info(
     );
@@ -2247,6 +2256,14 @@ NativeDdkFfi::NativeDdkFfi(
             return this->cpp_uniffi_ddk_ffi_fn_func_sign_fund_transaction_input(rt, thisVal, args, count);
         }
     );
+    props["ubrn_uniffi_ddk_ffi_fn_func_sign_multi_sig_input"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_ddk_ffi_fn_func_sign_multi_sig_input"),
+        4,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_ddk_ffi_fn_func_sign_multi_sig_input(rt, thisVal, args, count);
+        }
+    );
     props["ubrn_uniffi_ddk_ffi_fn_func_verify_cet_adaptor_sig_from_oracle_info"] = jsi::Function::createFromHostFunction(
         rt,
         jsi::PropNameID::forAscii(rt, "ubrn_uniffi_ddk_ffi_fn_func_verify_cet_adaptor_sig_from_oracle_info"),
@@ -2421,6 +2438,14 @@ NativeDdkFfi::NativeDdkFfi(
         0,
         [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
             return this->cpp_uniffi_ddk_ffi_checksum_func_sign_fund_transaction_input(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_ddk_ffi_checksum_func_sign_multi_sig_input"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_ddk_ffi_checksum_func_sign_multi_sig_input"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_ddk_ffi_checksum_func_sign_multi_sig_input(rt, thisVal, args, count);
         }
     );
     props["ubrn_uniffi_ddk_ffi_checksum_func_verify_cet_adaptor_sig_from_oracle_info"] = jsi::Function::createFromHostFunction(
@@ -2698,6 +2723,16 @@ jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_fn_func_sign_fund_transaction_input(
         
         return uniffi::ddk_ffi::Bridging<RustBuffer>::toJs(rt, callInvoker, value);
 }
+jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_fn_func_sign_multi_sig_input(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::ddk_ffi::Bridging<RustCallStatus>::rustSuccess(rt);
+        auto value = uniffi_ddk_ffi_fn_func_sign_multi_sig_input(uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[0]), uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1]), uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[2]), uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[3]), 
+            &status
+        );
+        uniffi::ddk_ffi::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return uniffi::ddk_ffi::Bridging<RustBuffer>::toJs(rt, callInvoker, value);
+}
 jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_fn_func_verify_cet_adaptor_sig_from_oracle_info(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
         RustCallStatus status = uniffi::ddk_ffi::Bridging<RustCallStatus>::rustSuccess(rt);
         auto value = uniffi_ddk_ffi_fn_func_verify_cet_adaptor_sig_from_oracle_info(uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[0]), uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1]), uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[2]), uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[3]), uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[4]), uniffi_jsi::Bridging<uint64_t>::fromJs(rt, callInvoker, args[5]), uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[6]), 
@@ -2858,6 +2893,13 @@ jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_checksum_func_sign_cet(jsi::Runtime&
 }
 jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_checksum_func_sign_fund_transaction_input(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
         auto value = uniffi_ddk_ffi_checksum_func_sign_fund_transaction_input(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_checksum_func_sign_multi_sig_input(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_ddk_ffi_checksum_func_sign_multi_sig_input(
         );
 
         

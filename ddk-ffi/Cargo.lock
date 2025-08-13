@@ -282,7 +282,7 @@ checksum = "b94f61472cee1439c0b966b47e3aca9ae07e45d070759512cd390ea2bebc6675"
 
 [[package]]
 name = "ddk_ffi"
-version = "0.3.12"
+version = "0.3.13"
 dependencies = [
  "bip39",
  "bitcoin",

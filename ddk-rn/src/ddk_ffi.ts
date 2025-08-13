@@ -586,6 +586,34 @@ export function signFundTransactionInput(
     )
   );
 }
+export function signMultiSigInput(
+  tx: Transaction,
+  dlcInput: DlcInputInfo,
+  localPrivkey: Array</*u8*/ number>,
+  remoteSignature: Array</*u8*/ number>
+): Transaction /*throws*/ {
+  return FfiConverterTypeTransaction.lift(
+    uniffiCaller.rustCallWithError(
+      /*liftError:*/ FfiConverterTypeDLCError.lift.bind(
+        FfiConverterTypeDLCError
+      ),
+      /*caller:*/ (callStatus) => {
+        return (() => {
+          console.debug(`-- uniffi_ddk_ffi_fn_func_sign_multi_sig_input`);
+          return nativeModule()
+            .ubrn_uniffi_ddk_ffi_fn_func_sign_multi_sig_input;
+        })()(
+          FfiConverterTypeTransaction.lower(tx),
+          FfiConverterTypeDlcInputInfo.lower(dlcInput),
+          FfiConverterArrayUInt8.lower(localPrivkey),
+          FfiConverterArrayUInt8.lower(remoteSignature),
+          callStatus
+        );
+      },
+      /*liftString:*/ FfiConverterString.lift
+    )
+  );
+}
 export function verifyCetAdaptorSigFromOracleInfo(
   adaptorSig: AdaptorSignature,
   cet: Transaction,
@@ -2136,6 +2164,14 @@ function uniffiEnsureInitialized() {
   ) {
     throw new UniffiInternalError.ApiChecksumMismatch(
       'uniffi_ddk_ffi_checksum_func_sign_fund_transaction_input'
+    );
+  }
+  if (
+    nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_sign_multi_sig_input() !==
+    14569
+  ) {
+    throw new UniffiInternalError.ApiChecksumMismatch(
+      'uniffi_ddk_ffi_checksum_func_sign_multi_sig_input'
     );
   }
   if (

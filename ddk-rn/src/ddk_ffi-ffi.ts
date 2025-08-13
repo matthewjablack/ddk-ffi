@@ -162,6 +162,13 @@ interface NativeModuleInterface {
     value: bigint,
     uniffi_out_err: UniffiRustCallStatus
   ): Uint8Array;
+  ubrn_uniffi_ddk_ffi_fn_func_sign_multi_sig_input(
+    tx: Uint8Array,
+    dlcInput: Uint8Array,
+    localPrivkey: Uint8Array,
+    remoteSignature: Uint8Array,
+    uniffi_out_err: UniffiRustCallStatus
+  ): Uint8Array;
   ubrn_uniffi_ddk_ffi_fn_func_verify_cet_adaptor_sig_from_oracle_info(
     adaptorSig: Uint8Array,
     cet: Uint8Array,
@@ -212,6 +219,7 @@ interface NativeModuleInterface {
   ubrn_uniffi_ddk_ffi_checksum_func_is_dust_output(): number;
   ubrn_uniffi_ddk_ffi_checksum_func_sign_cet(): number;
   ubrn_uniffi_ddk_ffi_checksum_func_sign_fund_transaction_input(): number;
+  ubrn_uniffi_ddk_ffi_checksum_func_sign_multi_sig_input(): number;
   ubrn_uniffi_ddk_ffi_checksum_func_verify_cet_adaptor_sig_from_oracle_info(): number;
   ubrn_uniffi_ddk_ffi_checksum_func_verify_cet_adaptor_sigs_from_oracle_info(): number;
   ubrn_uniffi_ddk_ffi_checksum_func_verify_fund_tx_signature(): number;

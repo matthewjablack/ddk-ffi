@@ -1,6 +1,6 @@
 {
   "name": "@bennyblader/ddk-ts",
-  "version": "0.3.12",
+  "version": "0.3.13",
   "description": "dlcdevkit typescript bindings",
   "type": "module",
   "main": "dist/index.js",
@@ -80,7 +80,7 @@
   ],
   "packageManager": "yarn@4.9.2",
   "optionalDependencies": {
-    "@bennyblader/ddk-ts-darwin-arm64": "0.3.12",
-    "@bennyblader/ddk-ts-linux-x64-gnu": "0.3.12"
+    "@bennyblader/ddk-ts-darwin-arm64": "0.3.13",
+    "@bennyblader/ddk-ts-linux-x64-gnu": "0.3.13"
   }
 }
