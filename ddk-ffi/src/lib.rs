@@ -8,7 +8,7 @@ use bitcoin::{
     TxOut as BtcTxOut, Txid, Witness,
 };
 use bitcoin::{Script, WPubkeyHash};
-use dlc::{
+use ddk_dlc::{
     self, dlc_input::DlcInputInfo as RustDlcInputInfo, DlcTransactions as RustDlcTransactions,
     OracleInfo as DlcOracleInfo, PartyParams as DlcPartyParams, Payout as DlcPayout,
     TxInputInfo as DlcTxInputInfo,
@@ -78,16 +78,16 @@ pub enum ExtendedKey {
     InvalidDerivationPath,
 }
 
-impl From<dlc::Error> for DLCError {
-    fn from(err: dlc::Error) -> Self {
+impl From<ddk_dlc::Error> for DLCError {
+    fn from(err: ddk_dlc::Error) -> Self {
         match err {
-            dlc::Error::Secp256k1(_) => DLCError::Secp256k1Error(err.to_string()),
-            dlc::Error::InvalidArgument => {
+            ddk_dlc::Error::Secp256k1(_) => DLCError::Secp256k1Error(err.to_string()),
+            ddk_dlc::Error::InvalidArgument => {
                 DLCError::InvalidArgument("Error from rust-dlc".to_string())
             }
-            dlc::Error::Miniscript(_) => DLCError::MiniscriptError,
-            dlc::Error::P2wpkh(_) => DLCError::InvalidTransaction,
-            dlc::Error::InputsIndex(_) => {
+            ddk_dlc::Error::Miniscript(_) => DLCError::MiniscriptError,
+            ddk_dlc::Error::P2wpkh(_) => DLCError::InvalidTransaction,
+            ddk_dlc::Error::InputsIndex(_) => {
                 DLCError::InvalidArgument("Error from rust-dlc: InputsIndex".to_string())
             }
         }
@@ -345,7 +345,7 @@ pub fn create_fund_tx_locking_script(
     let remote_pk =
         PublicKey::from_slice(&remote_fund_pubkey).map_err(|_| DLCError::InvalidPublicKey)?;
 
-    let script = dlc::make_funding_redeemscript(&local_pk, &remote_pk);
+    let script = ddk_dlc::make_funding_redeemscript(&local_pk, &remote_pk);
     Ok(script.to_bytes())
 }
 
@@ -374,7 +374,7 @@ pub fn create_dlc_transactions(
         .collect();
 
     // Use rust-dlc library to create transactions
-    let dlc_txs = dlc::create_dlc_transactions(
+    let dlc_txs = ddk_dlc::create_dlc_transactions(
         &rust_local_params,
         &rust_remote_params,
         &payouts,
@@ -415,7 +415,7 @@ pub fn create_spliced_dlc_transactions(
         .collect();
 
     // Use rust-dlc library to create spliced transactions
-    let dlc_txs = dlc::create_spliced_dlc_transactions(
+    let dlc_txs = ddk_dlc::create_spliced_dlc_transactions(
         &rust_local_params,
         &rust_remote_params,
         &payouts,
@@ -464,7 +464,7 @@ pub fn create_cet(
         witness: Witness::new(),
     };
 
-    let btc_tx = dlc::create_cet(
+    let btc_tx = ddk_dlc::create_cet(
         local_btc_output,
         local_payout_serial_id,
         remote_btc_output,
@@ -511,7 +511,7 @@ pub fn create_cets(
         })
         .collect();
 
-    let btc_txs = dlc::create_cets(
+    let btc_txs = ddk_dlc::create_cets(
         &fund_tx_input,
         local_script,
         local_serial_id,
@@ -558,7 +558,7 @@ pub fn create_refund_transaction(
     };
 
     let btc_tx =
-        dlc::create_refund_transaction(local_output, remote_output, funding_input, lock_time);
+        ddk_dlc::create_refund_transaction(local_output, remote_output, funding_input, lock_time);
 
     Ok(btc_tx_to_transaction(&btc_tx))
 }
@@ -631,7 +631,7 @@ pub fn verify_fund_tx_signature(
     let sig = EcdsaSignature::from_der(&signature).map_err(|_| DLCError::InvalidSignature)?;
 
     let secp = Secp256k1::verification_only();
-    match dlc::verify_tx_input_sig(
+    match ddk_dlc::verify_tx_input_sig(
         &secp,
         &sig,
         &btc_tx,
@@ -680,7 +680,7 @@ pub fn get_raw_funding_transaction_input_signature(
     let wpkh = WPubkeyHash::hash(&pk.serialize());
     let script = bitcoin::ScriptBuf::new_p2wpkh(&wpkh);
 
-    let sig = dlc::util::get_sig_for_tx_input(
+    let sig = ddk_dlc::util::get_sig_for_tx_input(
         secp,
         &btc_tx,
         input_index,
@@ -720,7 +720,7 @@ pub fn sign_fund_transaction_input(
         )))?;
 
     let secp = Secp256k1::signing_only();
-    dlc::util::sign_p2wpkh_input(
+    ddk_dlc::util::sign_p2wpkh_input(
         &secp,
         &sk,
         &mut btc_tx,
@@ -751,7 +751,7 @@ pub fn sign_multi_sig_input(
 
     let dlc_input = dlc_input_info_to_rust(&dlc_input)?;
 
-    let signature = dlc::dlc_input::create_dlc_funding_input_signature(
+    let signature = ddk_dlc::dlc_input::create_dlc_funding_input_signature(
         secp,
         &btc_tx,
         dlc_input.fund_vout as usize,
@@ -766,7 +766,7 @@ pub fn sign_multi_sig_input(
         (remote_pk, local_pk)
     };
 
-    let witness = dlc::dlc_input::combine_dlc_input_signatures(
+    let witness = ddk_dlc::dlc_input::combine_dlc_input_signatures(
         &dlc_input,
         &signature,
         &remote_signature,
@@ -802,10 +802,10 @@ pub fn sign_cet(
     let other_pk = PublicKey::from_slice(&other_pubkey).map_err(|_| DLCError::InvalidPublicKey)?;
     let funding_pubkey =
         PublicKey::from_slice(&funding_script_pubkey).map_err(|_| DLCError::InvalidPublicKey)?;
-    let dlc_redeem_script = dlc::make_funding_redeemscript(&funding_pubkey, &other_pk);
+    let dlc_redeem_script = ddk_dlc::make_funding_redeemscript(&funding_pubkey, &other_pk);
     let secp = get_secp_context();
 
-    dlc::sign_cet(
+    ddk_dlc::sign_cet(
         secp,
         &mut btc_tx,
         &adaptor_sig,
@@ -882,7 +882,7 @@ pub fn create_cet_adaptor_sigs_from_oracle_info(
         })
         .collect::<Result<Vec<_>, _>>()?;
     let secp = get_secp_context();
-    let adaptor_sigs = dlc::create_cet_adaptor_sigs_from_oracle_info(
+    let adaptor_sigs = ddk_dlc::create_cet_adaptor_sigs_from_oracle_info(
         secp,
         &cets,
         &oracle_infos,
@@ -931,7 +931,7 @@ pub fn verify_cet_adaptor_sig_from_oracle_info(
                 .collect::<Result<Vec<_>, _>>()?;
             Ok(DlcOracleInfo { public_key, nonces })
         })
-        .collect::<Result<Vec<_>, dlc::Error>>()
+        .collect::<Result<Vec<_>, ddk_dlc::Error>>()
     else {
         return false;
     };
@@ -950,11 +950,11 @@ pub fn verify_cet_adaptor_sig_from_oracle_info(
     else {
         return false;
     };
-    let Ok(adaptor_point) = dlc::get_adaptor_point_from_oracle_info(secp, &oracle_infos, &msgs)
+    let Ok(adaptor_point) = ddk_dlc::get_adaptor_point_from_oracle_info(secp, &oracle_infos, &msgs)
     else {
         return false;
     };
-    let Ok(_) = dlc::verify_cet_adaptor_sig_from_point(
+    let Ok(_) = ddk_dlc::verify_cet_adaptor_sig_from_point(
         secp,
         &adaptor_sig,
         &btc_tx,
@@ -1032,7 +1032,7 @@ pub fn create_cet_adaptor_signature_from_oracle_info(
     let nested_msgs = vec![msg_vec]; // Wrap in vector for single oracle
 
     let secp = get_secp_context();
-    let adaptor_sig = dlc::create_cet_adaptor_sig_from_oracle_info(
+    let adaptor_sig = ddk_dlc::create_cet_adaptor_sig_from_oracle_info(
         secp,
         &btc_tx,
         &[dlc_oracle_info],
@@ -1104,7 +1104,7 @@ pub fn get_xpub_from_xpriv(xpriv: Vec<u8>, network: String) -> Result<Vec<u8>, D
 mod tests {
     use super::*;
     use bitcoin::{hashes::sha256, locktime::absolute::LockTime, Address, CompressedPublicKey};
-    use dlc::secp_utils;
+    use ddk_dlc::secp_utils;
     use secp256k1_zkp::{
         rand::{thread_rng, RngCore},
         Keypair, Scalar,
@@ -1220,7 +1220,7 @@ mod tests {
         .unwrap();
 
         // Compare with direct rust-dlc call
-        let direct_result = dlc::make_funding_redeemscript(&offer_pk, &accept_pk);
+        let direct_result = ddk_dlc::make_funding_redeemscript(&offer_pk, &accept_pk);
 
         assert_eq!(wrapper_result, direct_result.to_bytes());
     }
@@ -1596,7 +1596,7 @@ mod tests {
         let script = ScriptBuf::from_bytes(script_pubkey);
         let sig = EcdsaSignature::from_der(&signature).map_err(|_| DLCError::InvalidSignature)?;
         let pk = PublicKey::from_slice(&pk).map_err(|_| DLCError::InvalidPublicKey)?;
-        dlc::verify_tx_input_sig(
+        ddk_dlc::verify_tx_input_sig(
             secp,
             &sig,
             &btc_txn,
@@ -1691,7 +1691,7 @@ mod tests {
             oracle_sk_nonce.push(sk_nonces);
             oracle_sks.push(oracle_kp);
         }
-        let funding_script_pubkey = dlc::make_funding_redeemscript(
+        let funding_script_pubkey = ddk_dlc::make_funding_redeemscript(
             &PublicKey::from_slice(&offer_party_params.fund_pubkey.clone()).unwrap(),
             &PublicKey::from_slice(&accept_party_params.fund_pubkey.clone()).unwrap(),
         );

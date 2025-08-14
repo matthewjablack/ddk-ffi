@@ -281,27 +281,28 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b94f61472cee1439c0b966b47e3aca9ae07e45d070759512cd390ea2bebc6675"
 
 [[package]]
-name = "ddk_ffi"
-version = "0.3.20"
-dependencies = [
- "bip39",
- "bitcoin",
- "dlc",
- "secp256k1-zkp",
- "thiserror",
- "uniffi",
-]
-
-[[package]]
-name = "dlc"
-version = "0.7.1"
-source = "git+https://github.com/bennyhodl/dlcdevkit.git?branch=master#95e7450cf9254ac8d872ad8c4a2491cb26500e19"
+name = "ddk-dlc"
+version = "0.0.21"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cd81ea804b1fe6ad44621b79db9261b7a595e0c41e9fb33642ec4798100eeff7"
 dependencies = [
  "bitcoin",
  "miniscript",
  "secp256k1-sys",
  "secp256k1-zkp",
  "serde",
+]
+
+[[package]]
+name = "ddk_ffi"
+version = "0.3.20"
+dependencies = [
+ "bip39",
+ "bitcoin",
+ "ddk-dlc",
+ "secp256k1-zkp",
+ "thiserror",
+ "uniffi",
 ]
 
 [[package]]
