@@ -3,7 +3,7 @@
 const fs = require("fs");
 const path = require("path");
 const { execSync, spawn } = require("child_process");
-const { applyHotFix } = require('../ddk-rn/scripts/apply-hotfix.js');
+const { applyHotFix } = require("../ddk-rn/scripts/apply-hotfix.js");
 
 // Parse command line arguments
 const args = process.argv.slice(2);
@@ -224,6 +224,10 @@ function generateTypeScriptBindings() {
   if (process.platform === "darwin") {
     runCommand("pnpm build:darwin-arm64", ddkTsRoot, {
       description: "Building for Darwin ARM64",
+    });
+
+    runCommand("pnpm build:linux-x64", ddkTsRoot, {
+      description: "Building for Linux x64",
     });
   }
 
