@@ -1,6 +1,6 @@
 {
   "name": "@bennyblader/ddk-rn",
-  "version": "0.3.21",
+  "version": "0.3.22",
   "description": "dlcdevkit bindings for react-native",
   "source": "./src/index.tsx",
   "main": "./lib/commonjs/index.js",
