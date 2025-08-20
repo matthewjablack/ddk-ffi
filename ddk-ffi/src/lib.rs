@@ -1,4 +1,5 @@
 #![allow(clippy::too_many_arguments)]
+#![allow(deprecated)]
 use bip39::{Language, Mnemonic};
 use bitcoin::bip32::{IntoDerivationPath, Xpriv, Xpub};
 use bitcoin::hashes::Hash;
@@ -1074,10 +1075,7 @@ pub fn create_extkey_from_seed(seed: Vec<u8>, network: String) -> Result<Vec<u8>
 
 /// Derive child extended private key from parent extended key
 /// Input: 78-byte encoded xpriv, Output: 78-byte encoded xpriv
-pub fn create_extkey_from_parent_path(
-    extkey: Vec<u8>,
-    path: String,
-) -> Result<Vec<u8>, DLCError> {
+pub fn create_extkey_from_parent_path(extkey: Vec<u8>, path: String) -> Result<Vec<u8>, DLCError> {
     if extkey.len() != 78 {
         return Err(DLCError::KeyError(ExtendedKey::InvalidXpriv));
     }
@@ -1144,10 +1142,8 @@ pub fn create_xpriv_from_parent_path(
     };
 
     // Derive base path from master
-    let base_xpriv = create_extkey_from_parent_path(
-        master_xpriv,
-        base_derivation_path.replace("m/", ""),
-    )?;
+    let base_xpriv =
+        create_extkey_from_parent_path(master_xpriv, base_derivation_path.replace("m/", ""))?;
 
     // Derive final path from base
     create_extkey_from_parent_path(base_xpriv, path)
@@ -1163,8 +1159,7 @@ pub fn get_xpub_from_xpriv(xpriv: Vec<u8>, network: String) -> Result<Vec<u8>, D
     let secp = get_secp_context();
     let _network = Network::from_str(&network).map_err(|_| DLCError::InvalidNetwork)?;
 
-    let xpriv = Xpriv::decode(&xpriv)
-        .map_err(|_| DLCError::KeyError(ExtendedKey::InvalidXpriv))?;
+    let xpriv = Xpriv::decode(&xpriv).map_err(|_| DLCError::KeyError(ExtendedKey::InvalidXpriv))?;
 
     let xpub = Xpub::from_priv(secp, &xpriv);
     Ok(xpub.encode().to_vec())
@@ -1173,9 +1168,9 @@ pub fn get_xpub_from_xpriv(xpriv: Vec<u8>, network: String) -> Result<Vec<u8>, D
 #[cfg(test)]
 mod tests {
     use super::*;
+    use bitcoin::bip32::DerivationPath;
     use bitcoin::{hashes::sha256, locktime::absolute::LockTime, Address, CompressedPublicKey};
     use ddk_dlc::secp_utils;
-    use bitcoin::bip32::DerivationPath;
     use secp256k1_zkp::{
         rand::{thread_rng, RngCore},
         Keypair, Scalar,
@@ -1248,7 +1243,11 @@ mod tests {
         let mnemonic = Mnemonic::generate(24).unwrap();
         let rust_xpriv =
             Xpriv::new_master(Network::Bitcoin, &mnemonic.to_seed_normalized("").to_vec()).unwrap();
-        let ffi_xpriv = create_extkey_from_seed(mnemonic.to_seed_normalized("").to_vec(), "bitcoin".to_string()).unwrap();
+        let ffi_xpriv = create_extkey_from_seed(
+            mnemonic.to_seed_normalized("").to_vec(),
+            "bitcoin".to_string(),
+        )
+        .unwrap();
         let rust_xpub = Xpub::from_priv(get_secp_context(), &rust_xpriv);
         let ffi_xpub = get_xpub_from_xpriv(ffi_xpriv, "bitcoin".to_string()).unwrap();
         assert_eq!(rust_xpub.encode().to_vec(), ffi_xpub);
