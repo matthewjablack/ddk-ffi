@@ -502,6 +502,36 @@ pub fn convert_mnemonic_to_seed(mnemonic: String, passphrase: Option<String>) ->
 }
 
 #[napi]
+pub fn create_extkey_from_seed(seed: Buffer, network: String) -> Result<Buffer> {
+  let seed_bytes = buffer_to_vec(&seed);
+  let result = ddk_ffi::create_extkey_from_seed(seed_bytes, network)
+    .map_err(|e| Error::from_reason(format!("{:?}", e)))?;
+
+  Ok(vec_to_buffer(result))
+}
+
+#[napi]
+pub fn create_extkey_from_parent_path(
+  extkey: Buffer,
+  path: String,
+) -> Result<Buffer> {
+  let extkey_bytes = buffer_to_vec(&extkey);
+  let result = ddk_ffi::create_extkey_from_parent_path(extkey_bytes, path)
+    .map_err(|e| Error::from_reason(format!("{:?}", e)))?;
+
+  Ok(vec_to_buffer(result))
+}
+
+#[napi]
+pub fn get_pubkey_from_extkey(extkey: Buffer, network: String) -> Result<Buffer> {
+  let extkey_bytes = buffer_to_vec(&extkey);
+  let result = ddk_ffi::get_pubkey_from_extkey(extkey_bytes, network)
+    .map_err(|e| Error::from_reason(format!("{:?}", e)))?;
+
+  Ok(vec_to_buffer(result))
+}
+
+#[napi]
 pub fn create_xpriv_from_parent_path(
   xpriv: Buffer,
   base_derivation_path: String,
