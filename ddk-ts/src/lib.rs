@@ -513,11 +513,10 @@ pub fn create_extkey_from_seed(seed: Buffer, network: String) -> Result<Buffer> 
 #[napi]
 pub fn create_extkey_from_parent_path(
   extkey: Buffer,
-  network: String,
   path: String,
 ) -> Result<Buffer> {
   let extkey_bytes = buffer_to_vec(&extkey);
-  let result = ddk_ffi::create_extkey_from_parent_path(extkey_bytes, network, path)
+  let result = ddk_ffi::create_extkey_from_parent_path(extkey_bytes, path)
     .map_err(|e| Error::from_reason(format!("{:?}", e)))?;
 
   Ok(vec_to_buffer(result))

@@ -10,7 +10,7 @@ namespace ddk_ffi {
 
     // === EXTENDED KEY OPERATIONS ===
     [Throws=DLCError]
-    sequence<u8> create_extkey_from_parent_path(sequence<u8> extkey, string network, string path);
+    sequence<u8> create_extkey_from_parent_path(sequence<u8> extkey, string path);
 
     [Throws=DLCError]
     sequence<u8> get_pubkey_from_extkey(sequence<u8> extkey, string network);
