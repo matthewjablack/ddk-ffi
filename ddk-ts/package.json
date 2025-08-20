@@ -78,7 +78,7 @@
   "workspaces": [
     "example"
   ],
-  "packageManager": "yarn@4.9.2",
+  "packageManager": "pnpm@10.14.0",
   "optionalDependencies": {
     "@bennyblader/ddk-ts-darwin-arm64": "0.3.22",
     "@bennyblader/ddk-ts-linux-x64-gnu": "0.3.22"
