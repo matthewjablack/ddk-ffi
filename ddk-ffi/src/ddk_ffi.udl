@@ -1,17 +1,31 @@
 namespace ddk_ffi {
     string version();
+
+    // === SEED OPERATIONS ===
     [Throws=DLCError]
     sequence<u8> convert_mnemonic_to_seed(string mnemonic, string? passphrase);
+
+    [Throws=DLCError]
+    sequence<u8> create_extkey_from_seed(sequence<u8> seed, string network);
+
+    // === EXTENDED KEY OPERATIONS ===
+    [Throws=DLCError]
+    sequence<u8> create_extkey_from_parent_path(sequence<u8> extkey, string network, string path);
+
+    [Throws=DLCError]
+    sequence<u8> get_pubkey_from_extkey(sequence<u8> extkey, string network);
+
+    [Throws=DLCError]
+    sequence<u8> get_xpub_from_xpriv(sequence<u8> xpriv, string network);
+
+    // === DEPRECATED ===
     [Throws=DLCError]
     sequence<u8> create_xpriv_from_parent_path(
-        sequence<u8> xpriv,
+        sequence<u8> seed_or_xpriv,
         string base_derivation_path,
         string network,
         string path
     );
-    [Throws=DLCError]
-    sequence<u8> get_xpub_from_xpriv(sequence<u8> xpriv, string network);
-
 
     // DLC Transaction Creation Functions
     [Throws=DLCError]

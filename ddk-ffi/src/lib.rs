@@ -1060,42 +1060,111 @@ pub fn convert_mnemonic_to_seed(
     Ok(seed.to_vec())
 }
 
-pub fn create_xpriv_from_parent_path(
-    xpriv: Vec<u8>,
-    base_derivation_path: String,
+/// Create master extended private key from 64-byte seed
+/// Returns 78-byte encoded xpriv
+pub fn create_extkey_from_seed(seed: Vec<u8>, network: String) -> Result<Vec<u8>, DLCError> {
+    if seed.len() != 64 {
+        return Err(DLCError::KeyError(ExtendedKey::InvalidXpriv));
+    }
+    let network = Network::from_str(&network).map_err(|_| DLCError::InvalidNetwork)?;
+    let xpriv = Xpriv::new_master(network, &seed)
+        .map_err(|_| DLCError::KeyError(ExtendedKey::InvalidXpriv))?;
+    Ok(xpriv.encode().to_vec())
+}
+
+/// Derive child extended private key from parent extended key
+/// Input: 78-byte encoded xpriv, Output: 78-byte encoded xpriv
+pub fn create_extkey_from_parent_path(
+    extkey: Vec<u8>,
     network: String,
     path: String,
 ) -> Result<Vec<u8>, DLCError> {
-    if xpriv.len() != 64 {
+    if extkey.len() != 78 {
         return Err(DLCError::KeyError(ExtendedKey::InvalidXpriv));
     }
-    let secp = get_secp_context();
-    let network = Network::from_str(&network).map_err(|_| DLCError::InvalidNetwork)?;
-    let xpriv = Xpriv::new_master(network, &xpriv)
-        .map_err(|_| DLCError::KeyError(ExtendedKey::InvalidXpriv))?;
-    // Base path: 84'/0'/0'
-    let base_path = DerivationPath::from_str(&base_derivation_path)
-        .map_err(|_| DLCError::KeyError(ExtendedKey::InvalidDerivationPath))?;
 
-    // App path: {0 || 1}/{child_number}
-    let app_path = path
+    let secp = get_secp_context();
+    let xpriv = Xpriv::decode(&extkey)
+        .map_err(|_| DLCError::KeyError(ExtendedKey::InvalidXpriv))?;
+
+    let derivation_path = path
         .into_derivation_path()
         .map_err(|_| DLCError::KeyError(ExtendedKey::InvalidDerivationPath))?;
 
-    let full_path = base_path.extend(app_path);
-
     let derived_xpriv = xpriv
-        .derive_priv(secp, &full_path)
+        .derive_priv(secp, &derivation_path)
         .map_err(|_| DLCError::KeyError(ExtendedKey::InvalidXpriv))?;
 
     Ok(derived_xpriv.encode().to_vec())
 }
 
-pub fn get_xpub_from_xpriv(xpriv: Vec<u8>, network: String) -> Result<Vec<u8>, DLCError> {
+/// Extract public key from extended key (private or public)
+/// Input: 78-byte encoded xpriv/xpub, Output: 33-byte compressed public key
+pub fn get_pubkey_from_extkey(extkey: Vec<u8>, network: String) -> Result<Vec<u8>, DLCError> {
+    if extkey.len() != 78 {
+        return Err(DLCError::KeyError(ExtendedKey::InvalidXpriv));
+    }
+
     let secp = get_secp_context();
-    let network = Network::from_str(&network).map_err(|_| DLCError::InvalidNetwork)?;
-    let xpriv = Xpriv::new_master(network, &xpriv)
+    let _network = Network::from_str(&network).map_err(|_| DLCError::InvalidNetwork)?;
+
+    // Try as xpriv first
+    if let Ok(xpriv) = Xpriv::decode(&extkey) {
+        let xpub = Xpub::from_priv(secp, &xpriv);
+        return Ok(xpub.public_key.serialize().to_vec());
+    }
+
+    // Try as xpub
+    if let Ok(xpub) = Xpub::decode(&extkey) {
+        return Ok(xpub.public_key.serialize().to_vec());
+    }
+
+    Err(DLCError::KeyError(ExtendedKey::InvalidXpriv))
+}
+
+/// DEPRECATED: Use create_extkey_from_seed + create_extkey_from_parent_path instead
+/// This function handles both seeds (64 bytes) and xprivs (78 bytes) which is confusing
+#[deprecated(since = "0.4.0", note = "Use create_extkey_from_seed + create_extkey_from_parent_path")]
+pub fn create_xpriv_from_parent_path(
+    seed_or_xpriv: Vec<u8>,
+    base_derivation_path: String,
+    network: String,
+    path: String,
+) -> Result<Vec<u8>, DLCError> {
+    let master_xpriv = if seed_or_xpriv.len() == 64 {
+        // This is a seed, create master xpriv
+        create_extkey_from_seed(seed_or_xpriv, network.clone())?
+    } else if seed_or_xpriv.len() == 78 {
+        // This is already an xpriv
+        seed_or_xpriv
+    } else {
+        return Err(DLCError::KeyError(ExtendedKey::InvalidXpriv));
+    };
+
+    // Derive base path from master
+    let base_xpriv = create_extkey_from_parent_path(
+        master_xpriv,
+        network.clone(),
+        base_derivation_path.replace("m/", ""),
+    )?;
+
+    // Derive final path from base
+    create_extkey_from_parent_path(base_xpriv, network, path)
+}
+
+/// Convert extended private key to extended public key
+/// Input: 78-byte encoded xpriv, Output: 78-byte encoded xpub
+pub fn get_xpub_from_xpriv(xpriv: Vec<u8>, network: String) -> Result<Vec<u8>, DLCError> {
+    if xpriv.len() != 78 {
+        return Err(DLCError::KeyError(ExtendedKey::InvalidXpriv));
+    }
+
+    let secp = get_secp_context();
+    let _network = Network::from_str(&network).map_err(|_| DLCError::InvalidNetwork)?;
+
+    let xpriv = Xpriv::decode(&xpriv)
         .map_err(|_| DLCError::KeyError(ExtendedKey::InvalidXpriv))?;
+
     let xpub = Xpub::from_priv(secp, &xpriv);
     Ok(xpub.encode().to_vec())
 }
