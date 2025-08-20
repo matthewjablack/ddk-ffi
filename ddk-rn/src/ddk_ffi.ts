@@ -287,6 +287,56 @@ export function createDlcTransactions(
     )
   );
 }
+export function createExtkeyFromParentPath(
+  extkey: Array</*u8*/ number>,
+  path: string
+): Array</*u8*/ number> /*throws*/ {
+  return FfiConverterArrayUInt8.lift(
+    uniffiCaller.rustCallWithError(
+      /*liftError:*/ FfiConverterTypeDLCError.lift.bind(
+        FfiConverterTypeDLCError
+      ),
+      /*caller:*/ (callStatus) => {
+        return (() => {
+          console.debug(
+            `-- uniffi_ddk_ffi_fn_func_create_extkey_from_parent_path`
+          );
+          return nativeModule()
+            .ubrn_uniffi_ddk_ffi_fn_func_create_extkey_from_parent_path;
+        })()(
+          FfiConverterArrayUInt8.lower(extkey),
+          FfiConverterString.lower(path),
+          callStatus
+        );
+      },
+      /*liftString:*/ FfiConverterString.lift
+    )
+  );
+}
+export function createExtkeyFromSeed(
+  seed: Array</*u8*/ number>,
+  network: string
+): Array</*u8*/ number> /*throws*/ {
+  return FfiConverterArrayUInt8.lift(
+    uniffiCaller.rustCallWithError(
+      /*liftError:*/ FfiConverterTypeDLCError.lift.bind(
+        FfiConverterTypeDLCError
+      ),
+      /*caller:*/ (callStatus) => {
+        return (() => {
+          console.debug(`-- uniffi_ddk_ffi_fn_func_create_extkey_from_seed`);
+          return nativeModule()
+            .ubrn_uniffi_ddk_ffi_fn_func_create_extkey_from_seed;
+        })()(
+          FfiConverterArrayUInt8.lower(seed),
+          FfiConverterString.lower(network),
+          callStatus
+        );
+      },
+      /*liftString:*/ FfiConverterString.lift
+    )
+  );
+}
 export function createFundTxLockingScript(
   localFundPubkey: Array</*u8*/ number>,
   remoteFundPubkey: Array</*u8*/ number>
@@ -386,7 +436,7 @@ export function createSplicedDlcTransactions(
   );
 }
 export function createXprivFromParentPath(
-  xpriv: Array</*u8*/ number>,
+  seedOrXpriv: Array</*u8*/ number>,
   baseDerivationPath: string,
   network: string,
   path: string
@@ -404,7 +454,7 @@ export function createXprivFromParentPath(
           return nativeModule()
             .ubrn_uniffi_ddk_ffi_fn_func_create_xpriv_from_parent_path;
         })()(
-          FfiConverterArrayUInt8.lower(xpriv),
+          FfiConverterArrayUInt8.lower(seedOrXpriv),
           FfiConverterString.lower(baseDerivationPath),
           FfiConverterString.lower(network),
           FfiConverterString.lower(path),
@@ -432,6 +482,30 @@ export function getChangeOutputAndFees(
         })()(
           FfiConverterTypePartyParams.lower(params),
           FfiConverterUInt64.lower(feeRate),
+          callStatus
+        );
+      },
+      /*liftString:*/ FfiConverterString.lift
+    )
+  );
+}
+export function getPubkeyFromExtkey(
+  extkey: Array</*u8*/ number>,
+  network: string
+): Array</*u8*/ number> /*throws*/ {
+  return FfiConverterArrayUInt8.lift(
+    uniffiCaller.rustCallWithError(
+      /*liftError:*/ FfiConverterTypeDLCError.lift.bind(
+        FfiConverterTypeDLCError
+      ),
+      /*caller:*/ (callStatus) => {
+        return (() => {
+          console.debug(`-- uniffi_ddk_ffi_fn_func_get_pubkey_from_extkey`);
+          return nativeModule()
+            .ubrn_uniffi_ddk_ffi_fn_func_get_pubkey_from_extkey;
+        })()(
+          FfiConverterArrayUInt8.lower(extkey),
+          FfiConverterString.lower(network),
           callStatus
         );
       },
@@ -2083,6 +2157,22 @@ function uniffiEnsureInitialized() {
     );
   }
   if (
+    nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_create_extkey_from_parent_path() !==
+    26671
+  ) {
+    throw new UniffiInternalError.ApiChecksumMismatch(
+      'uniffi_ddk_ffi_checksum_func_create_extkey_from_parent_path'
+    );
+  }
+  if (
+    nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_create_extkey_from_seed() !==
+    12526
+  ) {
+    throw new UniffiInternalError.ApiChecksumMismatch(
+      'uniffi_ddk_ffi_checksum_func_create_extkey_from_seed'
+    );
+  }
+  if (
     nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_create_fund_tx_locking_script() !==
     2761
   ) {
@@ -2108,7 +2198,7 @@ function uniffiEnsureInitialized() {
   }
   if (
     nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_create_xpriv_from_parent_path() !==
-    50010
+    34808
   ) {
     throw new UniffiInternalError.ApiChecksumMismatch(
       'uniffi_ddk_ffi_checksum_func_create_xpriv_from_parent_path'
@@ -2120,6 +2210,14 @@ function uniffiEnsureInitialized() {
   ) {
     throw new UniffiInternalError.ApiChecksumMismatch(
       'uniffi_ddk_ffi_checksum_func_get_change_output_and_fees'
+    );
+  }
+  if (
+    nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_get_pubkey_from_extkey() !==
+    64637
+  ) {
+    throw new UniffiInternalError.ApiChecksumMismatch(
+      'uniffi_ddk_ffi_checksum_func_get_pubkey_from_extkey'
     );
   }
   if (

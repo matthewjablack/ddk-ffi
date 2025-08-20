@@ -195,6 +195,16 @@ extern "C" {
         uint64_t fund_output_serial_id, 
         RustCallStatus *uniffi_out_err
     );
+    RustBuffer uniffi_ddk_ffi_fn_func_create_extkey_from_parent_path(
+        RustBuffer extkey, 
+        RustBuffer path, 
+        RustCallStatus *uniffi_out_err
+    );
+    RustBuffer uniffi_ddk_ffi_fn_func_create_extkey_from_seed(
+        RustBuffer seed, 
+        RustBuffer network, 
+        RustCallStatus *uniffi_out_err
+    );
     RustBuffer uniffi_ddk_ffi_fn_func_create_fund_tx_locking_script(
         RustBuffer local_fund_pubkey, 
         RustBuffer remote_fund_pubkey, 
@@ -222,7 +232,7 @@ extern "C" {
         RustCallStatus *uniffi_out_err
     );
     RustBuffer uniffi_ddk_ffi_fn_func_create_xpriv_from_parent_path(
-        RustBuffer xpriv, 
+        RustBuffer seed_or_xpriv, 
         RustBuffer base_derivation_path, 
         RustBuffer network, 
         RustBuffer path, 
@@ -231,6 +241,11 @@ extern "C" {
     RustBuffer uniffi_ddk_ffi_fn_func_get_change_output_and_fees(
         RustBuffer params, 
         uint64_t fee_rate, 
+        RustCallStatus *uniffi_out_err
+    );
+    RustBuffer uniffi_ddk_ffi_fn_func_get_pubkey_from_extkey(
+        RustBuffer extkey, 
+        RustBuffer network, 
         RustCallStatus *uniffi_out_err
     );
     RustBuffer uniffi_ddk_ffi_fn_func_get_raw_funding_transaction_input_signature(
@@ -536,6 +551,10 @@ extern "C" {
     );
     uint16_t uniffi_ddk_ffi_checksum_func_create_dlc_transactions(
     );
+    uint16_t uniffi_ddk_ffi_checksum_func_create_extkey_from_parent_path(
+    );
+    uint16_t uniffi_ddk_ffi_checksum_func_create_extkey_from_seed(
+    );
     uint16_t uniffi_ddk_ffi_checksum_func_create_fund_tx_locking_script(
     );
     uint16_t uniffi_ddk_ffi_checksum_func_create_refund_transaction(
@@ -545,6 +564,8 @@ extern "C" {
     uint16_t uniffi_ddk_ffi_checksum_func_create_xpriv_from_parent_path(
     );
     uint16_t uniffi_ddk_ffi_checksum_func_get_change_output_and_fees(
+    );
+    uint16_t uniffi_ddk_ffi_checksum_func_get_pubkey_from_extkey(
     );
     uint16_t uniffi_ddk_ffi_checksum_func_get_raw_funding_transaction_input_signature(
     );
@@ -2168,6 +2189,22 @@ NativeDdkFfi::NativeDdkFfi(
             return this->cpp_uniffi_ddk_ffi_fn_func_create_dlc_transactions(rt, thisVal, args, count);
         }
     );
+    props["ubrn_uniffi_ddk_ffi_fn_func_create_extkey_from_parent_path"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_ddk_ffi_fn_func_create_extkey_from_parent_path"),
+        2,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_ddk_ffi_fn_func_create_extkey_from_parent_path(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_ddk_ffi_fn_func_create_extkey_from_seed"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_ddk_ffi_fn_func_create_extkey_from_seed"),
+        2,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_ddk_ffi_fn_func_create_extkey_from_seed(rt, thisVal, args, count);
+        }
+    );
     props["ubrn_uniffi_ddk_ffi_fn_func_create_fund_tx_locking_script"] = jsi::Function::createFromHostFunction(
         rt,
         jsi::PropNameID::forAscii(rt, "ubrn_uniffi_ddk_ffi_fn_func_create_fund_tx_locking_script"),
@@ -2206,6 +2243,14 @@ NativeDdkFfi::NativeDdkFfi(
         2,
         [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
             return this->cpp_uniffi_ddk_ffi_fn_func_get_change_output_and_fees(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_ddk_ffi_fn_func_get_pubkey_from_extkey"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_ddk_ffi_fn_func_get_pubkey_from_extkey"),
+        2,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_ddk_ffi_fn_func_get_pubkey_from_extkey(rt, thisVal, args, count);
         }
     );
     props["ubrn_uniffi_ddk_ffi_fn_func_get_raw_funding_transaction_input_signature"] = jsi::Function::createFromHostFunction(
@@ -2352,6 +2397,22 @@ NativeDdkFfi::NativeDdkFfi(
             return this->cpp_uniffi_ddk_ffi_checksum_func_create_dlc_transactions(rt, thisVal, args, count);
         }
     );
+    props["ubrn_uniffi_ddk_ffi_checksum_func_create_extkey_from_parent_path"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_ddk_ffi_checksum_func_create_extkey_from_parent_path"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_ddk_ffi_checksum_func_create_extkey_from_parent_path(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_ddk_ffi_checksum_func_create_extkey_from_seed"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_ddk_ffi_checksum_func_create_extkey_from_seed"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_ddk_ffi_checksum_func_create_extkey_from_seed(rt, thisVal, args, count);
+        }
+    );
     props["ubrn_uniffi_ddk_ffi_checksum_func_create_fund_tx_locking_script"] = jsi::Function::createFromHostFunction(
         rt,
         jsi::PropNameID::forAscii(rt, "ubrn_uniffi_ddk_ffi_checksum_func_create_fund_tx_locking_script"),
@@ -2390,6 +2451,14 @@ NativeDdkFfi::NativeDdkFfi(
         0,
         [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
             return this->cpp_uniffi_ddk_ffi_checksum_func_get_change_output_and_fees(rt, thisVal, args, count);
+        }
+    );
+    props["ubrn_uniffi_ddk_ffi_checksum_func_get_pubkey_from_extkey"] = jsi::Function::createFromHostFunction(
+        rt,
+        jsi::PropNameID::forAscii(rt, "ubrn_uniffi_ddk_ffi_checksum_func_get_pubkey_from_extkey"),
+        0,
+        [this](jsi::Runtime &rt, const jsi::Value &thisVal, const jsi::Value *args, size_t count) -> jsi::Value {
+            return this->cpp_uniffi_ddk_ffi_checksum_func_get_pubkey_from_extkey(rt, thisVal, args, count);
         }
     );
     props["ubrn_uniffi_ddk_ffi_checksum_func_get_raw_funding_transaction_input_signature"] = jsi::Function::createFromHostFunction(
@@ -2613,6 +2682,26 @@ jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_fn_func_create_dlc_transactions(jsi:
         
         return uniffi::ddk_ffi::Bridging<RustBuffer>::toJs(rt, callInvoker, value);
 }
+jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_fn_func_create_extkey_from_parent_path(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::ddk_ffi::Bridging<RustCallStatus>::rustSuccess(rt);
+        auto value = uniffi_ddk_ffi_fn_func_create_extkey_from_parent_path(uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[0]), uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1]), 
+            &status
+        );
+        uniffi::ddk_ffi::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return uniffi::ddk_ffi::Bridging<RustBuffer>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_fn_func_create_extkey_from_seed(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::ddk_ffi::Bridging<RustCallStatus>::rustSuccess(rt);
+        auto value = uniffi_ddk_ffi_fn_func_create_extkey_from_seed(uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[0]), uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1]), 
+            &status
+        );
+        uniffi::ddk_ffi::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return uniffi::ddk_ffi::Bridging<RustBuffer>::toJs(rt, callInvoker, value);
+}
 jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_fn_func_create_fund_tx_locking_script(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
         RustCallStatus status = uniffi::ddk_ffi::Bridging<RustCallStatus>::rustSuccess(rt);
         auto value = uniffi_ddk_ffi_fn_func_create_fund_tx_locking_script(uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[0]), uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1]), 
@@ -2656,6 +2745,16 @@ jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_fn_func_create_xpriv_from_parent_pat
 jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_fn_func_get_change_output_and_fees(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
         RustCallStatus status = uniffi::ddk_ffi::Bridging<RustCallStatus>::rustSuccess(rt);
         auto value = uniffi_ddk_ffi_fn_func_get_change_output_and_fees(uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[0]), uniffi_jsi::Bridging<uint64_t>::fromJs(rt, callInvoker, args[1]), 
+            &status
+        );
+        uniffi::ddk_ffi::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
+
+        
+        return uniffi::ddk_ffi::Bridging<RustBuffer>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_fn_func_get_pubkey_from_extkey(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        RustCallStatus status = uniffi::ddk_ffi::Bridging<RustCallStatus>::rustSuccess(rt);
+        auto value = uniffi_ddk_ffi_fn_func_get_pubkey_from_extkey(uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[0]), uniffi::ddk_ffi::Bridging<RustBuffer>::fromJs(rt, callInvoker, args[1]), 
             &status
         );
         uniffi::ddk_ffi::Bridging<RustCallStatus>::copyIntoJs(rt, callInvoker, status, args[count - 1]);
@@ -2821,6 +2920,20 @@ jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_checksum_func_create_dlc_transaction
         
         return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
 }
+jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_checksum_func_create_extkey_from_parent_path(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_ddk_ffi_checksum_func_create_extkey_from_parent_path(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_checksum_func_create_extkey_from_seed(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_ddk_ffi_checksum_func_create_extkey_from_seed(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
 jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_checksum_func_create_fund_tx_locking_script(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
         auto value = uniffi_ddk_ffi_checksum_func_create_fund_tx_locking_script(
         );
@@ -2851,6 +2964,13 @@ jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_checksum_func_create_xpriv_from_pare
 }
 jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_checksum_func_get_change_output_and_fees(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
         auto value = uniffi_ddk_ffi_checksum_func_get_change_output_and_fees(
+        );
+
+        
+        return uniffi_jsi::Bridging<uint16_t>::toJs(rt, callInvoker, value);
+}
+jsi::Value NativeDdkFfi::cpp_uniffi_ddk_ffi_checksum_func_get_pubkey_from_extkey(jsi::Runtime& rt, const jsi::Value& thisVal, const jsi::Value* args, size_t count) {
+        auto value = uniffi_ddk_ffi_checksum_func_get_pubkey_from_extkey(
         );
 
         
