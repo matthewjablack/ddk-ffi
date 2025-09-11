@@ -11,14 +11,14 @@ use types::*;
 // Import ddk_ffi crate
 extern crate ddk_ffi;
 
-// fn log_to_console(env: Env, message: &str) -> Result<()> {
-//   let global = env.get_global()?;
-//   let console: Object = global.get_named_property("console")?;
-//   let log_fn: Function = console.get_named_property("log")?;
-//   let msg = env.create_string(message)?.into_unknown(&env)?;
-//   log_fn.call(msg)?;
-//   Ok(())
-// }
+fn log_to_console(env: Env, message: &str) -> Result<()> {
+  let global = env.get_global()?;
+  let console: Object = global.get_named_property("console")?;
+  let log_fn: Function = console.get_named_property("log")?;
+  let msg = env.create_string(message)?.into_unknown(&env)?;
+  log_fn.call(msg)?;
+  Ok(())
+}
 
 #[napi]
 pub fn version() -> String {
@@ -41,6 +41,7 @@ pub fn create_fund_tx_locking_script(
 
 #[napi]
 pub fn create_dlc_transactions(
+  env: Env,
   outcomes: Vec<Payout>,
   local_params: PartyParams,
   remote_params: PartyParams,
@@ -50,22 +51,22 @@ pub fn create_dlc_transactions(
   cet_lock_time: u32,
   fund_output_serial_id: BigInt,
 ) -> Result<DlcTransactions> {
-  // log_to_console(env, "create_dlc_transactions: parsing inputs")
-  //   .map_err(|e| Error::from_reason(format!("{:?}", e)))?;
+  log_to_console(env, "create_dlc_transactions: parsing inputs")
+    .map_err(|e| Error::from_reason(format!("{:?}", e)))?;
 
   let ffi_outcomes: Result<Vec<ddk_ffi::Payout>> =
     outcomes.into_iter().map(TryInto::try_into).collect();
 
   let ffi_local_params = local_params.try_into()?;
   let ffi_remote_params = remote_params.try_into()?;
-  // log_to_console(env, "create_dlc_transactions: inputs parsed correctly")
-  //   .map_err(|e| Error::from_reason(format!("{:?}", e)))?;
+  log_to_console(env, "create_dlc_transactions: inputs parsed correctly")
+    .map_err(|e| Error::from_reason(format!("{:?}", e)))?;
 
-  // log_to_console(
-  //   env,
-  //   "create_dlc_transactions: calling ddk_ffi::create_dlc_transactions with inputs",
-  // )
-  // .map_err(|e| Error::from_reason(format!("{:?}", e)))?;
+  log_to_console(
+    env,
+    "create_dlc_transactions: calling ddk_ffi::create_dlc_transactions with inputs",
+  )
+  .map_err(|e| Error::from_reason(format!("{:?}", e)))?;
 
   let result = ddk_ffi::create_dlc_transactions(
     ffi_outcomes?,
@@ -78,10 +79,10 @@ pub fn create_dlc_transactions(
     bigint_to_u64(&fund_output_serial_id)?,
   )
   .map_err(|e| {
-    // let _ = log_to_console(
-    //   env,
-    //   &format!("ddk_ffi::create_dlc_transactions: error: {:?}", e),
-    // );
+    let _ = log_to_console(
+      env,
+      &format!("ddk_ffi::create_dlc_transactions: error: {:?}", e),
+    );
     Error::from_reason(format!("{:?}", e))
   })?;
 
@@ -468,6 +469,44 @@ pub fn create_cet_adaptor_sigs_from_oracle_info(
 }
 
 #[napi]
+pub fn create_cet_adaptor_points_from_oracle_info(
+  oracle_info: Vec<OracleInfo>,
+  msgs: Vec<Vec<Vec<Buffer>>>,
+) -> Result<Vec<Buffer>> {
+  let ffi_oracle_info: Vec<ddk_ffi::OracleInfo> = oracle_info
+    .into_iter()
+    .map(|info| info.into())
+    .collect();
+
+  let ffi_msgs = msgs
+    .into_iter()
+    .map(|cet_msgs| {
+      // For each CET
+      cet_msgs
+        .into_iter()
+        .map(|outcome_msgs| {
+          // For each outcome
+          outcome_msgs.iter().map(buffer_to_vec).collect::<Vec<_>>()
+        })
+        .collect::<Vec<_>>()
+    })
+    .collect::<Vec<_>>();
+
+  let points = ddk_ffi::create_cet_adaptor_points_from_oracle_info(
+    ffi_oracle_info,
+    ffi_msgs,
+  )
+  .map_err(|e| Error::from_reason(format!("{:?}", e)))?;
+
+  let result = points
+    .into_iter()
+    .map(|point| Buffer::from(point))
+    .collect::<Vec<Buffer>>();
+
+  Ok(result)
+}
+
+#[napi]
 pub fn create_cet_adaptor_signature_from_oracle_info(
   cet: Transaction,
   oracle_info: OracleInfo,
@@ -495,33 +534,6 @@ pub fn create_cet_adaptor_signature_from_oracle_info(
 #[napi]
 pub fn convert_mnemonic_to_seed(mnemonic: String, passphrase: Option<String>) -> Result<Buffer> {
   let result = ddk_ffi::convert_mnemonic_to_seed(mnemonic, passphrase)
-    .map_err(|e| Error::from_reason(format!("{:?}", e)))?;
-
-  Ok(vec_to_buffer(result))
-}
-
-#[napi]
-pub fn create_extkey_from_seed(seed: Buffer, network: String) -> Result<Buffer> {
-  let seed_bytes = buffer_to_vec(&seed);
-  let result = ddk_ffi::create_extkey_from_seed(seed_bytes, network)
-    .map_err(|e| Error::from_reason(format!("{:?}", e)))?;
-
-  Ok(vec_to_buffer(result))
-}
-
-#[napi]
-pub fn create_extkey_from_parent_path(extkey: Buffer, path: String) -> Result<Buffer> {
-  let extkey_bytes = buffer_to_vec(&extkey);
-  let result = ddk_ffi::create_extkey_from_parent_path(extkey_bytes, path)
-    .map_err(|e| Error::from_reason(format!("{:?}", e)))?;
-
-  Ok(vec_to_buffer(result))
-}
-
-#[napi]
-pub fn get_pubkey_from_extkey(extkey: Buffer, network: String) -> Result<Buffer> {
-  let extkey_bytes = buffer_to_vec(&extkey);
-  let result = ddk_ffi::get_pubkey_from_extkey(extkey_bytes, network)
     .map_err(|e| Error::from_reason(format!("{:?}", e)))?;
 
   Ok(vec_to_buffer(result))

@@ -1,31 +1,17 @@
 namespace ddk_ffi {
     string version();
-
-    // === SEED OPERATIONS ===
     [Throws=DLCError]
     sequence<u8> convert_mnemonic_to_seed(string mnemonic, string? passphrase);
-
-    [Throws=DLCError]
-    sequence<u8> create_extkey_from_seed(sequence<u8> seed, string network);
-
-    // === EXTENDED KEY OPERATIONS ===
-    [Throws=DLCError]
-    sequence<u8> create_extkey_from_parent_path(sequence<u8> extkey, string path);
-
-    [Throws=DLCError]
-    sequence<u8> get_pubkey_from_extkey(sequence<u8> extkey, string network);
-
-    [Throws=DLCError]
-    sequence<u8> get_xpub_from_xpriv(sequence<u8> xpriv, string network);
-
-    // === DEPRECATED ===
     [Throws=DLCError]
     sequence<u8> create_xpriv_from_parent_path(
-        sequence<u8> seed_or_xpriv,
+        sequence<u8> xpriv,
         string base_derivation_path,
         string network,
         string path
     );
+    [Throws=DLCError]
+    sequence<u8> get_xpub_from_xpriv(sequence<u8> xpriv, string network);
+
 
     // DLC Transaction Creation Functions
     [Throws=DLCError]
@@ -147,6 +133,12 @@ namespace ddk_ffi {
         sequence<u8> funding_secret_key,
         sequence<u8> funding_script_pubkey,
         u64 fund_output_value,
+        sequence<sequence<sequence<sequence<u8>>>> msgs
+    );
+
+    [Throws=DLCError]
+    sequence<sequence<u8>> create_cet_adaptor_points_from_oracle_info(
+        sequence<OracleInfo> oracle_info,
         sequence<sequence<sequence<sequence<u8>>>> msgs
     );
 
