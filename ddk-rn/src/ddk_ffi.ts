@@ -148,6 +148,32 @@ export function createCet(
     )
   );
 }
+export function createCetAdaptorPointsFromOracleInfo(
+  oracleInfo: Array<OracleInfo>,
+  msgs: Array<Array<Array<Array</*u8*/ number>>>>
+): Array<Array</*u8*/ number>> /*throws*/ {
+  return FfiConverterArrayArrayUInt8.lift(
+    uniffiCaller.rustCallWithError(
+      /*liftError:*/ FfiConverterTypeDLCError.lift.bind(
+        FfiConverterTypeDLCError
+      ),
+      /*caller:*/ (callStatus) => {
+        return (() => {
+          console.debug(
+            `-- uniffi_ddk_ffi_fn_func_create_cet_adaptor_points_from_oracle_info`
+          );
+          return nativeModule()
+            .ubrn_uniffi_ddk_ffi_fn_func_create_cet_adaptor_points_from_oracle_info;
+        })()(
+          FfiConverterArrayTypeOracleInfo.lower(oracleInfo),
+          FfiConverterArrayArrayArrayArrayUInt8.lower(msgs),
+          callStatus
+        );
+      },
+      /*liftString:*/ FfiConverterString.lift
+    )
+  );
+}
 export function createCetAdaptorSignatureFromOracleInfo(
   cet: Transaction,
   oracleInfo: OracleInfo,
@@ -2123,6 +2149,14 @@ function uniffiEnsureInitialized() {
   if (nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_create_cet() !== 23081) {
     throw new UniffiInternalError.ApiChecksumMismatch(
       'uniffi_ddk_ffi_checksum_func_create_cet'
+    );
+  }
+  if (
+    nativeModule().ubrn_uniffi_ddk_ffi_checksum_func_create_cet_adaptor_points_from_oracle_info() !==
+    6552
+  ) {
+    throw new UniffiInternalError.ApiChecksumMismatch(
+      'uniffi_ddk_ffi_checksum_func_create_cet_adaptor_points_from_oracle_info'
     );
   }
   if (

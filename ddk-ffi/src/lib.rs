@@ -1050,6 +1050,45 @@ pub fn create_cet_adaptor_signature_from_oracle_info(
     })
 }
 
+pub fn create_cet_adaptor_points_from_oracle_info(
+    oracle_info: Vec<OracleInfo>,
+    msgs: Vec<Vec<Vec<Vec<u8>>>>,
+) -> Result<Vec<Vec<u8>>, DLCError> {
+    let oracle_infos = oracle_info
+        .iter()
+        .map(|info| {
+            let public_key = XOnlyPublicKey::from_slice(&info.public_key)
+                .map_err(|_| DLCError::InvalidPublicKey)?;
+            let nonces = info
+                .nonces
+                .iter()
+                .map(|nonce| XOnlyPublicKey::from_slice(nonce))
+                .collect::<Result<Vec<_>, _>>()
+                .map_err(|_| DLCError::InvalidArgument("Invalid nonce pubkey".to_string()))?;
+            Ok(DlcOracleInfo { public_key, nonces })
+        })
+        .collect::<Result<Vec<_>, DLCError>>()
+        .map_err(|_| DLCError::InvalidArgument("Invalid oracle info".to_string()))?;
+
+    let msgs: Vec<Vec<Message>> = msgs
+        .into_iter()
+        .flatten() // Flatten from Vec<Vec<Vec<Vec<u8>>>> to Vec<Vec<Vec<u8>>>
+        .map(|msg| {
+            msg.iter()
+                .map(|m| Message::from_digest_slice(m).map_err(|_| DLCError::InvalidArgument("Invalid message".to_string())))
+                .collect::<Result<Vec<_>, _>>()
+        })
+        .collect::<Result<Vec<_>, _>>()?;
+
+    let secp = get_secp_context();
+    let adaptor_points = ddk_dlc::get_adaptor_point_from_oracle_info(secp, &oracle_infos, &msgs)
+        .map_err(|e| DLCError::Secp256k1Error(e.to_string()))?;
+
+    // Convert the adaptor point to bytes
+    let adaptor_point_bytes = adaptor_points.serialize().to_vec();
+    Ok(vec![adaptor_point_bytes])
+}
+
 pub fn convert_mnemonic_to_seed(
     mnemonic: String,
     passphrase: Option<String>,
