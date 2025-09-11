@@ -1075,7 +1075,10 @@ pub fn create_cet_adaptor_points_from_oracle_info(
         .flatten() // Flatten from Vec<Vec<Vec<Vec<u8>>>> to Vec<Vec<Vec<u8>>>
         .map(|msg| {
             msg.iter()
-                .map(|m| Message::from_digest_slice(m).map_err(|_| DLCError::InvalidArgument("Invalid message".to_string())))
+                .map(|m| {
+                    Message::from_digest_slice(m)
+                        .map_err(|_| DLCError::InvalidArgument("Invalid message".to_string()))
+                })
                 .collect::<Result<Vec<_>, _>>()
         })
         .collect::<Result<Vec<_>, _>>()?;
