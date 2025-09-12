@@ -493,6 +493,44 @@ pub fn create_cet_adaptor_signature_from_oracle_info(
 }
 
 #[napi]
+pub fn create_cet_adaptor_points_from_oracle_info(
+  oracle_info: Vec<OracleInfo>,
+  msgs: Vec<Vec<Vec<Buffer>>>,
+) -> Result<Vec<Buffer>> {
+  let ffi_oracle_info: Vec<ddk_ffi::OracleInfo> = oracle_info
+    .into_iter()
+    .map(|info| info.into())
+    .collect();
+
+  let ffi_msgs = msgs
+    .into_iter()
+    .map(|cet_msgs| {
+      // For each CET
+      cet_msgs
+        .into_iter()
+        .map(|outcome_msgs| {
+          // For each outcome
+          outcome_msgs.iter().map(buffer_to_vec).collect::<Vec<_>>()
+        })
+        .collect::<Vec<_>>()
+    })
+    .collect::<Vec<_>>();
+
+  let points = ddk_ffi::create_cet_adaptor_points_from_oracle_info(
+    ffi_oracle_info,
+    ffi_msgs,
+  )
+  .map_err(|e| Error::from_reason(format!("{:?}", e)))?;
+
+  let result = points
+    .into_iter()
+    .map(|point| Buffer::from(point))
+    .collect::<Vec<Buffer>>();
+
+  Ok(result)
+}
+
+#[napi]
 pub fn convert_mnemonic_to_seed(mnemonic: String, passphrase: Option<String>) -> Result<Buffer> {
   let result = ddk_ffi::convert_mnemonic_to_seed(mnemonic, passphrase)
     .map_err(|e| Error::from_reason(format!("{:?}", e)))?;

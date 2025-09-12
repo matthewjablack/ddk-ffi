@@ -199,6 +199,12 @@ namespace ddk_ffi {
         u64 total_collateral,
         sequence<sequence<u8>> msgs
     );
+
+    [Throws=DLCError]
+    sequence<sequence<u8>> create_cet_adaptor_points_from_oracle_info(
+        sequence<OracleInfo> oracle_info,
+        sequence<sequence<sequence<sequence<u8>>>> msgs
+    );
 };
 
 // Transaction representation
