@@ -158,6 +158,27 @@ describe('creates and verifies adaptor signatures', () => {
 
     expect(adaptorSignatures.length).toBe(cets.length)
   })
+
+  test('creates adaptor points from oracle info', () => {
+    const { oracleInfo, messagesList } = getCets()
+
+    const result = ddk.createCetAdaptorPointsFromOracleInfo(oracleInfo, messagesList)
+
+    // Should return one adaptor point per CET
+    expect(Array.isArray(result)).toBe(true)
+    expect(result.length).toBe(messagesList.length) // 3 CETs = 3 adaptor points
+
+    // Each adaptor point should be a valid 33-byte compressed public key
+    result.forEach((adaptorPoint, index) => {
+      expect(Buffer.isBuffer(adaptorPoint)).toBe(true)
+      expect(adaptorPoint.length).toBe(33) // Compressed public key length
+      expect(adaptorPoint[0]).toBe(0x02) // Compressed public key prefix
+    })
+
+    // All adaptor points should be different
+    const uniquePoints = new Set(result.map((point) => point.toString('hex')))
+    expect(uniquePoints.size).toBe(result.length)
+  })
 })
 
 describe('DDK TypeScript Bindings', () => {
@@ -178,6 +199,7 @@ describe('DDK TypeScript Bindings', () => {
       'getRawFundingTransactionInputSignature',
       'signFundTransactionInput',
       'createCetAdaptorSignatureFromOracleInfo',
+      'createCetAdaptorPointsFromOracleInfo',
     ]
 
     requiredFunctions.forEach((funcName) => {
