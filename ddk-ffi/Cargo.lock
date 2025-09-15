@@ -295,7 +295,7 @@ dependencies = [
 
 [[package]]
 name = "ddk_ffi"
-version = "0.3.29"
+version = "0.3.30"
 dependencies = [
  "bip39",
  "bitcoin",
