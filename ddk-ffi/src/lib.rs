@@ -1070,26 +1070,36 @@ pub fn create_cet_adaptor_points_from_oracle_info(
         .collect::<Result<Vec<_>, DLCError>>()
         .map_err(|_| DLCError::InvalidArgument("Invalid oracle info".to_string()))?;
 
-    let msgs: Vec<Vec<Message>> = msgs
-        .into_iter()
-        .flatten() // Flatten from Vec<Vec<Vec<Vec<u8>>>> to Vec<Vec<Vec<u8>>>
-        .map(|msg| {
-            msg.iter()
-                .map(|m| {
-                    Message::from_digest_slice(m)
-                        .map_err(|_| DLCError::InvalidArgument("Invalid message".to_string()))
-                })
-                .collect::<Result<Vec<_>, _>>()
-        })
-        .collect::<Result<Vec<_>, _>>()?;
-
     let secp = get_secp_context();
-    let adaptor_points = ddk_dlc::get_adaptor_point_from_oracle_info(secp, &oracle_infos, &msgs)
-        .map_err(|e| DLCError::Secp256k1Error(e.to_string()))?;
+    let mut adaptor_points = Vec::new();
 
-    // Convert the adaptor point to bytes
-    let adaptor_point_bytes = adaptor_points.serialize().to_vec();
-    Ok(vec![adaptor_point_bytes])
+    // Process each CET's messages separately
+    for cet_msgs in msgs {
+        // Flatten from Vec<Vec<Vec<u8>>> to Vec<Vec<u8>>
+        let cet_msgs: Vec<Vec<Message>> = cet_msgs
+            .into_iter()
+            .map(|outcome_msgs| {
+                outcome_msgs
+                    .iter()
+                    .map(|m| {
+                        Message::from_digest_slice(m)
+                            .map_err(|_| DLCError::InvalidArgument("Invalid message".to_string()))
+                    })
+                    .collect::<Result<Vec<_>, _>>()
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+
+        // Get adaptor point for this CET
+        let adaptor_point =
+            ddk_dlc::get_adaptor_point_from_oracle_info(secp, &oracle_infos, &cet_msgs)
+                .map_err(|e| DLCError::Secp256k1Error(e.to_string()))?;
+
+        // Convert the adaptor point to bytes
+        let adaptor_point_bytes = adaptor_point.serialize().to_vec();
+        adaptor_points.push(adaptor_point_bytes);
+    }
+
+    Ok(adaptor_points)
 }
 
 pub fn convert_mnemonic_to_seed(
