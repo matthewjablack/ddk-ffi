@@ -83,9 +83,7 @@ impl From<ddk_dlc::Error> for DLCError {
     fn from(err: ddk_dlc::Error) -> Self {
         match err {
             ddk_dlc::Error::Secp256k1(_) => DLCError::Secp256k1Error(err.to_string()),
-            ddk_dlc::Error::InvalidArgument => {
-                DLCError::InvalidArgument("Error from rust-dlc".to_string())
-            }
+            ddk_dlc::Error::InvalidArgument(msg) => DLCError::InvalidArgument(msg),
             ddk_dlc::Error::Miniscript(_) => DLCError::MiniscriptError,
             ddk_dlc::Error::P2wpkh(_) => DLCError::InvalidTransaction,
             ddk_dlc::Error::InputsIndex(_) => {
