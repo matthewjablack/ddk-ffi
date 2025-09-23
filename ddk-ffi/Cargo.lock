@@ -282,9 +282,9 @@ checksum = "b94f61472cee1439c0b966b47e3aca9ae07e45d070759512cd390ea2bebc6675"
 
 [[package]]
 name = "ddk-dlc"
-version = "1.0.0"
+version = "1.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0079e364d8e7be9dbf6b9fbe0d867e9cf2c92c395a19ffbea50d379bf3fc3e48"
+checksum = "3a1ed0a9290697d2f9d2277f5c5ef5fbc1f3df200daf72e27e2da35f6121b114"
 dependencies = [
  "bitcoin",
  "miniscript",
