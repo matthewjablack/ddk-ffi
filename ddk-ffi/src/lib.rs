@@ -9,17 +9,17 @@ use bitcoin::{
     TxOut as BtcTxOut, Txid, Witness,
 };
 use bitcoin::{Script, WPubkeyHash};
+use ddk_dlc::secp_utils;
 use ddk_dlc::{
     self, dlc_input::DlcInputInfo as RustDlcInputInfo, DlcTransactions as RustDlcTransactions,
     OracleInfo as DlcOracleInfo, PartyParams as DlcPartyParams, Payout as DlcPayout,
     TxInputInfo as DlcTxInputInfo,
 };
 use secp256k1_zkp::{
-    ecdsa::Signature as EcdsaSignature, Message, PublicKey, Secp256k1, SecretKey, XOnlyPublicKey,
-    Scalar,
+    ecdsa::Signature as EcdsaSignature, Message, PublicKey, Scalar, Secp256k1, SecretKey,
+    XOnlyPublicKey,
 };
 use secp256k1_zkp::{schnorr::Signature as SchnorrSignature, All, EcdsaAdaptorSignature};
-use ddk_dlc::secp_utils;
 use std::str::FromStr;
 use std::sync::OnceLock;
 
@@ -841,7 +841,9 @@ fn signatures_to_secret(signatures: &[Vec<SchnorrSignature>]) -> Result<SecretKe
         .collect::<Result<Vec<&[u8]>, DLCError>>()?;
 
     if s_values.is_empty() {
-        return Err(DLCError::InvalidArgument("No signatures provided".to_string()));
+        return Err(DLCError::InvalidArgument(
+            "No signatures provided".to_string(),
+        ));
     }
 
     let secret = SecretKey::from_slice(s_values[0])
@@ -1144,7 +1146,8 @@ pub fn extract_ecdsa_signature_from_oracle_signatures(
     let adaptor_sig = vec_to_ecdsa_adaptor_signature(adaptor_signature)?;
 
     // Decrypt the adaptor signature to get the final ECDSA signature
-    let ecdsa_sig = adaptor_sig.decrypt(&adaptor_secret)
+    let ecdsa_sig = adaptor_sig
+        .decrypt(&adaptor_secret)
         .map_err(|e| DLCError::Secp256k1Error(e.to_string()))?;
 
     // Return the DER-encoded signature
@@ -2054,7 +2057,10 @@ mod tests {
         assert!(result.is_ok(), "Function should succeed");
 
         let ecdsa_sig_bytes = result.unwrap();
-        assert!(!ecdsa_sig_bytes.is_empty(), "Should return non-empty signature");
+        assert!(
+            !ecdsa_sig_bytes.is_empty(),
+            "Should return non-empty signature"
+        );
 
         // Verify the signature is valid DER format
         let ecdsa_sig = EcdsaSignature::from_der(&ecdsa_sig_bytes);
