@@ -205,6 +205,12 @@ namespace ddk_ffi {
         sequence<OracleInfo> oracle_info,
         sequence<sequence<sequence<sequence<u8>>>> msgs
     );
+
+    [Throws=DLCError]
+    sequence<u8> extract_ecdsa_signature_from_oracle_signatures(
+        sequence<sequence<u8>> oracle_signatures,
+        sequence<u8> adaptor_signature
+    );
 };
 
 // Transaction representation
