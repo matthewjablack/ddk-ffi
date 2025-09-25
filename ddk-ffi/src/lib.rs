@@ -9,13 +9,15 @@ use bitcoin::{
     TxOut as BtcTxOut, Txid, Witness,
 };
 use bitcoin::{Script, WPubkeyHash};
+use ddk_dlc::secp_utils;
 use ddk_dlc::{
     self, dlc_input::DlcInputInfo as RustDlcInputInfo, DlcTransactions as RustDlcTransactions,
     OracleInfo as DlcOracleInfo, PartyParams as DlcPartyParams, Payout as DlcPayout,
     TxInputInfo as DlcTxInputInfo,
 };
 use secp256k1_zkp::{
-    ecdsa::Signature as EcdsaSignature, Message, PublicKey, Secp256k1, SecretKey, XOnlyPublicKey,
+    ecdsa::Signature as EcdsaSignature, Message, PublicKey, Scalar, Secp256k1, SecretKey,
+    XOnlyPublicKey,
 };
 use secp256k1_zkp::{schnorr::Signature as SchnorrSignature, All, EcdsaAdaptorSignature};
 use std::str::FromStr;
@@ -828,6 +830,33 @@ fn vec_to_ecdsa_adaptor_signature(signature: Vec<u8>) -> Result<EcdsaAdaptorSign
     EcdsaAdaptorSignature::from_slice(&signature).map_err(|_| DLCError::InvalidSignature)
 }
 
+fn signatures_to_secret(signatures: &[Vec<SchnorrSignature>]) -> Result<SecretKey, DLCError> {
+    let s_values = signatures
+        .iter()
+        .flatten()
+        .map(|x| match secp_utils::schnorrsig_decompose(x) {
+            Ok(v) => Ok(v.1),
+            Err(err) => Err(DLCError::Secp256k1Error(err.to_string())),
+        })
+        .collect::<Result<Vec<&[u8]>, DLCError>>()?;
+
+    if s_values.is_empty() {
+        return Err(DLCError::InvalidArgument(
+            "No signatures provided".to_string(),
+        ));
+    }
+
+    let secret = SecretKey::from_slice(s_values[0])
+        .map_err(|_| DLCError::InvalidArgument("Invalid signature".to_string()))?;
+
+    let result = s_values.iter().skip(1).fold(secret, |accum, s| {
+        let sec = SecretKey::from_slice(s).unwrap();
+        accum.add_tweak(&Scalar::from(sec)).unwrap()
+    });
+
+    Ok(result)
+}
+
 pub fn create_cet_adaptor_sigs_from_oracle_info(
     cets: Vec<Transaction>,
     oracle_info: Vec<OracleInfo>,
@@ -1098,6 +1127,31 @@ pub fn create_cet_adaptor_points_from_oracle_info(
     }
 
     Ok(adaptor_points)
+}
+
+pub fn extract_ecdsa_signature_from_oracle_signatures(
+    oracle_signatures: Vec<Vec<u8>>,
+    adaptor_signature: Vec<u8>,
+) -> Result<Vec<u8>, DLCError> {
+    // Convert oracle signatures to Schnorr signatures
+    let oracle_sigs = oracle_signatures
+        .iter()
+        .map(|sig| vec_to_schnorr_signature(sig.as_slice()))
+        .collect::<Result<Vec<_>, _>>()?;
+
+    // Extract the secret key from oracle signatures
+    let adaptor_secret = signatures_to_secret(&[oracle_sigs])?;
+
+    // Convert adaptor signature to EcdsaAdaptorSignature
+    let adaptor_sig = vec_to_ecdsa_adaptor_signature(adaptor_signature)?;
+
+    // Decrypt the adaptor signature to get the final ECDSA signature
+    let ecdsa_sig = adaptor_sig
+        .decrypt(&adaptor_secret)
+        .map_err(|e| DLCError::Secp256k1Error(e.to_string()))?;
+
+    // Return the DER-encoded signature
+    Ok(ecdsa_sig.serialize_der().to_vec())
 }
 
 pub fn convert_mnemonic_to_seed(
@@ -1735,7 +1789,7 @@ mod tests {
         let mut rng = secp256k1_zkp::rand::thread_rng();
         let (offer_party_params, offer_fund_sk) =
             get_party_params(1_000_000_000, 100_000_000, None);
-        let (accept_party_params, accept_fund_sk) =
+        let (accept_party_params, _accept_fund_sk) =
             get_party_params(1_000_000_000, 100_000_000, None);
 
         let dlc_txs = create_dlc_transactions(
@@ -1837,7 +1891,7 @@ mod tests {
             cets[0].clone(),
             cet_sigs[0].signature.clone(),
             oracle_signatures[0].clone(),
-            accept_fund_sk.secret_bytes().to_vec(),
+            _accept_fund_sk.secret_bytes().to_vec(),
             offer_party_params.fund_pubkey.clone(),
             accept_party_params.fund_pubkey.clone(),
             fund_output_value,
@@ -1885,5 +1939,131 @@ mod tests {
             offer_party_params.fund_pubkey.clone(),
         )
         .expect("Invalid decrypted adaptor signature");
+    }
+
+    #[test]
+    fn test_extract_ecdsa_signature_from_oracle_signatures() {
+        // Setup test data (similar to the main test)
+        let secp = Secp256k1::new();
+        let mut rng = secp256k1_zkp::rand::thread_rng();
+        let (offer_party_params, offer_fund_sk) =
+            get_party_params(1_000_000_000, 100_000_000, None);
+        let (accept_party_params, _accept_fund_sk) =
+            get_party_params(1_000_000_000, 100_000_000, None);
+
+        let dlc_txs = create_dlc_transactions(
+            payouts_test(),
+            offer_party_params.clone(),
+            accept_party_params.clone(),
+            100,
+            4,
+            10,
+            10,
+            0, // Add missing fund_output_serial_id parameter
+        )
+        .unwrap();
+
+        let cets = dlc_txs.cets;
+        const NB_ORACLES: usize = 1; // 1 oracle
+        const NB_OUTCOMES: usize = 3; // 3 outcomes (enumeration)
+        const NB_DIGITS: usize = 1; // 1 nonce for enumeration contract
+
+        let mut oracle_infos: Vec<OracleInfo> = Vec::with_capacity(NB_ORACLES);
+        let mut oracle_sks: Vec<Keypair> = Vec::with_capacity(NB_ORACLES);
+        let mut oracle_sk_nonce: Vec<Vec<[u8; 32]>> = Vec::with_capacity(NB_ORACLES);
+        let mut oracle_sigs: Vec<Vec<SchnorrSignature>> = Vec::with_capacity(NB_ORACLES);
+
+        // Messages: 3 outcomes × 1 oracle × 1 message per outcome
+        let messages: Vec<Vec<Vec<_>>> = (0..NB_OUTCOMES)
+            .map(|outcome_idx| {
+                vec![
+                    // Single oracle
+                    vec![
+                        // Single message for this outcome
+                        {
+                            let message = &[outcome_idx as u8]; // Different message per outcome
+                            let hash = sha256::Hash::hash(message).to_byte_array();
+                            hash.to_vec()
+                        },
+                    ],
+                ]
+            })
+            .collect();
+
+        // Setup single oracle with single nonce
+        for i in 0..NB_ORACLES {
+            // Runs once
+            let oracle_kp = Keypair::new(&secp, &mut rng);
+            let oracle_pubkey = oracle_kp.x_only_public_key().0;
+            let mut nonces: Vec<XOnlyPublicKey> = Vec::with_capacity(NB_DIGITS);
+            let mut sk_nonces: Vec<[u8; 32]> = Vec::with_capacity(NB_DIGITS);
+            oracle_sigs.push(Vec::with_capacity(NB_DIGITS));
+
+            // Single nonce for enumeration
+            let mut sk_nonce = [0u8; 32];
+            rng.fill_bytes(&mut sk_nonce);
+            let oracle_r_kp = Keypair::from_seckey_slice(&secp, &sk_nonce).unwrap();
+            let nonce = XOnlyPublicKey::from_keypair(&oracle_r_kp).0;
+
+            // Sign the first outcome's message with the single nonce
+            let sig = secp_utils::schnorrsig_sign_with_nonce(
+                &secp,
+                &Message::from_digest_slice(&messages[0][0][0]).unwrap(), // First outcome, first oracle, first message
+                &oracle_kp,
+                &sk_nonce,
+            );
+
+            oracle_sigs[i].push(sig);
+            nonces.push(nonce);
+            sk_nonces.push(sk_nonce);
+
+            oracle_infos.push(OracleInfo {
+                public_key: oracle_pubkey.serialize().to_vec(),
+                nonces: nonces.iter().map(|n| n.serialize().to_vec()).collect(), // Just 1 nonce
+            });
+            oracle_sk_nonce.push(sk_nonces);
+            oracle_sks.push(oracle_kp);
+        }
+
+        let funding_script_pubkey = ddk_dlc::make_funding_redeemscript(
+            &PublicKey::from_slice(&offer_party_params.fund_pubkey.clone()).unwrap(),
+            &PublicKey::from_slice(&accept_party_params.fund_pubkey.clone()).unwrap(),
+        );
+        let fund_output_value = dlc_txs.fund.outputs[0].value;
+
+        // Create adaptor signatures
+        let cet_sigs = create_cet_adaptor_sigs_from_oracle_info(
+            cets.clone(),
+            oracle_infos.clone(),
+            offer_fund_sk.secret_bytes().to_vec(),
+            funding_script_pubkey.clone().into_bytes(),
+            fund_output_value,
+            messages.clone(),
+        )
+        .unwrap();
+
+        // Convert oracle signatures to the format expected by our function
+        let oracle_signatures = oracle_sigs
+            .iter()
+            .map(|s| s.iter().map(|s| s.serialize().to_vec()).collect::<Vec<_>>())
+            .collect::<Vec<_>>();
+
+        // Test our new function
+        let result = extract_ecdsa_signature_from_oracle_signatures(
+            oracle_signatures[0].clone(),
+            cet_sigs[0].signature.clone(),
+        );
+
+        assert!(result.is_ok(), "Function should succeed");
+
+        let ecdsa_sig_bytes = result.unwrap();
+        assert!(
+            !ecdsa_sig_bytes.is_empty(),
+            "Should return non-empty signature"
+        );
+
+        // Verify the signature is valid DER format
+        let ecdsa_sig = EcdsaSignature::from_der(&ecdsa_sig_bytes);
+        assert!(ecdsa_sig.is_ok(), "Should be valid DER signature");
     }
 }

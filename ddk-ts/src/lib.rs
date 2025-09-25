@@ -531,6 +531,27 @@ pub fn create_cet_adaptor_points_from_oracle_info(
 }
 
 #[napi]
+pub fn extract_ecdsa_signature_from_oracle_signatures(
+  oracle_signatures: Vec<Buffer>,
+  adaptor_signature: Buffer,
+) -> Result<Buffer> {
+  let ffi_oracle_signatures = oracle_signatures
+    .into_iter()
+    .map(|buffer| buffer_to_vec(&buffer))
+    .collect::<Vec<Vec<u8>>>();
+
+  let ffi_adaptor_signature = buffer_to_vec(&adaptor_signature);
+
+  let signature = ddk_ffi::extract_ecdsa_signature_from_oracle_signatures(
+    ffi_oracle_signatures,
+    ffi_adaptor_signature,
+  )
+  .map_err(|e| Error::from_reason(format!("{:?}", e)))?;
+
+  Ok(Buffer::from(signature))
+}
+
+#[napi]
 pub fn convert_mnemonic_to_seed(mnemonic: String, passphrase: Option<String>) -> Result<Buffer> {
   let result = ddk_ffi::convert_mnemonic_to_seed(mnemonic, passphrase)
     .map_err(|e| Error::from_reason(format!("{:?}", e)))?;
