@@ -267,9 +267,8 @@ checksum = "c3e64b0cc0439b12df2fa678eae89a1c56a529fd067a9115f7827f1fffd22b32"
 
 [[package]]
 name = "ddk-dlc"
-version = "1.0.9"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b2730518f3d2166431d2cfb5c9a158063b68d49b875a115468b150e175f76b80"
+version = "1.0.11"
+source = "git+https://github.com/matthewjablack/dlcdevkit.git?branch=feat%2Frefund-payout-override#6b7bed79e6379f1e5ff2e7e334b522118480159f"
 dependencies = [
  "bitcoin",
  "miniscript",
@@ -280,7 +279,7 @@ dependencies = [
 
 [[package]]
 name = "ddk_ffi"
-version = "0.3.35"
+version = "0.3.38"
 dependencies = [
  "bip39",
  "bitcoin",

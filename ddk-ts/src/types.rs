@@ -70,6 +70,7 @@ pub struct PartyParams {
   pub input_amount: BigInt,
   pub collateral: BigInt,
   pub dlc_inputs: Vec<DlcInputInfo>,
+  pub refund_payout: Option<BigInt>,
 }
 
 // Container for all DLC transactions - matches UDL exactly

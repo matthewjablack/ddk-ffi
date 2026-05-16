@@ -194,6 +194,12 @@ impl TryFrom<PartyParams> for ddk_ffi::PartyParams {
       .map(TryInto::try_into)
       .collect();
 
+    let refund_payout = params
+      .refund_payout
+      .as_ref()
+      .map(bigint_to_u64)
+      .transpose()?;
+
     Ok(ddk_ffi::PartyParams {
       fund_pubkey: params.fund_pubkey.to_vec(),
       change_script_pubkey: params.change_script_pubkey.to_vec(),
@@ -204,6 +210,7 @@ impl TryFrom<PartyParams> for ddk_ffi::PartyParams {
       input_amount: bigint_to_u64(&params.input_amount)?,
       collateral: bigint_to_u64(&params.collateral)?,
       dlc_inputs: dlc_inputs?,
+      refund_payout,
     })
   }
 }
@@ -221,6 +228,7 @@ impl From<ddk_ffi::PartyParams> for PartyParams {
       input_amount: BigInt::from(params.input_amount),
       collateral: BigInt::from(params.collateral),
       dlc_inputs: params.dlc_inputs.into_iter().map(Into::into).collect(),
+      refund_payout: params.refund_payout.map(BigInt::from),
     }
   }
 }

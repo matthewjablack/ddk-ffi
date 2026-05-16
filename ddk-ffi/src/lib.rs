@@ -164,6 +164,7 @@ pub struct PartyParams {
     pub input_amount: u64,
     pub collateral: u64,
     pub dlc_inputs: Vec<DlcInputInfo>,
+    pub refund_payout: Option<u64>,
 }
 
 #[derive(Clone)]
@@ -348,6 +349,7 @@ pub fn party_params_to_rust(params: &PartyParams) -> Result<DlcPartyParams, DLCE
         dlc_inputs: dlc_inputs?,
         input_amount: Amount::from_sat(params.input_amount),
         collateral: Amount::from_sat(params.collateral),
+        refund_payout: params.refund_payout.map(Amount::from_sat),
     })
 }
 
@@ -1523,6 +1525,7 @@ mod tests {
             input_amount,
             collateral,
             dlc_inputs: vec![],
+            refund_payout: None,
         }
     }
 
@@ -1912,6 +1915,7 @@ mod tests {
                     serial_id,
                 }],
                 dlc_inputs: vec![],
+                refund_payout: None,
             },
             fund_privkey,
         )

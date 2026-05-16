@@ -291,6 +291,7 @@ dictionary PartyParams {
     u64 input_amount;
     u64 collateral;
     sequence<DlcInputInfo> dlc_inputs;
+    u64? refund_payout;
 };
 
 dictionary DlcInputInfo {
