@@ -49,23 +49,13 @@ pub fn create_dlc_transactions(
   fund_lock_time: u32,
   cet_lock_time: u32,
   fund_output_serial_id: BigInt,
+  contract_flags: u8,
 ) -> Result<DlcTransactions> {
-  // log_to_console(env, "create_dlc_transactions: parsing inputs")
-  //   .map_err(|e| Error::from_reason(format!("{:?}", e)))?;
-
   let ffi_outcomes: Result<Vec<ddk_ffi::Payout>> =
     outcomes.into_iter().map(TryInto::try_into).collect();
 
   let ffi_local_params = local_params.try_into()?;
   let ffi_remote_params = remote_params.try_into()?;
-  // log_to_console(env, "create_dlc_transactions: inputs parsed correctly")
-  //   .map_err(|e| Error::from_reason(format!("{:?}", e)))?;
-
-  // log_to_console(
-  //   env,
-  //   "create_dlc_transactions: calling ddk_ffi::create_dlc_transactions with inputs",
-  // )
-  // .map_err(|e| Error::from_reason(format!("{:?}", e)))?;
 
   let result = ddk_ffi::create_dlc_transactions(
     ffi_outcomes?,
@@ -76,14 +66,9 @@ pub fn create_dlc_transactions(
     fund_lock_time,
     cet_lock_time,
     bigint_to_u64(&fund_output_serial_id)?,
+    contract_flags,
   )
-  .map_err(|e| {
-    // let _ = log_to_console(
-    //   env,
-    //   &format!("ddk_ffi::create_dlc_transactions: error: {:?}", e),
-    // );
-    Error::from_reason(format!("{:?}", e))
-  })?;
+  .map_err(|e| Error::from_reason(format!("{:?}", e)))?;
 
   Ok(result.into())
 }
@@ -98,6 +83,7 @@ pub fn create_spliced_dlc_transactions(
   fund_lock_time: u32,
   cet_lock_time: u32,
   fund_output_serial_id: BigInt,
+  contract_flags: u8,
 ) -> Result<DlcTransactions> {
   let ffi_outcomes: Result<Vec<ddk_ffi::Payout>> =
     outcomes.into_iter().map(TryInto::try_into).collect();
@@ -114,6 +100,7 @@ pub fn create_spliced_dlc_transactions(
     fund_lock_time,
     cet_lock_time,
     bigint_to_u64(&fund_output_serial_id)?,
+    contract_flags,
   )
   .map_err(|e| Error::from_reason(format!("{:?}", e)))?;
 

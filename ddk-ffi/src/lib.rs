@@ -385,6 +385,7 @@ pub fn create_dlc_transactions(
     fund_lock_time: u32,
     cet_lock_time: u32,
     fund_output_serial_id: u64,
+    contract_flags: u8,
 ) -> Result<DlcTransactions, DLCError> {
     // Convert UniFFI types to rust-dlc types
     let rust_local_params = party_params_to_rust(&local_params)?;
@@ -409,6 +410,7 @@ pub fn create_dlc_transactions(
         fund_lock_time,
         cet_lock_time,
         fund_output_serial_id,
+        contract_flags,
     )
     .map_err(DLCError::from)?;
 
@@ -426,6 +428,7 @@ pub fn create_spliced_dlc_transactions(
     fund_lock_time: u32,
     cet_lock_time: u32,
     fund_output_serial_id: u64,
+    contract_flags: u8,
 ) -> Result<DlcTransactions, DLCError> {
     // Convert UniFFI types to rust-dlc types
     let rust_local_params = party_params_to_rust(&local_params)?;
@@ -450,6 +453,7 @@ pub fn create_spliced_dlc_transactions(
         fund_lock_time,
         cet_lock_time,
         fund_output_serial_id,
+        contract_flags,
     )
     .map_err(DLCError::from)?;
 
@@ -1665,6 +1669,7 @@ mod tests {
             10,  // fund lock time
             10,  // cet lock time
             0,   // fund output serial id
+            0,   // contract flags
         );
 
         assert!(result.is_ok());
@@ -1993,6 +1998,7 @@ mod tests {
             10,
             10,
             0,
+            0,
         )
         .unwrap();
 
@@ -2151,7 +2157,8 @@ mod tests {
             4,
             10,
             10,
-            0, // Add missing fund_output_serial_id parameter
+            0,
+            0,
         )
         .unwrap();
 
@@ -2276,6 +2283,7 @@ mod tests {
             10,
             10,
             0,
+            0,
         )
         .unwrap();
 
@@ -2333,6 +2341,7 @@ mod tests {
             4,
             10,
             10,
+            0,
             0,
         )
         .unwrap();
@@ -2465,6 +2474,7 @@ mod tests {
             4,
             10,
             10,
+            0,
             0,
         )
         .unwrap();

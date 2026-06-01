@@ -43,9 +43,10 @@ namespace ddk_ffi {
         u64 fee_rate,
         u32 fund_lock_time,
         u32 cet_lock_time,
-        u64 fund_output_serial_id
+        u64 fund_output_serial_id,
+        u8 contract_flags
     );
-    
+
     [Throws=DLCError]
     DlcTransactions create_spliced_dlc_transactions(
         sequence<Payout> outcomes,
@@ -55,7 +56,8 @@ namespace ddk_ffi {
         u64 fee_rate,
         u32 fund_lock_time,
         u32 cet_lock_time,
-        u64 fund_output_serial_id
+        u64 fund_output_serial_id,
+        u8 contract_flags
     );
     
     [Throws=DLCError]
