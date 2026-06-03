@@ -21,8 +21,7 @@
     "binaryName": "ddk-ts",
     "packageName": "@bennyblader/ddk-ts",
     "targets": [
-      "aarch64-apple-darwin",
-      "x86_64-unknown-linux-gnu"
+      "aarch64-apple-darwin"
     ]
   },
   "engines": {
@@ -79,7 +78,6 @@
   ],
   "packageManager": "pnpm@10.14.0",
   "optionalDependencies": {
-    "@bennyblader/ddk-ts-darwin-arm64": "0.3.35",
-    "@bennyblader/ddk-ts-linux-x64-gnu": "0.3.35"
+    "@bennyblader/ddk-ts-darwin-arm64": "0.3.35"
   }
 }

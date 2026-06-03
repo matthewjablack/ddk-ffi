@@ -8,6 +8,10 @@ const { applyHotFix } = require("../ddk-rn/scripts/apply-hotfix.js");
 // Parse command line arguments
 const args = process.argv.slice(2);
 const version = args[0];
+// Apple-only by default. Opt into the Linux x64 build with --build-linux or
+// BUILD_LINUX=1 (requires the x86_64-unknown-linux-gnu target + cross linker,
+// and re-adding the Linux target/optionalDependency in ddk-ts/package.json).
+const buildLinux = args.includes("--build-linux") || process.env.BUILD_LINUX === "1";
 
 if (!version || args.includes("--help") || args.includes("-h")) {
   console.log(`
@@ -105,6 +109,32 @@ function checkGitStatus() {
   }
 
   console.log("✅ Git working directory is clean\n");
+}
+
+// Step 1b: Verify auth up front so we never leave a half-release
+// (git tag + GitHub release pushed but npm publish failing on auth).
+function checkAuth() {
+  console.log("🔐 Checking publish credentials...");
+
+  try {
+    runCommand("npm whoami", projectRoot, { silent: true });
+  } catch (error) {
+    console.error(
+      "❌ Not authenticated with npm. Run `npm login` before releasing."
+    );
+    process.exit(1);
+  }
+
+  try {
+    runCommand("gh auth status", projectRoot, { silent: true });
+  } catch (error) {
+    console.error(
+      "❌ Not authenticated with GitHub CLI. Run `gh auth login` before releasing."
+    );
+    process.exit(1);
+  }
+
+  console.log("✅ npm and GitHub CLI authenticated\n");
 }
 
 // Step 2: Run all tests
@@ -226,9 +256,13 @@ function generateTypeScriptBindings() {
       description: "Building for Darwin ARM64",
     });
 
-    runCommand("pnpm build:linux-x64", ddkTsRoot, {
-      description: "Building for Linux x64",
-    });
+    if (buildLinux) {
+      runCommand("pnpm build:linux-x64", ddkTsRoot, {
+        description: "Building for Linux x64",
+      });
+    } else {
+      console.log("   ⚠️  Skipping Linux x64 build (Apple-only; pass --build-linux to enable)");
+    }
   }
 
   // Build for current platform as fallback
@@ -236,10 +270,11 @@ function generateTypeScriptBindings() {
     description: "Building for current platform",
   });
 
-  // Run prepublish to update optionalDependencies versions
-  runCommand("pnpm prepublish", ddkTsRoot, {
-    description: "Running napi prepublish to update optionalDependencies",
-  });
+  // NOTE: Do NOT call `napi prepublish` here. It is wired as the
+  // `prepublishOnly` lifecycle script in ddk-ts/package.json, so it runs
+  // automatically during `npm publish` (see publishNpmPackages). Calling it
+  // explicitly here would publish the platform sub-packages a second time and
+  // fail with EPUBLISHCONFLICT.
 
   console.log();
 }
@@ -535,6 +570,7 @@ async function main() {
   try {
     // Pre-flight checks
     checkGitStatus();
+    checkAuth();
 
     // Build and test
     runTests();
