@@ -1,6 +1,6 @@
 {
   "name": "@bennyblader/ddk-ts",
-  "version": "0.3.41",
+  "version": "0.3.42",
   "description": "dlcdevkit typescript bindings",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -79,7 +79,7 @@
   ],
   "packageManager": "pnpm@10.14.0",
   "optionalDependencies": {
-    "@bennyblader/ddk-ts-darwin-arm64": "0.3.40",
-    "@bennyblader/ddk-ts-linux-x64-gnu": "0.3.40"
+    "@bennyblader/ddk-ts-darwin-arm64": "0.3.42",
+    "@bennyblader/ddk-ts-linux-x64-gnu": "0.3.42"
   }
 }
