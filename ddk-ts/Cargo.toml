@@ -14,7 +14,7 @@ path = "src/lib.rs"
 ddk_ffi = { path = "../ddk-ffi" }
 
 # NAPI-RS dependencies
-napi = { version = "3.0.0", default-features = false, features = ["napi8", "async", "serde-json"] }
+napi = { version = "3.0.0", default-features = false, features = ["napi8", "serde-json"] }
 napi-derive = "3.0.0"
 
 # Match the same dependencies as ddk-ffi
