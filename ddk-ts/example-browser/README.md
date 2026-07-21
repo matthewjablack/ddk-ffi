@@ -26,8 +26,8 @@ pnpm build && pnpm preview
 Open the page — you should see:
 
 ```
-ddk-ts version: 0.3.42
-✅ WASM loaded. ddk-ts version() -> 0.3.42
+ddk-ts version: 0.3.43
+✅ WASM loaded. ddk-ts version() -> 0.3.43
    crossOriginIsolated: true
 ```
 
